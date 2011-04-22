@@ -16,8 +16,6 @@ import android.os.RemoteException;
 import android.util.Log;
 import android.widget.SimpleAdapter;
 import de.uniluebeck.itm.mdcf.PluginConfiguration;
-import de.uniluebeck.itm.mdcf.PluginService;
-import de.uniluebeck.itm.mdcf.PluginServiceListener;
 
 public class MobileDataCollector extends ListActivity implements ServiceConnection {
 	
@@ -31,15 +29,15 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 	
 	private List<Map<String, String>> plugins = new ArrayList<Map<String, String>>();
 	
-	private PluginServiceListener.Stub pluginListener;
+	private PluginServiceListener pluginListener;
 	
 	private PluginService service;
 	
 	public MobileDataCollector() {
-		pluginListener = new PluginServiceListener.Stub() {
+		pluginListener = new PluginServiceListener() {
 			
 			@Override
-			public void onRegistered(final PluginConfiguration plugin) throws RemoteException {
+			public void onRegistered(final PluginConfiguration plugin) {
 				runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
@@ -94,8 +92,8 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     }
 
 	@Override
-	public void onServiceConnected(ComponentName paramComponentName, IBinder paramIBinder) {
-		service = PluginService.Stub.asInterface(paramIBinder);
+	public void onServiceConnected(ComponentName paramComponentName, IBinder binder) {
+		service = ((PluginService.PluginServiceBinder) binder).getService();
 		try {
 			service.addListener(pluginListener);
 		} catch (RemoteException e) {

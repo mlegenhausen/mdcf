@@ -18,7 +18,7 @@ public class BootCompleteBroadcastReceiver extends BroadcastReceiver {
 	
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		ComponentName comp = new ComponentName(context.getPackageName(), PluginServiceManager.class.getName());
+		ComponentName comp = new ComponentName(context.getPackageName(), PluginService.class.getName());
 		ComponentName service = context.startService(new Intent().setComponent(comp));
 		if (service == null) {
 			Log.e(TAG, "Could not start service " + comp.toString());
