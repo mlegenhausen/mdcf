@@ -80,6 +80,7 @@ public class PluginService extends Service {
 		super.onDestroy();
 		pluginTimer.cancel();
 		stopForeground(true);
+		initialized = false;
 		Log.i(LOG_TAG, "MobileDataCollectorService destroyed");
 	}
 	
