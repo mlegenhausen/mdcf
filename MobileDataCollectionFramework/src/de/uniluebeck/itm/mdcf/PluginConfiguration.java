@@ -67,7 +67,7 @@ public class PluginConfiguration implements Parcelable {
 	@Override
 	public boolean equals(Object o) {
 		if (o instanceof PluginConfiguration) {
-			return name.equals(((PluginConfiguration) o).getName());
+			return action.equals(((PluginConfiguration) o).getAction());
 		}
 		return super.equals(o);
 	}
