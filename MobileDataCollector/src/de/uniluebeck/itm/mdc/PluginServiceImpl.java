@@ -28,13 +28,12 @@ public class PluginServiceImpl extends PluginService.Stub {
 		this.context = context;
 	}
 	
-	@Override
 	public void register(final PluginConfiguration plugin) throws RemoteException {
 		if (!plugins.contains(plugin)) {
 			plugins.add(plugin);
 			notifyRegistered(plugin);
 			schedulePlugin(plugin);
-			Log.i(TAG_LOG, "Service registered: " + plugin);
+			Log.i(TAG_LOG, "Service registered: " + plugin.getAction());
 		}
 	}
 	
