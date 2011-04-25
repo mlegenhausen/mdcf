@@ -57,7 +57,7 @@ public class PluginService extends Service implements PluginTaskListener {
 	}
 	
 	private void initService() {		
-		Notification notification = Notifications.createNotification(this, "Mobile Data Collector started", "Collecting Data");
+		Notification notification = Notifications.createNotification(this, "Mobile Data Collector started", "Waiting for next task...");
 		startForeground(R.string.foreground_service, notification);
 		Log.i(LOG_TAG, "Sending broadcast");
 		sendBroadcast(new Intent(PluginIntent.PLUGIN_ACTION));
@@ -150,6 +150,15 @@ public class PluginService extends Service implements PluginTaskListener {
 		PluginConfiguration configuration = event.getConfiguration();
 		String title = configuration.getName() + " is starting";
 		String ticker = configuration.getName() + " is collecting data...";
+		Notification notification = Notifications.createNotification(this, title, ticker);
+		notificationManager.notify(R.string.foreground_service, notification);
+	}
+
+	@Override
+	public void onStop(PluginTaskEvent event) {
+		PluginConfiguration configuration = event.getConfiguration();
+		String title = configuration.getName() + " is stopping";
+		String ticker = configuration.getName() + " has stopped collecting data...";
 		Notification notification = Notifications.createNotification(this, title, ticker);
 		notificationManager.notify(R.string.foreground_service, notification);
 	}

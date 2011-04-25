@@ -44,6 +44,8 @@ public class PluginTask extends TimerTask implements ServiceConnection {
 			plugin.init();
 			notifyPluginStart();
 			plugin.start();
+			notifyPluginStop();
+			plugin.stop();
 		} catch (RemoteException e) {
 			Log.e(LOG_TAG, "Unable to call proceed.", e);
 		}
@@ -55,9 +57,15 @@ public class PluginTask extends TimerTask implements ServiceConnection {
 		Log.i(LOG_TAG, "Service disconnected");
 	}
 	
-	public void notifyPluginStart() {
+	private void notifyPluginStart() {
 		for (PluginTaskListener listener : listeners.toArray(new PluginTaskListener[0])) {
 			listener.onStart(new PluginTaskEvent(this, configuration));
+		}
+	}
+	
+	private void notifyPluginStop() {
+		for (PluginTaskListener listener : listeners.toArray(new PluginTaskListener[0])) {
+			listener.onStop(new PluginTaskEvent(this, configuration));
 		}
 	}
 	
