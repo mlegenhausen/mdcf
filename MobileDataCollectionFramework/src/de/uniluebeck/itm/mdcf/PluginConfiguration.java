@@ -19,6 +19,14 @@ public class PluginConfiguration implements Parcelable {
     
     private String action;
     
+    private String url;
+    
+    private int period;
+    
+    private int duration;
+    
+    private int[] sensorTypes = new int[0];
+    
     public PluginConfiguration() {
 		
 	}
@@ -41,11 +49,17 @@ public class PluginConfiguration implements Parcelable {
 	public void writeToParcel(Parcel parcel, int index) {
 		parcel.writeString(action);
 		parcel.writeString(name);
+		parcel.writeInt(period);
+		parcel.writeInt(duration);
+		parcel.writeIntArray(sensorTypes);
 	}
 	
 	public void readFromParcel(Parcel parcel) {
 		action = parcel.readString();
 		name = parcel.readString();
+		period = parcel.readInt();
+		duration = parcel.readInt();
+		parcel.readIntArray(sensorTypes);
 	}
 
 	public String getName() {
@@ -64,6 +78,38 @@ public class PluginConfiguration implements Parcelable {
 		this.action = action;
 	}
 	
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public int getPeriod() {
+		return period;
+	}
+
+	public void setPeriod(int period) {
+		this.period = period;
+	}
+
+	public int getDuration() {
+		return duration;
+	}
+
+	public void setDuration(int duration) {
+		this.duration = duration;
+	}
+
+	public int[] getSensorTypes() {
+		return sensorTypes;
+	}
+
+	public void setSensorTypes(int[] sensorTypes) {
+		this.sensorTypes = sensorTypes;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (o instanceof PluginConfiguration) {

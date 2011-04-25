@@ -5,16 +5,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import android.app.Dialog;
 import android.app.ListActivity;
+import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.RemoteException;
 import android.util.Log;
 import android.widget.SimpleAdapter;
+import de.uniluebeck.itm.mdc.service.PluginService;
+import de.uniluebeck.itm.mdc.service.PluginServiceEvent;
+import de.uniluebeck.itm.mdc.service.PluginServiceListener;
 import de.uniluebeck.itm.mdcf.PluginConfiguration;
 
 public class MobileDataCollector extends ListActivity implements ServiceConnection {
@@ -24,6 +28,8 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 	public static final String SERVICE = "de.uniluebeck.itm.mdc.SERVICE";
 	
 	private	static final String KEY_PLUGIN = "plugin";
+	
+	private static final int DIALOG_PLUGIN_LOADING = 1;
 	
 	private SimpleAdapter listAdapter;
 	
@@ -37,7 +43,17 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 		pluginListener = new PluginServiceListener() {
 			
 			@Override
-			public void onRegistered(final PluginConfiguration plugin) {
+			public void onRegistered(final PluginServiceEvent event) {
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						loadPlugins();
+					}
+				});
+			}
+			
+			@Override
+			public void onUnregistered(PluginServiceEvent event) {
 				runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
@@ -49,17 +65,14 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 	}
 	
 	private void loadPlugins() {
+		showDialog(DIALOG_PLUGIN_LOADING);
 		this.plugins.clear();
-		List<PluginConfiguration> plugins = new ArrayList<PluginConfiguration>(0);
-		try {
-			plugins = service.getPlugins();
-		} catch (RemoteException e) {
-			Log.e(LOG_TAG, "Unable to load Plugins.", e);
-		}
+		List<PluginConfiguration> plugins = service.getPlugins();
 		for (final PluginConfiguration plugin : plugins) {
 			addPlugin(plugin);
 		}
 		listAdapter.notifyDataSetChanged();
+		dismissDialog(DIALOG_PLUGIN_LOADING);
 	}
 	
 	private void addPlugin(PluginConfiguration plugin) {
@@ -82,7 +95,7 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     	super.onStart();
     	Log.i(LOG_TAG, "Bind Service");
     	startService(new Intent(SERVICE));
-    	bindService(new Intent(SERVICE), this, Context.BIND_DEBUG_UNBIND);
+    	bindService(new Intent(SERVICE), this, Context.BIND_AUTO_CREATE);
     }
     
     @Override
@@ -90,23 +103,27 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     	super.onDestroy();
     	unbindService(this);
     }
+    
+    @Override
+    protected Dialog onCreateDialog(int id) {
+    	Dialog dialog = null;
+    	switch (id) {
+    	case DIALOG_PLUGIN_LOADING:
+    		dialog = ProgressDialog.show(MobileDataCollector.this, "", "Loading. Please wait...", true);
+    		break;
+    	}
+    	return dialog;
+    }
 
 	@Override
 	public void onServiceConnected(ComponentName paramComponentName, IBinder binder) {
 		service = ((PluginService.PluginServiceBinder) binder).getService();
-		try {
-			service.addListener(pluginListener);
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
+		service.addListener(pluginListener);
+		loadPlugins();
 	}
 
 	@Override
 	public void onServiceDisconnected(ComponentName paramComponentName) {
-		try {
-			service.removeListener(pluginListener);
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
+		service.removeListener(pluginListener);
 	}
 }

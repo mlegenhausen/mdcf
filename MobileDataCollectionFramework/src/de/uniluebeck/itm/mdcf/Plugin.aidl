@@ -2,5 +2,13 @@ package de.uniluebeck.itm.mdcf;
 
 interface Plugin {
 	
-	String proceed();
+	void init();
+	
+	void start();
+	
+	void pause();
+	
+	void resume();
+	
+	void stop();
 }

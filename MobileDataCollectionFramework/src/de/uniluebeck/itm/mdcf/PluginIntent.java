@@ -8,6 +8,8 @@ public class PluginIntent extends Intent {
 	
 	public static final String PLUGIN_REGISTER = "de.uniluebeck.itm.mdc.PLUGIN_REGISTER";
 	
+	public static final String PLUGIN_UNREGISTER = "de.uniluebeck.itm.mdc.PLUGIN_UNREGISTER";
+	
 	public static final String PLUGIN_CONFIGURATION = "de.uniluebeck.itm.mdc.PLUGIN_CONFIGURATION";
 
 	public PluginIntent(final PluginConfiguration configuration) {

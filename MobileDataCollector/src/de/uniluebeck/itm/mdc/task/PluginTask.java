@@ -1,5 +1,7 @@
-package de.uniluebeck.itm.mdc;
+package de.uniluebeck.itm.mdc.task;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.TimerTask;
 
 import android.content.ComponentName;
@@ -10,25 +12,28 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 import de.uniluebeck.itm.mdcf.Plugin;
+import de.uniluebeck.itm.mdcf.PluginConfiguration;
 
 public class PluginTask extends TimerTask implements ServiceConnection {
 	
+	private final List<PluginTaskListener> listeners = new ArrayList<PluginTaskListener>();
+
 	private final String LOG_TAG = "Plugin Task";
 
 	private final Context context;
 	
-	private final Intent pluginIntent;
+	private final PluginConfiguration configuration;
 	
 	private Plugin plugin;
 	
-	public PluginTask(final Context context, final Intent pluginIntent) {
+	public PluginTask(final Context context, final PluginConfiguration configuration) {
 		this.context = context;
-		this.pluginIntent = pluginIntent;
+		this.configuration = configuration;
 	}
 	
 	@Override
 	public void run() {
-		context.bindService(pluginIntent, this, Context.BIND_AUTO_CREATE);
+		context.bindService(new Intent(configuration.getAction()), this, Context.BIND_AUTO_CREATE);
 	}
 
 	@Override
@@ -36,7 +41,9 @@ public class PluginTask extends TimerTask implements ServiceConnection {
 		Log.i(LOG_TAG, "Service connected");
 		plugin = Plugin.Stub.asInterface(binder);
 		try {
-			Log.i(LOG_TAG, "Proceed: " + plugin.proceed());
+			plugin.init();
+			notifyPluginStart();
+			plugin.start();
 		} catch (RemoteException e) {
 			Log.e(LOG_TAG, "Unable to call proceed.", e);
 		}
@@ -46,5 +53,19 @@ public class PluginTask extends TimerTask implements ServiceConnection {
 	@Override
 	public void onServiceDisconnected(ComponentName paramComponentName) {
 		Log.i(LOG_TAG, "Service disconnected");
+	}
+	
+	public void notifyPluginStart() {
+		for (PluginTaskListener listener : listeners.toArray(new PluginTaskListener[0])) {
+			listener.onStart(new PluginTaskEvent(this, configuration));
+		}
+	}
+	
+	public void addListener(PluginTaskListener listener) {
+		listeners.add(listener);
+	}
+	
+	public void removeListener(PluginTaskListener listener) {
+		listeners.remove(listener);
 	}
 }

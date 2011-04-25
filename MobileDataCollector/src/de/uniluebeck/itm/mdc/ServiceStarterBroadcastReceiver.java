@@ -1,5 +1,6 @@
 package de.uniluebeck.itm.mdc;
 
+import de.uniluebeck.itm.mdc.service.PluginService;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -12,7 +13,7 @@ import android.util.Log;
  * 
  * @author Malte Legenhausen
  */
-public class BootCompleteBroadcastReceiver extends BroadcastReceiver {
+public class ServiceStarterBroadcastReceiver extends BroadcastReceiver {
 
 	private static final String TAG = "MobileDataCollectorServiceManager";
 	
