@@ -13,6 +13,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 import de.uniluebeck.itm.mdc.R;
+import de.uniluebeck.itm.mdc.service.PluginConfiguration.Mode;
 import de.uniluebeck.itm.mdc.task.PluginTask;
 import de.uniluebeck.itm.mdc.task.PluginTaskEvent;
 import de.uniluebeck.itm.mdc.task.PluginTaskListener;
@@ -32,7 +33,7 @@ public class PluginService extends Service implements PluginTaskListener {
 	
 	private final List<PluginServiceListener> listeners = new ArrayList<PluginServiceListener>();
 	
-	private final List<PluginInfo> plugins = new ArrayList<PluginInfo>();
+	private final List<PluginConfiguration> plugins = new ArrayList<PluginConfiguration>();
 	
 	private final Timer pluginTimer = new Timer();
 	
@@ -68,16 +69,17 @@ public class PluginService extends Service implements PluginTaskListener {
 		if (PluginIntent.PLUGIN_REGISTER.equals(action)) {
 			Log.i(LOG_TAG, "Plugin " + action + " wants to register");
 			if (intent.hasExtra(PluginIntent.PLUGIN_CONFIGURATION)) {
-				final PluginInfo configuration = intent.getParcelableExtra(PluginIntent.PLUGIN_CONFIGURATION);
-				register(configuration);
+				final PluginInfo info = intent.getParcelableExtra(PluginIntent.PLUGIN_CONFIGURATION);
+				register(new PluginConfiguration(info));
 			} else {
 				Log.e(LOG_TAG, "Plugin " + action + " has no configuration");
 			}
 		} else if (PluginIntent.PLUGIN_UNREGISTER.equals(action)) {
 			Log.i(LOG_TAG, "Plugin " + action + " wants to unregister");
 			if (intent.hasExtra(PluginIntent.PLUGIN_CONFIGURATION)) {
-				final PluginInfo configuration = intent.getParcelableExtra(PluginIntent.PLUGIN_CONFIGURATION);
-				unregister(configuration);
+				final PluginInfo info = intent.getParcelableExtra(PluginIntent.PLUGIN_CONFIGURATION);
+				// TODO: adjust data structure to find a configuration by his info.
+				unregister(new PluginConfiguration(info));
 			} else {
 				Log.e(LOG_TAG, "Plugin " + action + " has no configuration");
 			}
@@ -98,41 +100,42 @@ public class PluginService extends Service implements PluginTaskListener {
 		return binder;
 	}
 	
-	private void register(final PluginInfo plugin) {
+	private void register(final PluginConfiguration plugin) {
 		if (!plugins.contains(plugin)) {
 			plugins.add(plugin);
 			notifyRegistered(plugin);
-			Log.i(LOG_TAG, "Service registered: " + plugin.getAction());
+			Log.i(LOG_TAG, "Service registered: " + plugin.getPluginInfo().getAction());
 		}
 	}
 	
-	private void unregister(final PluginInfo plugin) {
+	private void unregister(final PluginConfiguration plugin) {
 		if (plugins.contains(plugin)) {
 			plugins.remove(plugin);
 			notifyUnregistered(plugin);
-			Log.i(LOG_TAG, "Service unregistered: " + plugin.getAction());
+			Log.i(LOG_TAG, "Service unregistered: " + plugin.getPluginInfo().getAction());
 		}
 	}
 	
-	private void notifyRegistered(PluginInfo configuration) {
+	private void notifyRegistered(PluginConfiguration configuration) {
 		for (final PluginServiceListener listener : listeners.toArray(new PluginServiceListener[0])) {
 			listener.onRegistered(new PluginServiceEvent(this, configuration));
 		}
 	}
 	
-	private void notifyUnregistered(PluginInfo configuration) {
+	private void notifyUnregistered(PluginConfiguration configuration) {
 		for (final PluginServiceListener listener : listeners.toArray(new PluginServiceListener[0])) {
 			listener.onRegistered(new PluginServiceEvent(this, configuration));
 		}
 	}
 	
-	private void schedulePlugin(PluginInfo plugin) {
+	private void schedulePlugin(PluginConfiguration plugin) {
 		PluginTask task = new PluginTask(this, plugin);
 		task.addListener(this);
 		pluginTimer.schedule(task, 0, 300000);
 	}
 	
-	public void activate(PluginInfo plugin) {
+	public void activate(PluginConfiguration plugin) {
+		plugin.setMode(Mode.ACTIVATED);
 		schedulePlugin(plugin);
 	}
 	
@@ -144,24 +147,26 @@ public class PluginService extends Service implements PluginTaskListener {
 		listeners.remove(listener);
 	}
 
-	public List<PluginInfo> getPlugins() {
+	public List<PluginConfiguration> getPlugins() {
 		return plugins;
 	}
 
 	@Override
 	public void onStart(PluginTaskEvent event) {
-		PluginInfo configuration = event.getConfiguration();
-		String title = configuration.getName() + " is starting";
-		String ticker = configuration.getName() + " is collecting data...";
+		PluginConfiguration configuration = event.getConfiguration();
+		PluginInfo info = configuration.getPluginInfo();
+		String title = info.getName() + " is starting";
+		String ticker = info.getName() + " is collecting data...";
 		Notification notification = Notifications.createNotification(this, title, ticker);
 		notificationManager.notify(R.string.foreground_service, notification);
 	}
 
 	@Override
 	public void onStop(PluginTaskEvent event) {
-		PluginInfo configuration = event.getConfiguration();
-		String title = configuration.getName() + " is stopping";
-		String ticker = configuration.getName() + " has stopped collecting data...";
+		PluginConfiguration configuration = event.getConfiguration();
+		PluginInfo info = configuration.getPluginInfo();
+		String title = info.getName() + " is stopping";
+		String ticker = info.getName() + " has stopped collecting data...";
 		Notification notification = Notifications.createNotification(this, title, ticker);
 		notificationManager.notify(R.string.foreground_service, notification);
 	}

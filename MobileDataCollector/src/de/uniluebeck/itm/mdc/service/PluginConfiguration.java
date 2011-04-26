@@ -9,14 +9,18 @@ public class PluginConfiguration {
 	}
 	
 	public enum State {
-		WAITING, RUNNING, STOPPING
+		RESOLVED, WAITING, RUNNING, STOPPING
 	}
 	
 	private PluginInfo pluginInfo;
 	
-	private Mode mode;
+	private Mode mode = Mode.NEW;
 	
-	private State state;
+	private State state = State.RESOLVED;
+	
+	public PluginConfiguration(PluginInfo pluginInfo) {
+		this.pluginInfo = pluginInfo;
+	}
 
 	public PluginInfo getPluginInfo() {
 		return pluginInfo;

@@ -19,10 +19,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.SimpleAdapter;
+import de.uniluebeck.itm.mdc.service.PluginConfiguration;
 import de.uniluebeck.itm.mdc.service.PluginService;
 import de.uniluebeck.itm.mdc.service.PluginServiceEvent;
 import de.uniluebeck.itm.mdc.service.PluginServiceListener;
-import de.uniluebeck.itm.mdcf.PluginInfo;
 
 public class MobileDataCollector extends ListActivity implements ServiceConnection {
 	
@@ -36,7 +36,7 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 	
 	private SimpleAdapter listAdapter;
 	
-	private List<PluginInfo> plugins = new ArrayList<PluginInfo>();
+	private List<PluginConfiguration> plugins = new ArrayList<PluginConfiguration>();
 	
 	private List<Map<String, String>> pluginMappings = new ArrayList<Map<String, String>>();
 	
@@ -72,15 +72,15 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 	private void loadPlugins() {
 		pluginMappings.clear();
 		plugins = service.getPlugins();
-		for (final PluginInfo plugin : plugins) {
+		for (final PluginConfiguration plugin : plugins) {
 			addPlugin(plugin);
 		}
 		listAdapter.notifyDataSetChanged();
 	}
 	
-	private void addPlugin(PluginInfo plugin) {
+	private void addPlugin(PluginConfiguration plugin) {
 		final Map<String, String> map = new HashMap<String, String>();
-		map.put(KEY_PLUGIN, plugin.getName());
+		map.put(KEY_PLUGIN, plugin.getPluginInfo().getName());
 		pluginMappings.add(map);
 	}
 	

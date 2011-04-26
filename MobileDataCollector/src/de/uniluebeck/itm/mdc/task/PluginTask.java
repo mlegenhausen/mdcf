@@ -11,8 +11,8 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
+import de.uniluebeck.itm.mdc.service.PluginConfiguration;
 import de.uniluebeck.itm.mdcf.Plugin;
-import de.uniluebeck.itm.mdcf.PluginInfo;
 
 public class PluginTask extends TimerTask implements ServiceConnection {
 	
@@ -22,18 +22,18 @@ public class PluginTask extends TimerTask implements ServiceConnection {
 
 	private final Context context;
 	
-	private final PluginInfo configuration;
+	private final PluginConfiguration configuration;
 	
 	private Plugin plugin;
 	
-	public PluginTask(final Context context, final PluginInfo configuration) {
+	public PluginTask(final Context context, final PluginConfiguration configuration) {
 		this.context = context;
 		this.configuration = configuration;
 	}
 	
 	@Override
 	public void run() {
-		context.bindService(new Intent(configuration.getAction()), this, Context.BIND_AUTO_CREATE);
+		context.bindService(new Intent(configuration.getPluginInfo().getAction()), this, Context.BIND_AUTO_CREATE);
 	}
 
 	@Override
