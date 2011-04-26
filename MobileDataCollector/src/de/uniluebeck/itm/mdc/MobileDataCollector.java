@@ -5,9 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import android.app.Dialog;
 import android.app.ListActivity;
-import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -15,11 +13,16 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.SimpleAdapter;
 import de.uniluebeck.itm.mdc.service.PluginService;
 import de.uniluebeck.itm.mdc.service.PluginServiceEvent;
 import de.uniluebeck.itm.mdc.service.PluginServiceListener;
-import de.uniluebeck.itm.mdcf.PluginConfiguration;
+import de.uniluebeck.itm.mdcf.PluginInfo;
 
 public class MobileDataCollector extends ListActivity implements ServiceConnection {
 	
@@ -29,11 +32,13 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 	
 	private	static final String KEY_PLUGIN = "plugin";
 	
-	private static final int DIALOG_PLUGIN_LOADING = 1;
+	private static final int ACTIVATE_ID = 1;
 	
 	private SimpleAdapter listAdapter;
 	
-	private List<Map<String, String>> plugins = new ArrayList<Map<String, String>>();
+	private List<PluginInfo> plugins = new ArrayList<PluginInfo>();
+	
+	private List<Map<String, String>> pluginMappings = new ArrayList<Map<String, String>>();
 	
 	private PluginServiceListener pluginListener;
 	
@@ -65,29 +70,30 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 	}
 	
 	private void loadPlugins() {
-		showDialog(DIALOG_PLUGIN_LOADING);
-		this.plugins.clear();
-		List<PluginConfiguration> plugins = service.getPlugins();
-		for (final PluginConfiguration plugin : plugins) {
+		pluginMappings.clear();
+		plugins = service.getPlugins();
+		for (final PluginInfo plugin : plugins) {
 			addPlugin(plugin);
 		}
 		listAdapter.notifyDataSetChanged();
-		dismissDialog(DIALOG_PLUGIN_LOADING);
 	}
 	
-	private void addPlugin(PluginConfiguration plugin) {
+	private void addPlugin(PluginInfo plugin) {
 		final Map<String, String> map = new HashMap<String, String>();
 		map.put(KEY_PLUGIN, plugin.getName());
-		plugins.add(map);
+		pluginMappings.add(map);
 	}
 	
-    /** Called when the activity is first created. */
+    /**
+     * Called when the activity is first created. 
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        listAdapter = new SimpleAdapter(this, plugins, R.layout.services_row, new String[] { KEY_PLUGIN }, new int[] { R.id.plugin });
+        listAdapter = new SimpleAdapter(this, pluginMappings, R.layout.services_row, new String[] { KEY_PLUGIN }, new int[] { R.id.plugin });
         setListAdapter(listAdapter);
+        registerForContextMenu(getListView());
     }
     
     @Override
@@ -105,14 +111,20 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     }
     
     @Override
-    protected Dialog onCreateDialog(int id) {
-    	Dialog dialog = null;
-    	switch (id) {
-    	case DIALOG_PLUGIN_LOADING:
-    		dialog = ProgressDialog.show(MobileDataCollector.this, "", "Loading. Please wait...", true);
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+    	super.onCreateContextMenu(menu, v, menuInfo);
+    	menu.add(0, ACTIVATE_ID, 0, R.string.menu_activate);
+    }
+    
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+    	switch (item.getItemId()) {
+    	case ACTIVATE_ID:
+    		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+    		service.activate(plugins.get(info.position));
     		break;
     	}
-    	return dialog;
+    	return super.onContextItemSelected(item);
     }
 
 	@Override

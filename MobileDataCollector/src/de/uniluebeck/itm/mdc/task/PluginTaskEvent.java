@@ -2,7 +2,7 @@ package de.uniluebeck.itm.mdc.task;
 
 import java.util.EventObject;
 
-import de.uniluebeck.itm.mdcf.PluginConfiguration;
+import de.uniluebeck.itm.mdcf.PluginInfo;
 
 public class PluginTaskEvent extends EventObject {
 
@@ -11,14 +11,14 @@ public class PluginTaskEvent extends EventObject {
 	 */
 	private static final long serialVersionUID = 9040182235968785001L;
 
-	private final PluginConfiguration configuration;
+	private final PluginInfo configuration;
 	
-	public PluginTaskEvent(Object source, PluginConfiguration configuration) {
+	public PluginTaskEvent(Object source, PluginInfo configuration) {
 		super(source);
 		this.configuration = configuration;
 	}
 	
-	public PluginConfiguration getConfiguration() {
+	public PluginInfo getConfiguration() {
 		return configuration;
 	}
 }

@@ -12,12 +12,12 @@ public class PluginIntent extends Intent {
 	
 	public static final String PLUGIN_CONFIGURATION = "de.uniluebeck.itm.mdc.PLUGIN_CONFIGURATION";
 
-	public PluginIntent(final PluginConfiguration configuration) {
+	public PluginIntent(final PluginInfo configuration) {
 		super(PLUGIN_REGISTER);
 		putExtra(PLUGIN_CONFIGURATION, configuration);
 	}
 	
-	public PluginConfiguration getConfiguration() {
+	public PluginInfo getConfiguration() {
 		return getParcelableExtra(PLUGIN_CONFIGURATION);
 	}
 }

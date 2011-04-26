@@ -12,7 +12,7 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 import de.uniluebeck.itm.mdcf.Plugin;
-import de.uniluebeck.itm.mdcf.PluginConfiguration;
+import de.uniluebeck.itm.mdcf.PluginInfo;
 
 public class PluginTask extends TimerTask implements ServiceConnection {
 	
@@ -22,11 +22,11 @@ public class PluginTask extends TimerTask implements ServiceConnection {
 
 	private final Context context;
 	
-	private final PluginConfiguration configuration;
+	private final PluginInfo configuration;
 	
 	private Plugin plugin;
 	
-	public PluginTask(final Context context, final PluginConfiguration configuration) {
+	public PluginTask(final Context context, final PluginInfo configuration) {
 		this.context = context;
 		this.configuration = configuration;
 	}

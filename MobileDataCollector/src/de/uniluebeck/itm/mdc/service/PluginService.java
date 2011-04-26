@@ -17,7 +17,7 @@ import de.uniluebeck.itm.mdc.task.PluginTask;
 import de.uniluebeck.itm.mdc.task.PluginTaskEvent;
 import de.uniluebeck.itm.mdc.task.PluginTaskListener;
 import de.uniluebeck.itm.mdc.util.Notifications;
-import de.uniluebeck.itm.mdcf.PluginConfiguration;
+import de.uniluebeck.itm.mdcf.PluginInfo;
 import de.uniluebeck.itm.mdcf.PluginIntent;
 
 public class PluginService extends Service implements PluginTaskListener {
@@ -32,7 +32,7 @@ public class PluginService extends Service implements PluginTaskListener {
 	
 	private final List<PluginServiceListener> listeners = new ArrayList<PluginServiceListener>();
 	
-	private final List<PluginConfiguration> plugins = new ArrayList<PluginConfiguration>();
+	private final List<PluginInfo> plugins = new ArrayList<PluginInfo>();
 	
 	private final Timer pluginTimer = new Timer();
 	
@@ -68,7 +68,7 @@ public class PluginService extends Service implements PluginTaskListener {
 		if (PluginIntent.PLUGIN_REGISTER.equals(action)) {
 			Log.i(LOG_TAG, "Plugin " + action + " wants to register");
 			if (intent.hasExtra(PluginIntent.PLUGIN_CONFIGURATION)) {
-				final PluginConfiguration configuration = intent.getParcelableExtra(PluginIntent.PLUGIN_CONFIGURATION);
+				final PluginInfo configuration = intent.getParcelableExtra(PluginIntent.PLUGIN_CONFIGURATION);
 				register(configuration);
 			} else {
 				Log.e(LOG_TAG, "Plugin " + action + " has no configuration");
@@ -76,7 +76,7 @@ public class PluginService extends Service implements PluginTaskListener {
 		} else if (PluginIntent.PLUGIN_UNREGISTER.equals(action)) {
 			Log.i(LOG_TAG, "Plugin " + action + " wants to unregister");
 			if (intent.hasExtra(PluginIntent.PLUGIN_CONFIGURATION)) {
-				final PluginConfiguration configuration = intent.getParcelableExtra(PluginIntent.PLUGIN_CONFIGURATION);
+				final PluginInfo configuration = intent.getParcelableExtra(PluginIntent.PLUGIN_CONFIGURATION);
 				unregister(configuration);
 			} else {
 				Log.e(LOG_TAG, "Plugin " + action + " has no configuration");
@@ -98,16 +98,15 @@ public class PluginService extends Service implements PluginTaskListener {
 		return binder;
 	}
 	
-	private void register(final PluginConfiguration plugin) {
+	private void register(final PluginInfo plugin) {
 		if (!plugins.contains(plugin)) {
 			plugins.add(plugin);
 			notifyRegistered(plugin);
-			schedulePlugin(plugin);
 			Log.i(LOG_TAG, "Service registered: " + plugin.getAction());
 		}
 	}
 	
-	private void unregister(final PluginConfiguration plugin) {
+	private void unregister(final PluginInfo plugin) {
 		if (plugins.contains(plugin)) {
 			plugins.remove(plugin);
 			notifyUnregistered(plugin);
@@ -115,22 +114,26 @@ public class PluginService extends Service implements PluginTaskListener {
 		}
 	}
 	
-	private void notifyRegistered(PluginConfiguration configuration) {
+	private void notifyRegistered(PluginInfo configuration) {
 		for (final PluginServiceListener listener : listeners.toArray(new PluginServiceListener[0])) {
 			listener.onRegistered(new PluginServiceEvent(this, configuration));
 		}
 	}
 	
-	private void notifyUnregistered(PluginConfiguration configuration) {
+	private void notifyUnregistered(PluginInfo configuration) {
 		for (final PluginServiceListener listener : listeners.toArray(new PluginServiceListener[0])) {
 			listener.onRegistered(new PluginServiceEvent(this, configuration));
 		}
 	}
 	
-	private void schedulePlugin(PluginConfiguration plugin) {
+	private void schedulePlugin(PluginInfo plugin) {
 		PluginTask task = new PluginTask(this, plugin);
 		task.addListener(this);
-		pluginTimer.schedule(task, 0, 10000);
+		pluginTimer.schedule(task, 0, 300000);
+	}
+	
+	public void activate(PluginInfo plugin) {
+		schedulePlugin(plugin);
 	}
 	
 	public void addListener(PluginServiceListener listener) {
@@ -141,13 +144,13 @@ public class PluginService extends Service implements PluginTaskListener {
 		listeners.remove(listener);
 	}
 
-	public List<PluginConfiguration> getPlugins() {
+	public List<PluginInfo> getPlugins() {
 		return plugins;
 	}
 
 	@Override
 	public void onStart(PluginTaskEvent event) {
-		PluginConfiguration configuration = event.getConfiguration();
+		PluginInfo configuration = event.getConfiguration();
 		String title = configuration.getName() + " is starting";
 		String ticker = configuration.getName() + " is collecting data...";
 		Notification notification = Notifications.createNotification(this, title, ticker);
@@ -156,7 +159,7 @@ public class PluginService extends Service implements PluginTaskListener {
 
 	@Override
 	public void onStop(PluginTaskEvent event) {
-		PluginConfiguration configuration = event.getConfiguration();
+		PluginInfo configuration = event.getConfiguration();
 		String title = configuration.getName() + " is stopping";
 		String ticker = configuration.getName() + " has stopped collecting data...";
 		Notification notification = Notifications.createNotification(this, title, ticker);

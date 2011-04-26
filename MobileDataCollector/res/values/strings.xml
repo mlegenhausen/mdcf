@@ -3,4 +3,5 @@
     <string name="app_name">Mobile Data Collector</string>
     <string name="main_no_items">No plugins</string>
     <string name="foreground_service">Foreground Service</string>
+    <string name="menu_activate">Activate</string>
 </resources>

@@ -3,15 +3,15 @@ package de.uniluebeck.itm.mdcf;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class PluginConfiguration implements Parcelable {
+public class PluginInfo implements Parcelable {
 
-	public static final Parcelable.Creator<PluginConfiguration> CREATOR = new Parcelable.Creator<PluginConfiguration>() {
-        public PluginConfiguration createFromParcel(Parcel in) {
-            return new PluginConfiguration(in);
+	public static final Parcelable.Creator<PluginInfo> CREATOR = new Parcelable.Creator<PluginInfo>() {
+        public PluginInfo createFromParcel(Parcel in) {
+            return new PluginInfo(in);
         }
 
-        public PluginConfiguration[] newArray(int size) {
-            return new PluginConfiguration[size];
+        public PluginInfo[] newArray(int size) {
+            return new PluginInfo[size];
         }
     };
     
@@ -27,16 +27,16 @@ public class PluginConfiguration implements Parcelable {
     
     private int[] sensorTypes = new int[0];
     
-    public PluginConfiguration() {
+    public PluginInfo() {
 		
 	}
     
-    public PluginConfiguration(String action, String name) {
+    public PluginInfo(String action, String name) {
     	this.action = action;
     	this.name = name;
     }
     
-    public PluginConfiguration(Parcel in) {
+    public PluginInfo(Parcel in) {
 		readFromParcel(in);
 	}
 	
@@ -112,8 +112,8 @@ public class PluginConfiguration implements Parcelable {
 
 	@Override
 	public boolean equals(Object o) {
-		if (o instanceof PluginConfiguration) {
-			return action.equals(((PluginConfiguration) o).getAction());
+		if (o instanceof PluginInfo) {
+			return action.equals(((PluginInfo) o).getAction());
 		}
 		return super.equals(o);
 	}
