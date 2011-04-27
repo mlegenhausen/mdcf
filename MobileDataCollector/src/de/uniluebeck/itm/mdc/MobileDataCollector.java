@@ -37,6 +37,8 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 	
 	private static final int DEACTIVATE_ID = 2;
 	
+	private static final int DATAVIEWER_ID = 3;
+	
 	private SimpleAdapter listAdapter;
 	
 	private List<PluginConfiguration> pluginConfigurations = new ArrayList<PluginConfiguration>();
@@ -96,6 +98,7 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     	} else {
     		menu.add(0, DEACTIVATE_ID, 0, R.string.menu_deactivate);
     	}
+    	menu.add(0, DATAVIEWER_ID, 1, R.string.menu_dataviewer);
     }
     
     @Override
