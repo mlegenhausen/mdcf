@@ -7,4 +7,8 @@
     <string name="menu_deactivate">Deactivate</string>
     <string name="notification_mdc_started">Mobile Data Collector started</string>
     <string name="notification_task_wait">Waiting for next task...</string>
+    <string name="plugin_running">%1$s is running</string>
+    <string name="plugin_collecting">%1$s is collecting data...</string>
+    <string name="plugin_stopping">%1$s is stopping</string>
+    <string name="plugin_stop_collecting">%1$s has stopped collecting data...</string>
 </resources>

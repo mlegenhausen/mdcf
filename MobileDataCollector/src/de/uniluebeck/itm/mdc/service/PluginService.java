@@ -49,7 +49,8 @@ public class PluginService extends Service implements PluginTaskListener {
 	}
 	
 	private void initService() {		
-		Notification notification = Notifications.createNotification(this, getText(R.string.notification_mdc_started), getText(R.string.notification_task_wait));
+		Notification notification = Notifications.createNotification(this, R.string.notification_task_wait);
+		notification.tickerText = getString(R.string.notification_mdc_started);
 		startForeground(R.string.foreground_service, notification);
 		Log.i(LOG_TAG, "Sending broadcast");
 		sendBroadcast(new Intent(PluginIntent.PLUGIN_ACTION));
@@ -149,26 +150,33 @@ public class PluginService extends Service implements PluginTaskListener {
 	public List<PluginConfiguration> getPluginConfigurations() {
 		return pluginConfigurations;
 	}
+	
+	private void notifyPluginRunning(String name) {
+		String content = String.format(getString(R.string.plugin_collecting), name);
+		Notification notification = Notifications.createNotification(this, content);
+		notification.tickerText = String.format(getString(R.string.plugin_running), name);
+		notificationManager.notify(R.string.foreground_service, notification);
+	}
+	
+	private void notifyPluginStopping(String name) {
+		String content = String.format(getString(R.string.plugin_stop_collecting), name);
+		Notification notification = Notifications.createNotification(this, content);
+		notification.tickerText = String.format(getString(R.string.plugin_stopping), name);
+		notificationManager.notify(R.string.foreground_service, notification);
+	}
 
 	@Override
 	public void onStateChange(PluginTaskEvent event) {
 		PluginConfiguration configuration = event.getConfiguration();
 		PluginInfo info = configuration.getPluginInfo();
 		State state = configuration.getState();
-		if (State.RUNNING.equals(state) || State.STOPPING.equals(state)) {
-			String title = info.getName();
-			String ticker = info.getName();
-			if (State.RUNNING.equals(state)) {
-				title += " is running";
-				ticker += " is collecting data...";
-			} else if (State.STOPPING.equals(state)) {
-				title += " is stopping";
-				ticker += " has stopped collecting data...";
-			} 
-			Notification notification = Notifications.createNotification(this, title, ticker);
-			notificationManager.notify(R.string.foreground_service, notification);
+		String name = info.getName();
+		if (State.RUNNING.equals(state)) {
+			notifyPluginRunning(name);
+		} else if (State.STOPPING.equals(state)) {
+			notifyPluginStopping(name);
 		} else if (State.WAITING.equals(state)) {
-			Notification notification = Notifications.createNotification(this, getText(R.string.notification_mdc_started), getText(R.string.notification_task_wait), 5000);
+			Notification notification = Notifications.createNotification(this, R.string.notification_task_wait);
 			notificationManager.notify(R.string.foreground_service, notification);
 		}
 	}
