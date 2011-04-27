@@ -45,4 +45,15 @@ public class PluginConfiguration {
 	public void setState(State state) {
 		this.state = state;
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof PluginInfo) {
+			return pluginInfo.getAction().equals(((PluginInfo) o).getAction());
+		}
+		if (o instanceof PluginConfiguration) {
+			return equals(((PluginConfiguration) o).getPluginInfo());
+		}
+		return super.equals(o);
+	}
 }

@@ -41,19 +41,28 @@ public class PluginTask implements Runnable, ServiceConnection {
 		Log.i(LOG_TAG, "Service connected");
 		plugin = Plugin.Stub.asInterface(binder);
 		try {
-			plugin.init();
-			configuration.setState(State.RUNNING);
-			notifyStateChange();
-			plugin.start();
-			configuration.setState(State.STOPPING);
-			notifyStateChange();
-			plugin.stop();
-			configuration.setState(State.WAITING);
-			notifyStateChange();
+			execute();
 		} catch (RemoteException e) {
 			Log.e(LOG_TAG, "Unable to call proceed.", e);
 		}
 		context.unbindService(this);
+	}
+	
+	private void execute() throws RemoteException {
+		plugin.init();
+		configuration.setState(State.RUNNING);
+		notifyStateChange();
+		plugin.start();
+		configuration.setState(State.STOPPING);
+		notifyStateChange();
+		plugin.stop();
+		configuration.setState(State.WAITING);
+		notifyStateChange();
+	}
+	
+	public void destroy() {
+		configuration.setState(State.RESOLVED);
+		notifyStateChange();
 	}
 
 	@Override

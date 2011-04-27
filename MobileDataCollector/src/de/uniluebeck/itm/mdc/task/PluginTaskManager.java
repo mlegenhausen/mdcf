@@ -36,17 +36,16 @@ public class PluginTaskManager implements PluginTaskListener {
 	
 	public PluginTask deactivatePluginConfiguration(PluginConfiguration configuration) {
 		PluginTask task = tasks.remove(configuration);
+		task.destroy();
 		futures.get(configuration).cancel(true);
 		futures.remove(configuration);
 		return task;
 	}
 	
 	public void destroy() {
-		for (ScheduledFuture<?> future : futures.values()) {
-			future.cancel(true);
+		for (PluginConfiguration configuration : tasks.keySet()) {
+			deactivatePluginConfiguration(configuration);
 		}
-		futures.clear();
-		tasks.clear();
 	}
 
 	@Override
