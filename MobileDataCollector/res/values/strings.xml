@@ -4,4 +4,7 @@
     <string name="main_no_items">No plugins</string>
     <string name="foreground_service">Foreground Service</string>
     <string name="menu_activate">Activate</string>
+    <string name="menu_deactivate">Deactivate</string>
+    <string name="notification_mdc_started">Mobile Data Collector started</string>
+    <string name="notification_task_wait">Waiting for next task...</string>
 </resources>

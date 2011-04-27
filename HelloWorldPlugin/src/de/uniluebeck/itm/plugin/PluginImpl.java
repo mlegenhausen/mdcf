@@ -25,18 +25,6 @@ public class PluginImpl extends Plugin.Stub {
 	}
 
 	@Override
-	public void pause() throws RemoteException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void resume() throws RemoteException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void stop() throws RemoteException {
 		// TODO Auto-generated method stub
 		

@@ -6,9 +6,5 @@ interface Plugin {
 	
 	void start();
 	
-	void pause();
-	
-	void resume();
-	
 	void stop();
 }

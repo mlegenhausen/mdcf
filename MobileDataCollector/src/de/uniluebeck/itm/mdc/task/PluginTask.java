@@ -2,7 +2,6 @@ package de.uniluebeck.itm.mdc.task;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TimerTask;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -12,9 +11,10 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration;
+import de.uniluebeck.itm.mdc.service.PluginConfiguration.State;
 import de.uniluebeck.itm.mdcf.Plugin;
 
-public class PluginTask extends TimerTask implements ServiceConnection {
+public class PluginTask implements Runnable, ServiceConnection {
 	
 	private final List<PluginTaskListener> listeners = new ArrayList<PluginTaskListener>();
 
@@ -42,10 +42,14 @@ public class PluginTask extends TimerTask implements ServiceConnection {
 		plugin = Plugin.Stub.asInterface(binder);
 		try {
 			plugin.init();
-			notifyPluginStart();
+			configuration.setState(State.RUNNING);
+			notifyStateChange();
 			plugin.start();
-			notifyPluginStop();
+			configuration.setState(State.STOPPING);
+			notifyStateChange();
 			plugin.stop();
+			configuration.setState(State.WAITING);
+			notifyStateChange();
 		} catch (RemoteException e) {
 			Log.e(LOG_TAG, "Unable to call proceed.", e);
 		}
@@ -57,15 +61,9 @@ public class PluginTask extends TimerTask implements ServiceConnection {
 		Log.i(LOG_TAG, "Service disconnected");
 	}
 	
-	private void notifyPluginStart() {
+	private void notifyStateChange() {
 		for (PluginTaskListener listener : listeners.toArray(new PluginTaskListener[0])) {
-			listener.onStart(new PluginTaskEvent(this, configuration));
-		}
-	}
-	
-	private void notifyPluginStop() {
-		for (PluginTaskListener listener : listeners.toArray(new PluginTaskListener[0])) {
-			listener.onStop(new PluginTaskEvent(this, configuration));
+			listener.onStateChange(new PluginTaskEvent(this, configuration));
 		}
 	}
 	

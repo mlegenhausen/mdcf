@@ -20,11 +20,12 @@ import android.view.View;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.SimpleAdapter;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration;
+import de.uniluebeck.itm.mdc.service.PluginConfiguration.Mode;
 import de.uniluebeck.itm.mdc.service.PluginService;
 import de.uniluebeck.itm.mdc.service.PluginServiceEvent;
 import de.uniluebeck.itm.mdc.service.PluginServiceListener;
 
-public class MobileDataCollector extends ListActivity implements ServiceConnection {
+public class MobileDataCollector extends ListActivity implements ServiceConnection, PluginServiceListener {
 	
 	public static final String LOG_TAG = "MobileDataCollector";
 	
@@ -34,45 +35,20 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 	
 	private static final int ACTIVATE_ID = 1;
 	
+	private static final int DEACTIVATE_ID = 2;
+	
 	private SimpleAdapter listAdapter;
 	
-	private List<PluginConfiguration> plugins = new ArrayList<PluginConfiguration>();
+	private List<PluginConfiguration> pluginConfigurations = new ArrayList<PluginConfiguration>();
 	
 	private List<Map<String, String>> pluginMappings = new ArrayList<Map<String, String>>();
 	
-	private PluginServiceListener pluginListener;
-	
 	private PluginService service;
-	
-	public MobileDataCollector() {
-		pluginListener = new PluginServiceListener() {
-			
-			@Override
-			public void onRegistered(final PluginServiceEvent event) {
-				runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						loadPlugins();
-					}
-				});
-			}
-			
-			@Override
-			public void onUnregistered(PluginServiceEvent event) {
-				runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						loadPlugins();
-					}
-				});
-			}
-		};
-	}
 	
 	private void loadPlugins() {
 		pluginMappings.clear();
-		plugins = service.getPlugins();
-		for (final PluginConfiguration plugin : plugins) {
+		pluginConfigurations = service.getPluginConfigurations();
+		for (final PluginConfiguration plugin : pluginConfigurations) {
 			addPlugin(plugin);
 		}
 		listAdapter.notifyDataSetChanged();
@@ -113,15 +89,24 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
     	super.onCreateContextMenu(menu, v, menuInfo);
-    	menu.add(0, ACTIVATE_ID, 0, R.string.menu_activate);
+    	AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
+    	Mode mode = pluginConfigurations.get(info.position).getMode();
+    	if (Mode.NEW.equals(mode) || Mode.DEACTIVATED.equals(mode)) {
+    		menu.add(0, ACTIVATE_ID, 0, R.string.menu_activate);
+    	} else {
+    		menu.add(0, DEACTIVATE_ID, 0, R.string.menu_deactivate);
+    	}
     }
     
     @Override
     public boolean onContextItemSelected(MenuItem item) {
+    	AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
     	switch (item.getItemId()) {
     	case ACTIVATE_ID:
-    		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-    		service.activate(plugins.get(info.position));
+    		service.activate(pluginConfigurations.get(info.position));
+    		break;
+    	case DEACTIVATE_ID:
+    		service.deactivate(pluginConfigurations.get(info.position));
     		break;
     	}
     	return super.onContextItemSelected(item);
@@ -130,12 +115,35 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 	@Override
 	public void onServiceConnected(ComponentName paramComponentName, IBinder binder) {
 		service = ((PluginService.PluginServiceBinder) binder).getService();
-		service.addListener(pluginListener);
+		service.addListener(this);
 		loadPlugins();
 	}
 
 	@Override
 	public void onServiceDisconnected(ComponentName paramComponentName) {
-		service.removeListener(pluginListener);
+		service.removeListener(this);
+		pluginConfigurations.clear();
+		pluginMappings.clear();
+		listAdapter.notifyDataSetChanged();
+	}
+
+	@Override
+	public void onRegistered(PluginServiceEvent event) {
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				loadPlugins();
+			}
+		});
+	}
+
+	@Override
+	public void onUnregistered(PluginServiceEvent event) {
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				loadPlugins();
+			}
+		});
 	}
 }
