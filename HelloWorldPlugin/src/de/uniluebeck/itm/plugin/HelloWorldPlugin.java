@@ -8,6 +8,6 @@ public class HelloWorldPlugin extends Service {
 	
 	@Override
 	public IBinder onBind(Intent intent) {
-		return new PluginImpl();
+		return new PluginImpl(this);
 	}
 }

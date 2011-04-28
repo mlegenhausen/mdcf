@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.SimpleAdapter;
+import android.widget.Toast;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration.Mode;
 import de.uniluebeck.itm.mdc.service.PluginService;
@@ -132,9 +133,12 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 
 	@Override
 	public void onRegistered(PluginServiceEvent event) {
+		final String name = event.getConfiguration().getPluginInfo().getName();
+		final String text = String.format(getString(R.string.toast_plugin_unregistered), name);
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
+				Toast.makeText(MobileDataCollector.this, text, Toast.LENGTH_LONG);
 				loadPlugins();
 			}
 		});
@@ -142,9 +146,12 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 
 	@Override
 	public void onUnregistered(PluginServiceEvent event) {
+		final String name = event.getConfiguration().getPluginInfo().getName();
+		final String text = String.format(getString(R.string.toast_plugin_unregistered), name);
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
+				Toast.makeText(MobileDataCollector.this, text, Toast.LENGTH_LONG);
 				loadPlugins();
 			}
 		});

@@ -6,6 +6,8 @@
     <string name="menu_activate">Activate</string>
     <string name="menu_deactivate">Deactivate</string>
     <string name="menu_dataviewer">Data Viewer</string>
+    <string name="toast_plugin_registered">%1$s was updated</string>
+    <string name="toast_plugin_unregistered">%1$s was removed</string>
     <string name="notification_mdc_started">Mobile Data Collector started</string>
     <string name="notification_task_wait">Waiting for next task...</string>
     <string name="plugin_running">%1$s is running</string>

@@ -19,13 +19,13 @@ public class PluginInfo implements Parcelable {
     
     private String action;
     
+    private String version;
+    
     private String url;
     
     private int period;
     
     private int duration;
-    
-    private int[] sensorTypes = new int[0];
     
     public PluginInfo() {
 		
@@ -49,17 +49,17 @@ public class PluginInfo implements Parcelable {
 	public void writeToParcel(Parcel parcel, int index) {
 		parcel.writeString(action);
 		parcel.writeString(name);
+		parcel.writeString(version);
 		parcel.writeInt(period);
 		parcel.writeInt(duration);
-		parcel.writeIntArray(sensorTypes);
 	}
 	
 	public void readFromParcel(Parcel parcel) {
 		action = parcel.readString();
 		name = parcel.readString();
+		version = parcel.readString();
 		period = parcel.readInt();
 		duration = parcel.readInt();
-		parcel.readIntArray(sensorTypes);
 	}
 
 	public String getName() {
@@ -102,12 +102,12 @@ public class PluginInfo implements Parcelable {
 		this.duration = duration;
 	}
 
-	public int[] getSensorTypes() {
-		return sensorTypes;
+	public String getVersion() {
+		return version;
 	}
 
-	public void setSensorTypes(int[] sensorTypes) {
-		this.sensorTypes = sensorTypes;
+	public void setVersion(String version) {
+		this.version = version;
 	}
 
 	@Override
