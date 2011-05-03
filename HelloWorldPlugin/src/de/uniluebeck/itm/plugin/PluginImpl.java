@@ -1,51 +1,36 @@
 package de.uniluebeck.itm.plugin;
 
 import android.content.Context;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.RemoteException;
 import android.util.Log;
 import de.uniluebeck.itm.mdcf.Plugin;
+import de.uniluebeck.itm.mdcf.location.SecureLocationManager;
 
-public class PluginImpl extends Plugin.Stub implements SensorEventListener {
+public class PluginImpl extends Plugin.Stub {
 
 	public static final String LOG_TAG = "HelloWorldPluginImpl";
 	
-	private SensorManager sensorManager;
+	private SecureLocationManager locationManager;
 	
 	public PluginImpl(Context context) {
-		sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+		
 	}
 	
 	@Override
-	public void init() throws RemoteException {
+	public void init(SecureLocationManager locationManager) throws RemoteException {
+		this.locationManager = locationManager;
 	}
 
 	@Override
 	public void start() throws RemoteException {
-		sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_FASTEST);
-		try {
-			Thread.sleep(10000);
-		} catch (InterruptedException e) {
-			Log.e(LOG_TAG, "Start was interrupted.", e);
-		}
-		Log.i(LOG_TAG, "Hello World");
+		Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+		Log.i(LOG_TAG, "latitude: " + location.getLatitude() + " longitude: " + location.getLongitude());
 	}
 
 	@Override
 	public void stop() throws RemoteException {
-		sensorManager.unregisterListener(this);
-	}
-
-	@Override
-	public void onAccuracyChanged(Sensor paramSensor, int paramInt) {
 		
-	}
-
-	@Override
-	public void onSensorChanged(SensorEvent event) {
-		Log.i(LOG_TAG, "Values: " + event.values[0] + " ," + event.values[1] + " ," + event.values[2]);
 	}
 }

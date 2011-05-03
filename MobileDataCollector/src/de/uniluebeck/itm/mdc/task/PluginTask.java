@@ -7,6 +7,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.location.LocationManager;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
@@ -24,11 +25,14 @@ public class PluginTask implements Runnable, ServiceConnection {
 	
 	private final PluginConfiguration configuration;
 	
+	private final LocationManager locationManager;
+	
 	private Plugin plugin;
 	
 	public PluginTask(final Context context, final PluginConfiguration configuration) {
 		this.context = context;
 		this.configuration = configuration;
+		this.locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 	}
 	
 	@Override
@@ -49,7 +53,7 @@ public class PluginTask implements Runnable, ServiceConnection {
 	}
 	
 	private void execute() throws RemoteException {
-		plugin.init();
+		plugin.init(new SecureLocationManagerImpl(locationManager));
 		configuration.setState(State.RUNNING);
 		notifyStateChange();
 		plugin.start();
