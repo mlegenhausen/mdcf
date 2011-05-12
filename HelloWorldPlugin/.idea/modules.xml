@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/HelloWorldPlugin.iml" filepath="$PROJECT_DIR$/HelloWorldPlugin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../MobileDataCollectionFramework/MobileDataCollectionFramework.iml" filepath="$PROJECT_DIR$/../MobileDataCollectionFramework/MobileDataCollectionFramework.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../MobileDataCollector/MobileDataCollector.iml" filepath="$PROJECT_DIR$/../MobileDataCollector/MobileDataCollector.iml" />
+    </modules>
+  </component>
+</project>
+
