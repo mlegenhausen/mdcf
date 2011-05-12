@@ -1,8 +1,5 @@
 package de.uniluebeck.itm.mdc.service;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.Service;
@@ -20,6 +17,9 @@ import de.uniluebeck.itm.mdc.task.PluginTaskManager;
 import de.uniluebeck.itm.mdc.util.Notifications;
 import de.uniluebeck.itm.mdcf.PluginInfo;
 import de.uniluebeck.itm.mdcf.PluginIntent;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PluginService extends Service implements PluginTaskListener {
 

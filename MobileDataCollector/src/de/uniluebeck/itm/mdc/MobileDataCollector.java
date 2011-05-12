@@ -1,10 +1,5 @@
 package de.uniluebeck.itm.mdc;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import android.app.ListActivity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -25,6 +20,11 @@ import de.uniluebeck.itm.mdc.service.PluginConfiguration.Mode;
 import de.uniluebeck.itm.mdc.service.PluginService;
 import de.uniluebeck.itm.mdc.service.PluginServiceEvent;
 import de.uniluebeck.itm.mdc.service.PluginServiceListener;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MobileDataCollector extends ListActivity implements ServiceConnection, PluginServiceListener {
 	

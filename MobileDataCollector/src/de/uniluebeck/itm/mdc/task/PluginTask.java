@@ -1,8 +1,5 @@
 package de.uniluebeck.itm.mdc.task;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +11,9 @@ import android.util.Log;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration.State;
 import de.uniluebeck.itm.mdcf.Plugin;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PluginTask implements Runnable, ServiceConnection {
 	
