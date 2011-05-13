@@ -7,6 +7,8 @@ import android.os.RemoteException;
 import android.util.Log;
 import de.uniluebeck.itm.mdcf.Plugin;
 import de.uniluebeck.itm.mdcf.location.SecureLocationManager;
+import de.uniluebeck.itm.mdcf.persistence.Node;
+import de.uniluebeck.itm.mdcf.persistence.PersistenceManager;
 
 public class PluginImpl extends Plugin.Stub {
 
@@ -14,13 +16,16 @@ public class PluginImpl extends Plugin.Stub {
 	
 	private SecureLocationManager locationManager;
 	
+	private PersistenceManager persistenceManager;
+	
 	public PluginImpl(Context context) {
 		
 	}
 	
 	@Override
-	public void init(SecureLocationManager locationManager) throws RemoteException {
+	public void init(SecureLocationManager locationManager, PersistenceManager persistenceManager) throws RemoteException {
 		this.locationManager = locationManager;
+		this.persistenceManager = persistenceManager;
 	}
 
 	@Override
@@ -28,10 +33,23 @@ public class PluginImpl extends Plugin.Stub {
 		Log.i(LOG_TAG, "Start plugin");
 		Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 		Log.i(LOG_TAG, "latitude: " + location.getLatitude() + " longitude: " + location.getLongitude());
+		storeLocation(location);
 	}
 
 	@Override
 	public void stop() throws RemoteException {
 		
+	}
+	
+	private void storeLocation(Location location) throws RemoteException {
+		Node workspace = persistenceManager.getWorkspace();
+		Log.i(LOG_TAG, "Workspace received");
+		Node node = new Node();
+		node.setProperty("latitude", location.getLatitude());
+		node.setProperty("longitude", location.getLongitude());
+		workspace.addNode(node);
+		Log.i(LOG_TAG, "Saving workspace...");
+		persistenceManager.save(workspace);
+		Log.i(LOG_TAG, "Workspace saved");
 	}
 }

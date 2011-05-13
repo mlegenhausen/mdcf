@@ -4,11 +4,7 @@ import de.uniluebeck.itm.mdcf.persistence.Node;
 
 interface PersistenceManager {
 	
-	void save();
+	Node save(in Node workspace);
 	
-	void delete();
-	
-	void query();
-	
-	Node getRoot();
+	Node getWorkspace();
 }

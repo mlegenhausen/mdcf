@@ -1,7 +1,12 @@
 package de.uniluebeck.itm.mdcf.persistence;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 public class Property extends Item implements Parcelable {
 
@@ -9,6 +14,8 @@ public class Property extends Item implements Parcelable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1296625465780574564L;
+	
+	private static final String TAG = Property.class.getName();
 
 	public static final Parcelable.Creator<Property> CREATOR = new Parcelable.Creator<Property>() {
         public Property createFromParcel(Parcel in) {
@@ -22,11 +29,11 @@ public class Property extends Item implements Parcelable {
 	
 	private String identifier;
 	
-	private Value[] values;
+	private final List<Value> values = new ArrayList<Value>();
 	
 	public Property(String identifier, Value[] values) {
 		this.identifier = identifier;
-		this.values = values;
+		this.values.addAll(Arrays.asList(values));
 	}
 	
 	public Property(String identifier, Value value) {
@@ -45,14 +52,16 @@ public class Property extends Item implements Parcelable {
 	public void readFromParcel(Parcel in) {
 		super.readFromParcel(in);
 		identifier = in.readString();
-		values = (Value[]) in.readArray(getClass().getClassLoader());
+		in.readTypedList(values, Value.CREATOR);
 	}
 	
 	@Override
 	public void writeToParcel(Parcel out, int flags) {
+		Log.i(TAG, "Writing to parcel...");
 		super.writeToParcel(out, flags);
 		out.writeString(identifier);
-		out.writeArray(values);
+		out.writeTypedList(values);
+		Log.i(TAG, "Write successful");
 	}
 	
 	@Override
@@ -66,7 +75,7 @@ public class Property extends Item implements Parcelable {
 	}
 	
 	public boolean isMultiple() {
-		return values != null && values.length > 1;
+		return values != null && values.size() > 1;
 	}
 	
 	public String getIdentifier() {
@@ -75,17 +84,20 @@ public class Property extends Item implements Parcelable {
 	
 	public void setIdentifier(String identifier) {
 		this.identifier = identifier;
+		setTimestamp(System.currentTimeMillis());
 	}
 	
 	public Value getValue() {
-		return values != null || values.length == 0 ? null : values[0];
+		return values.size() == 0 ? null : values.get(0);
 	}
 	
 	public void setValue(Value value) {
-		this.values = new Value[] { value };
+		values.clear();
+		values.add(value);
+		setTimestamp(System.currentTimeMillis());
 	}
 	
 	public Value[] getValues() {
-		return values;
+		return values.toArray(new Value[0]);
 	}
 }

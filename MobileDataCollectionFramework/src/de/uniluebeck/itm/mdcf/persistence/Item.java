@@ -6,7 +6,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public abstract class Item implements Parcelable, Serializable {
-
+	
 	/**
 	 * Serial UID.
 	 */
@@ -21,29 +21,21 @@ public abstract class Item implements Parcelable, Serializable {
      */
     private Long timestamp;
 	
-	public Item() {
-		
-	}
-	
-	public Item(Parcel in) {
-		readFromParcel(in);
-	}
-	
 	@Override
 	public int describeContents() {
 		return 0;
 	}
 	
 	public void readFromParcel(Parcel in) {
-		id = in.readLong();
-		timestamp = in.readLong();
-		parent = in.readParcelable(getClass().getClassLoader());
+		id = (Long) in.readSerializable();
+		timestamp = (Long) in.readSerializable();
+		parent = in.readParcelable(Node.class.getClassLoader());
 	}
 	
 	@Override
 	public void writeToParcel(Parcel out, int flags) {
-		out.writeLong(id);
-		out.writeLong(timestamp);
+		out.writeSerializable(id);
+		out.writeSerializable(timestamp);
 		out.writeParcelable(parent, flags);
 	}
 	

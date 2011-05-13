@@ -3,6 +3,7 @@ package de.uniluebeck.itm.mdc.service;
 import java.io.Serializable;
 
 import de.uniluebeck.itm.mdcf.PluginInfo;
+import de.uniluebeck.itm.mdcf.persistence.Node;
 
 public class PluginConfiguration implements Serializable {
 
@@ -24,6 +25,8 @@ public class PluginConfiguration implements Serializable {
 	private Mode mode = Mode.NEW;
 	
 	private State state = State.RESOLVED;
+	
+	private Node workspace = new Node();
 	
 	public PluginConfiguration(PluginInfo pluginInfo) {
 		this.pluginInfo = pluginInfo;
@@ -51,6 +54,10 @@ public class PluginConfiguration implements Serializable {
 
 	public void setState(State state) {
 		this.state = state;
+	}
+	
+	public Node getWorkspace() {
+		return workspace;
 	}
 	
 	@Override

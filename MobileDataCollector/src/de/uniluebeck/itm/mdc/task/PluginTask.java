@@ -1,5 +1,8 @@
 package de.uniluebeck.itm.mdc.task;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -8,15 +11,13 @@ import android.location.LocationManager;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
+import de.uniluebeck.itm.mdc.persistence.NodeRepository;
+import de.uniluebeck.itm.mdc.persistence.PersistenceManagerImpl;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration.State;
 import de.uniluebeck.itm.mdcf.Plugin;
 import de.uniluebeck.itm.mdcf.location.SecureLocationManager;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import com.google.common.base.Preconditions;
+import de.uniluebeck.itm.mdcf.persistence.PersistenceManager;
 
 public class PluginTask implements Runnable, ServiceConnection {
 	
@@ -32,14 +33,16 @@ public class PluginTask implements Runnable, ServiceConnection {
 	
 	private final SecureLocationManager secureLocationManager;
 	
+	private final PersistenceManager persistenceManager;
+	
 	private Plugin plugin;
 	
 	public PluginTask(final Context context, final PluginConfiguration configuration) {
 		this.context = context;
 		this.configuration = configuration;
 		locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-		Preconditions.checkState(locationManager != null, "Location manager is not available");
 		secureLocationManager = new SecureLocationManagerImpl(locationManager);
+		persistenceManager = new PersistenceManagerImpl(new NodeRepository(context), configuration.getWorkspace());
 	}
 	
 	@Override
@@ -60,7 +63,7 @@ public class PluginTask implements Runnable, ServiceConnection {
 	}
 	
 	private void execute() throws RemoteException {
-		plugin.init(secureLocationManager);
+		plugin.init(secureLocationManager, persistenceManager);
 		configuration.setState(State.RUNNING);
 		notifyStateChange();
 		plugin.start();

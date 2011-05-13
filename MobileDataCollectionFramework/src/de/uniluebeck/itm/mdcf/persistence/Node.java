@@ -31,6 +31,10 @@ public class Node extends Item implements Parcelable {
     
     private final Map<String, Item> properties = new HashMap<String, Item>();
     
+    public Node() {
+    	
+	}
+    
     public Node(Parcel in) {
 		readFromParcel(in);
 	}
@@ -42,14 +46,14 @@ public class Node extends Item implements Parcelable {
 	
 	public void readFromParcel(Parcel in) {
 		super.readFromParcel(in);
-		in.readList(nodes, getClass().getClassLoader());
-		in.readMap(properties, getClass().getClassLoader());
+		in.readTypedList(nodes, Node.CREATOR);
+		in.readMap(properties, Property.class.getClassLoader());
 	}
 
 	@Override
 	public void writeToParcel(Parcel out, int flags) {
 		super.writeToParcel(out, flags);
-		out.writeList(nodes);
+		out.writeTypedList(nodes);
 		out.writeMap(properties);
 	}
 	
@@ -100,6 +104,7 @@ public class Node extends Item implements Parcelable {
 	
 	public void setProperty(String name, Node value) {
 		properties.put(name, value);
+		setTimestamp(System.currentTimeMillis());
 	}
 	
 	public void setProperty(String name, Value value) {
@@ -109,6 +114,7 @@ public class Node extends Item implements Parcelable {
 	public void setProperty(String name, Value[] values) {
 		Property property = new Property(name, values);
 		properties.put(name, property);
+		setTimestamp(System.currentTimeMillis());
 	}
 
 	@Override
