@@ -1,12 +1,18 @@
 package de.uniluebeck.itm.mdc.persistence;
 
+import java.io.IOException;
+
 import android.content.Context;
 import android.util.Log;
+
 import com.db4o.Db4oEmbedded;
 import com.db4o.ObjectContainer;
 import com.db4o.config.EmbeddedConfiguration;
 
-import java.io.IOException;
+import de.uniluebeck.itm.mdc.service.PluginConfiguration;
+import de.uniluebeck.itm.mdcf.PluginInfo;
+import de.uniluebeck.itm.mdcf.persistence.Node;
+import de.uniluebeck.itm.mdcf.persistence.Property;
 
 public class Db4oHelper {
 
@@ -41,6 +47,16 @@ public class Db4oHelper {
      */
     private EmbeddedConfiguration dbConfig() throws IOException {
     	EmbeddedConfiguration configuration = Db4oEmbedded.newConfiguration();
+    	configuration.common().objectClass(PluginConfiguration.class);
+    	configuration.common().objectClass(PluginInfo.class);
+    	configuration.common().objectClass(Node.class).objectField("id").indexed(true);
+    	configuration.common().objectClass(Node.class).cascadeOnDelete(true);
+    	configuration.common().objectClass(Node.class).cascadeOnUpdate(true);
+    	configuration.common().objectClass(Node.class).cascadeOnActivate(true);
+    	configuration.common().objectClass(Property.class).objectField("id").indexed(true);
+    	configuration.common().objectClass(Property.class).cascadeOnDelete(true);
+    	configuration.common().objectClass(Property.class).cascadeOnUpdate(true);
+    	configuration.common().objectClass(Property.class).cascadeOnActivate(true);
     	return configuration;
 	}
 

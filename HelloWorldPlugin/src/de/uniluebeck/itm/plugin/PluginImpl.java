@@ -25,6 +25,7 @@ public class PluginImpl extends Plugin.Stub {
 
 	@Override
 	public void start() throws RemoteException {
+		Log.i(LOG_TAG, "Start plugin");
 		Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 		Log.i(LOG_TAG, "latitude: " + location.getLatitude() + " longitude: " + location.getLongitude());
 	}

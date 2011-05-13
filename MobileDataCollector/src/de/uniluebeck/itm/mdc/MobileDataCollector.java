@@ -143,17 +143,4 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 			}
 		});
 	}
-
-	@Override
-	public void onUnregistered(PluginServiceEvent event) {
-		final String name = event.getConfiguration().getPluginInfo().getName();
-		final String text = String.format(getString(R.string.toast_plugin_unregistered), name);
-		runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				Toast.makeText(MobileDataCollector.this, text, Toast.LENGTH_LONG);
-				loadPlugins();
-			}
-		});
-	}
 }

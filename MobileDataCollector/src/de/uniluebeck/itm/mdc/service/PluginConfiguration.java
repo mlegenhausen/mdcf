@@ -1,8 +1,15 @@
 package de.uniluebeck.itm.mdc.service;
 
+import java.io.Serializable;
+
 import de.uniluebeck.itm.mdcf.PluginInfo;
 
-public class PluginConfiguration {
+public class PluginConfiguration implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3205252713479131098L;
 
 	public enum Mode {
 		NEW, ACTIVATED, DEACTIVATED

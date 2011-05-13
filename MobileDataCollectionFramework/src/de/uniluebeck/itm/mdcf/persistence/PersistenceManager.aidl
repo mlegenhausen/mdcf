@@ -1,5 +1,7 @@
 package de.uniluebeck.itm.mdcf.persistence;
 
+import de.uniluebeck.itm.mdcf.persistence.Node;
+
 interface PersistenceManager {
 	
 	void save();
@@ -7,4 +9,6 @@ interface PersistenceManager {
 	void delete();
 	
 	void query();
+	
+	Node getRoot();
 }

@@ -9,6 +9,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 import de.uniluebeck.itm.mdc.R;
+import de.uniluebeck.itm.mdc.persistence.PluginConfigurationRepository;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration.Mode;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration.State;
 import de.uniluebeck.itm.mdc.task.PluginTaskEvent;
@@ -39,12 +40,15 @@ public class PluginService extends Service implements PluginTaskListener {
 	
 	private final IBinder binder = new PluginServiceBinder();
 	
+	private PluginConfigurationRepository repository;
+	
 	private NotificationManager notificationManager;
 	
 	@Override
 	public void onCreate() {
 		super.onCreate();
 		notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		repository = new PluginConfigurationRepository(this);
 		initService();
 	}
 	
@@ -71,16 +75,7 @@ public class PluginService extends Service implements PluginTaskListener {
 			Log.i(LOG_TAG, "Plugin " + action + " wants to register");
 			if (intent.hasExtra(PluginIntent.PLUGIN_CONFIGURATION)) {
 				final PluginInfo info = intent.getParcelableExtra(PluginIntent.PLUGIN_CONFIGURATION);
-				register(new PluginConfiguration(info));
-			} else {
-				Log.e(LOG_TAG, "Plugin " + action + " has no configuration");
-			}
-		} else if (PluginIntent.PLUGIN_UNREGISTER.equals(action)) {
-			Log.i(LOG_TAG, "Plugin " + action + " wants to unregister");
-			if (intent.hasExtra(PluginIntent.PLUGIN_CONFIGURATION)) {
-				final PluginInfo info = intent.getParcelableExtra(PluginIntent.PLUGIN_CONFIGURATION);
-				// TODO: adjust data structure to find a configuration by his info.
-				unregister(new PluginConfiguration(info));
+				register(info);
 			} else {
 				Log.e(LOG_TAG, "Plugin " + action + " has no configuration");
 			}
@@ -91,6 +86,7 @@ public class PluginService extends Service implements PluginTaskListener {
 	public void onDestroy() {
 		super.onDestroy();
 		manager.destroy();
+		repository.close();
 		stopForeground(true);
 		Log.i(LOG_TAG, "MobileDataCollectorService destroyed");
 	}
@@ -101,7 +97,8 @@ public class PluginService extends Service implements PluginTaskListener {
 		return binder;
 	}
 	
-	private void register(final PluginConfiguration plugin) {
+	private void register(final PluginInfo info) {
+		final PluginConfiguration plugin = createConfiguration(info);
 		if (!pluginConfigurations.contains(plugin)) {
 			pluginConfigurations.add(plugin);
 			notifyRegistered(plugin);
@@ -109,21 +106,11 @@ public class PluginService extends Service implements PluginTaskListener {
 		}
 	}
 	
-	private void unregister(final PluginConfiguration plugin) {
-		if (pluginConfigurations.contains(plugin)) {
-			pluginConfigurations.remove(plugin);
-			notifyUnregistered(plugin);
-			Log.i(LOG_TAG, "Service unregistered: " + plugin.getPluginInfo().getAction());
-		}
+	private PluginConfiguration createConfiguration(PluginInfo info) {
+		return new PluginConfiguration(info);
 	}
 	
 	private void notifyRegistered(PluginConfiguration configuration) {
-		for (final PluginServiceListener listener : listeners.toArray(new PluginServiceListener[0])) {
-			listener.onRegistered(new PluginServiceEvent(this, configuration));
-		}
-	}
-	
-	private void notifyUnregistered(PluginConfiguration configuration) {
 		for (final PluginServiceListener listener : listeners.toArray(new PluginServiceListener[0])) {
 			listener.onRegistered(new PluginServiceEvent(this, configuration));
 		}

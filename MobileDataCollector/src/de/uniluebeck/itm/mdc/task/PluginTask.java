@@ -11,9 +11,12 @@ import android.util.Log;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration.State;
 import de.uniluebeck.itm.mdcf.Plugin;
+import de.uniluebeck.itm.mdcf.location.SecureLocationManager;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.google.common.base.Preconditions;
 
 public class PluginTask implements Runnable, ServiceConnection {
 	
@@ -27,12 +30,16 @@ public class PluginTask implements Runnable, ServiceConnection {
 	
 	private final LocationManager locationManager;
 	
+	private final SecureLocationManager secureLocationManager;
+	
 	private Plugin plugin;
 	
 	public PluginTask(final Context context, final PluginConfiguration configuration) {
 		this.context = context;
 		this.configuration = configuration;
-		this.locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+		locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+		Preconditions.checkState(locationManager != null, "Location manager is not available");
+		secureLocationManager = new SecureLocationManagerImpl(locationManager);
 	}
 	
 	@Override
@@ -53,7 +60,7 @@ public class PluginTask implements Runnable, ServiceConnection {
 	}
 	
 	private void execute() throws RemoteException {
-		plugin.init(new SecureLocationManagerImpl(locationManager));
+		plugin.init(secureLocationManager);
 		configuration.setState(State.RUNNING);
 		notifyStateChange();
 		plugin.start();
