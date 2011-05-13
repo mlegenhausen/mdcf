@@ -26,6 +26,9 @@ public class PluginTaskManager implements PluginTaskListener {
 	}
 	
 	public PluginTask activatePluginConfiguration(PluginConfiguration configuration) {
+		if (tasks.containsKey(configuration)) {
+			return tasks.get(configuration);
+		}
 		PluginTask task = new PluginTask(context, configuration);
 		task.addListener(this);
 		tasks.put(configuration, task);
@@ -36,9 +39,11 @@ public class PluginTaskManager implements PluginTaskListener {
 	
 	public PluginTask deactivatePluginConfiguration(PluginConfiguration configuration) {
 		PluginTask task = tasks.remove(configuration);
-		task.destroy();
-		futures.get(configuration).cancel(true);
-		futures.remove(configuration);
+		if (task != null) {
+			task.destroy();
+			futures.get(configuration).cancel(true);
+			futures.remove(configuration);
+		}
 		return task;
 	}
 	

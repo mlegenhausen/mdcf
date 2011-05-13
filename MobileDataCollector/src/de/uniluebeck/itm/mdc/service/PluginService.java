@@ -102,6 +102,8 @@ public class PluginService extends Service implements PluginTaskListener {
 			repository.store(configuration);
 			notifyRegistered(configuration);
 			Log.i(LOG_TAG, "Service registered: " + configuration.getPluginInfo().getAction());
+		} else if (Mode.ACTIVATED.equals(configuration.getMode())) {
+			activate(configuration);
 		}
 	}
 	
@@ -111,14 +113,16 @@ public class PluginService extends Service implements PluginTaskListener {
 		}
 	}
 	
-	public void activate(PluginConfiguration plugin) {
-		plugin.setMode(Mode.ACTIVATED);
-		manager.activatePluginConfiguration(plugin).addListener(this);
+	public void activate(PluginConfiguration configuration) {
+		configuration.setMode(Mode.ACTIVATED);
+		repository.store(configuration);
+		manager.activatePluginConfiguration(configuration).addListener(this);
 	}
 	
-	public void deactivate(PluginConfiguration plugin) {
-		plugin.setMode(Mode.DEACTIVATED);
-		manager.deactivatePluginConfiguration(plugin).removeListener(this);
+	public void deactivate(PluginConfiguration configuration) {
+		configuration.setMode(Mode.DEACTIVATED);
+		repository.store(configuration);
+		manager.deactivatePluginConfiguration(configuration).removeListener(this);
 	}
 	
 	public void addListener(PluginServiceListener listener) {
