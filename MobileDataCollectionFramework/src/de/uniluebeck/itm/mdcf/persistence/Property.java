@@ -6,7 +6,6 @@ import java.util.List;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 public class Property extends Item implements Parcelable {
 
@@ -14,8 +13,6 @@ public class Property extends Item implements Parcelable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1296625465780574564L;
-	
-	private static final String TAG = Property.class.getName();
 
 	public static final Parcelable.Creator<Property> CREATOR = new Parcelable.Creator<Property>() {
         public Property createFromParcel(Parcel in) {
@@ -57,11 +54,9 @@ public class Property extends Item implements Parcelable {
 	
 	@Override
 	public void writeToParcel(Parcel out, int flags) {
-		Log.i(TAG, "Writing to parcel...");
 		super.writeToParcel(out, flags);
 		out.writeString(identifier);
 		out.writeTypedList(values);
-		Log.i(TAG, "Write successful");
 	}
 	
 	@Override
