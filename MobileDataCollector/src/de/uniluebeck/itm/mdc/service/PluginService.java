@@ -32,8 +32,6 @@ public class PluginService extends Service implements PluginTaskListener {
 	
 	public static final String LOG_TAG = "MobileDataCollectorService";
 	
-	private final List<PluginConfiguration> pluginConfigurations = new ArrayList<PluginConfiguration>();
-	
 	private final List<PluginServiceListener> listeners = new ArrayList<PluginServiceListener>();
 	
 	private final PluginTaskManager manager = new PluginTaskManager(this);
@@ -98,16 +96,13 @@ public class PluginService extends Service implements PluginTaskListener {
 	}
 	
 	private void register(final PluginInfo info) {
-		final PluginConfiguration plugin = createConfiguration(info);
-		if (!pluginConfigurations.contains(plugin)) {
-			pluginConfigurations.add(plugin);
-			notifyRegistered(plugin);
-			Log.i(LOG_TAG, "Service registered: " + plugin.getPluginInfo().getAction());
+		PluginConfiguration configuration = repository.findByPluginInfo(info);
+		if (configuration == null) {
+			configuration = new PluginConfiguration(info);
+			repository.store(configuration);
+			notifyRegistered(configuration);
+			Log.i(LOG_TAG, "Service registered: " + configuration.getPluginInfo().getAction());
 		}
-	}
-	
-	private PluginConfiguration createConfiguration(PluginInfo info) {
-		return new PluginConfiguration(info);
 	}
 	
 	private void notifyRegistered(PluginConfiguration configuration) {
@@ -135,7 +130,7 @@ public class PluginService extends Service implements PluginTaskListener {
 	}
 
 	public List<PluginConfiguration> getPluginConfigurations() {
-		return pluginConfigurations;
+		return repository.findAll();
 	}
 	
 	private void notifyPluginRunning(String name) {
