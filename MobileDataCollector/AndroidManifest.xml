@@ -12,6 +12,8 @@
 			</intent-filter>
 		</activity>
 		
+		<activity android:name="DataViewer" android:label="@string/data_viewer"/>
+		
 		<receiver android:name=".PackageAddedBroadcastReceiver">
 			<intent-filter>
 		      	<action android:name="android.intent.action.PACKAGE_INSTALL" />
@@ -33,7 +35,6 @@
 
 		<service android:name=".service.PluginService">
 			<intent-filter>
-				<action android:name="de.uniluebeck.itm.mdc.SERVICE" />
 				<action android:name="de.uniluebeck.itm.mdc.PLUGIN_REGISTER" />
 			</intent-filter>
 		</service>

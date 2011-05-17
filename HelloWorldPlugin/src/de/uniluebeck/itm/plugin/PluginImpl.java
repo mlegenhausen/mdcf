@@ -31,9 +31,9 @@ public class PluginImpl extends Plugin.Stub {
 	@Override
 	public void start() throws RemoteException {
 		Log.i(LOG_TAG, "Start plugin");
-		Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-		Log.i(LOG_TAG, "latitude: " + location.getLatitude() + " longitude: " + location.getLongitude());
-		storeLocation(location);
+		//Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+		//Log.i(LOG_TAG, "latitude: " + location.getLatitude() + " longitude: " + location.getLongitude());
+		storeLocation(null);
 	}
 
 	@Override
@@ -45,8 +45,8 @@ public class PluginImpl extends Plugin.Stub {
 		Node workspace = persistenceManager.getWorkspace();
 		Log.i(LOG_TAG, "Workspace received");
 		Node node = new Node();
-		node.setProperty("latitude", location.getLatitude());
-		node.setProperty("longitude", location.getLongitude());
+		node.setProperty("latitude", 150.0);
+		node.setProperty("longitude", 42.0);
 		workspace.addNode(node);
 		Log.i(LOG_TAG, "Saving workspace...");
 		persistenceManager.save(workspace);

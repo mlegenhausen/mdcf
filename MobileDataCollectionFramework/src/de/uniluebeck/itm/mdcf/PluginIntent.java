@@ -8,14 +8,14 @@ public class PluginIntent extends Intent {
 	
 	public static final String PLUGIN_REGISTER = "de.uniluebeck.itm.mdc.PLUGIN_REGISTER";
 	
-	public static final String PLUGIN_CONFIGURATION = "de.uniluebeck.itm.mdc.PLUGIN_CONFIGURATION";
+	public static final String PLUGIN_INFO = "de.uniluebeck.itm.mdc.PLUGIN_INFO";
 
 	public PluginIntent(final PluginInfo configuration) {
 		super(PLUGIN_REGISTER);
-		putExtra(PLUGIN_CONFIGURATION, configuration);
+		putExtra(PLUGIN_INFO, configuration);
 	}
 	
 	public PluginInfo getConfiguration() {
-		return getParcelableExtra(PLUGIN_CONFIGURATION);
+		return getParcelableExtra(PLUGIN_INFO);
 	}
 }

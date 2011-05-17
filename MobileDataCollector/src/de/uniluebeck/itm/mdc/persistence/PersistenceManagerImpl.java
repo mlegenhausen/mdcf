@@ -2,6 +2,10 @@ package de.uniluebeck.itm.mdc.persistence;
 
 import android.os.RemoteException;
 import android.util.Log;
+
+import com.google.common.collect.Iterators;
+
+import de.uniluebeck.itm.mdc.service.PluginConfiguration;
 import de.uniluebeck.itm.mdcf.persistence.Node;
 import de.uniluebeck.itm.mdcf.persistence.PersistenceManager;
 
@@ -9,29 +13,26 @@ public class PersistenceManagerImpl extends PersistenceManager.Stub {
 	
 	private final String TAG = PersistenceManagerImpl.class.getName();
 
-	private final NodeRepository repository;
+	private final PluginConfigurationRepository repository;
 	
-	private final Node workspace;
+	private final PluginConfiguration configuration;
 	
-	public PersistenceManagerImpl(NodeRepository repository, Node workspace) {
+	public PersistenceManagerImpl(PluginConfigurationRepository repository, PluginConfiguration configuration) {
 		this.repository = repository;
-		this.workspace = workspace;
+		this.configuration = configuration;
 	}
 	
 	@Override
 	public Node save(Node workspace) throws RemoteException {
 		Log.i(TAG, "Saving");
-		try {
-			repository.store(workspace);
-		} catch (Exception e) {
-			Log.e(TAG, "Unable to store workspace", e);
-		}
-		return workspace;
+		Log.i(TAG, "Size: " + Iterators.size(workspace.getNodes()));
+		configuration.setWorkspace(workspace);
+		repository.store(configuration);
+		return getWorkspace();
 	}
 
 	@Override
 	public Node getWorkspace() throws RemoteException {
-		return workspace;
+		return configuration.getWorkspace();
 	}
-
 }

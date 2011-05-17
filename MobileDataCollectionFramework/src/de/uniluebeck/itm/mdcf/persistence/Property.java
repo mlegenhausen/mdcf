@@ -92,6 +92,11 @@ public class Property extends Item implements Parcelable {
 		setTimestamp(System.currentTimeMillis());
 	}
 	
+	public void setValues(Value[] values) {
+		this.values.clear();
+		this.values.addAll(Arrays.asList(values));
+	}
+	
 	public Value[] getValues() {
 		return values.toArray(new Value[0]);
 	}
