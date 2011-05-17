@@ -1,6 +1,8 @@
 package de.uniluebeck.itm.mdc;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -27,6 +29,8 @@ import de.uniluebeck.itm.mdcf.persistence.Node;
 public class DataViewer extends ExpandableListActivity implements ServiceConnection {
 
 	private final static String TAG = DataViewer.class.getName();
+	
+	private final static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
 	
 	private SimpleExpandableListAdapter adapter;
 	
@@ -78,13 +82,13 @@ public class DataViewer extends ExpandableListActivity implements ServiceConnect
 		while (iterator.hasNext()) {
 			Map<String, String> curGroupMap = new HashMap<String, String>();
 			final Node node = iterator.next();
-			curGroupMap.put("name", node.getTimestamp().toString());
+			curGroupMap.put("name", DATE_FORMAT.format(new Date(node.getTimestamp())));
 			groups.add(curGroupMap);
 			
 			List<Map<String, String>> curChildList = new ArrayList<Map<String, String>>();
 			for (String property : node.getProperties()) {
 				Map<String, String> curChildMap = new HashMap<String, String>();
-				curChildMap.put("property", property);
+				curChildMap.put("property", property + ": " + node.getProperty(property).getValue().toString());
 				curChildList.add(curChildMap);
 			}
 			children.add(curChildList);
