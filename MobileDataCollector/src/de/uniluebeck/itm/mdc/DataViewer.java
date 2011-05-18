@@ -15,11 +15,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.util.Log;
 import android.widget.SimpleExpandableListAdapter;
-
-import com.google.common.collect.Iterators;
-
 import de.uniluebeck.itm.mdc.service.PluginConfiguration;
 import de.uniluebeck.itm.mdc.service.PluginService;
 import de.uniluebeck.itm.mdcf.PluginInfo;
@@ -77,23 +73,38 @@ public class DataViewer extends ExpandableListActivity implements ServiceConnect
 	
 	private void refresh() {
 		final Node workspace = pluginConfiguration.getWorkspace();
-		Log.i(TAG, "Length: " + Iterators.size(workspace.getNodes()));
 		final Iterator<Node> iterator = workspace.getNodes();
 		while (iterator.hasNext()) {
-			Map<String, String> curGroupMap = new HashMap<String, String>();
+			final Map<String, String> nodeMap = new HashMap<String, String>();
 			final Node node = iterator.next();
-			curGroupMap.put("name", DATE_FORMAT.format(new Date(node.getTimestamp())));
-			groups.add(curGroupMap);
+			nodeMap.put("name", DATE_FORMAT.format(new Date(node.getTimestamp())));
+			groups.add(nodeMap);
 			
-			List<Map<String, String>> curChildList = new ArrayList<Map<String, String>>();
-			for (String property : node.getProperties()) {
-				Map<String, String> curChildMap = new HashMap<String, String>();
-				curChildMap.put("property", property + ": " + node.getProperty(property).getValue().toString());
-				curChildList.add(curChildMap);
-			}
-			children.add(curChildList);
+			final List<Map<String, String>> subList = new ArrayList<Map<String, String>>();
+			mapNodes(subList, node);
+			mapProperties(subList, node);
+			children.add(subList);
 		}
+		mapProperties(groups, workspace);
 		adapter.notifyDataSetChanged();
+	}
+	
+	private static void mapProperties(final List<Map<String, String>> list, final Node node) {		
+		for (final String property : node.getProperties()) {
+			final Map<String, String> map = new HashMap<String, String>();
+			map.put("property", property + ": " +  node.getProperty(property).getValue().toString());
+			list.add(map);
+		}
+	}
+	
+	private static void mapNodes(final List<Map<String, String>> list, final Node node) {
+		final Iterator<Node> iterator = node.getNodes();
+		while (iterator.hasNext()) {
+			final Node subNode = iterator.next();
+			final Map<String, String> subMap = new HashMap<String, String>();
+			subMap.put("property", DATE_FORMAT.format(new Date(subNode.getTimestamp())));
+			list.add(subMap);
+		}
 	}
 
 	@Override
