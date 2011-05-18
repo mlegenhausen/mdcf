@@ -1,5 +1,10 @@
 package de.uniluebeck.itm.mdc;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import android.app.ListActivity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -20,17 +25,12 @@ import de.uniluebeck.itm.mdc.service.PluginConfiguration.Mode;
 import de.uniluebeck.itm.mdc.service.PluginService;
 import de.uniluebeck.itm.mdc.service.PluginServiceEvent;
 import de.uniluebeck.itm.mdc.service.PluginServiceListener;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import de.uniluebeck.itm.mdcf.PluginInfo;
+import de.uniluebeck.itm.mdcf.PluginIntent;
 
 public class MobileDataCollector extends ListActivity implements ServiceConnection, PluginServiceListener {
 	
 	public static final String LOG_TAG = "MobileDataCollector";
-	
-	public static final String SERVICE = "de.uniluebeck.itm.mdc.SERVICE";
 	
 	private	static final String KEY_PLUGIN = "plugin";
 	
@@ -79,8 +79,7 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     protected void onStart() {
     	super.onStart();
     	Log.i(LOG_TAG, "Bind Service");
-    	startService(new Intent(SERVICE));
-    	bindService(new Intent(SERVICE), this, Context.BIND_AUTO_CREATE);
+    	bindService(new Intent(this, PluginService.class), this, Context.BIND_AUTO_CREATE);
     }
     
     @Override
@@ -111,6 +110,12 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     		break;
     	case DEACTIVATE_ID:
     		service.deactivate(pluginConfigurations.get(info.position));
+    		break;
+    	case DATAVIEWER_ID:
+    		PluginInfo pluginInfo = pluginConfigurations.get(info.position).getPluginInfo();
+    		Intent intent = new Intent(this, ListDataViewer.class);
+    		intent.putExtra(PluginIntent.PLUGIN_INFO, pluginInfo);
+    		startActivity(intent);
     		break;
     	}
     	return super.onContextItemSelected(item);

@@ -71,8 +71,8 @@ public class PluginService extends Service implements PluginTaskListener {
 		final String action = intent.getAction();
 		if (PluginIntent.PLUGIN_REGISTER.equals(action)) {
 			Log.i(LOG_TAG, "Plugin " + action + " wants to register");
-			if (intent.hasExtra(PluginIntent.PLUGIN_CONFIGURATION)) {
-				final PluginInfo info = intent.getParcelableExtra(PluginIntent.PLUGIN_CONFIGURATION);
+			if (intent.hasExtra(PluginIntent.PLUGIN_INFO)) {
+				final PluginInfo info = intent.getParcelableExtra(PluginIntent.PLUGIN_INFO);
 				register(info);
 			} else {
 				Log.e(LOG_TAG, "Plugin " + action + " has no configuration");
@@ -135,6 +135,10 @@ public class PluginService extends Service implements PluginTaskListener {
 
 	public List<PluginConfiguration> getPluginConfigurations() {
 		return repository.findAll();
+	}
+	
+	public PluginConfiguration getPluginConfiguration(PluginInfo info) {
+		return repository.findByPluginInfo(info);
 	}
 	
 	private void notifyPluginRunning(String name) {

@@ -60,6 +60,10 @@ public class PluginConfiguration implements Serializable {
 		return workspace;
 	}
 	
+	public void setWorkspace(Node workspace) {
+		this.workspace = workspace;
+	}
+	
 	@Override
 	public boolean equals(Object o) {
 		if (o instanceof PluginInfo) {

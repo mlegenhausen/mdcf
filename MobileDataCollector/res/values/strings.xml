@@ -14,4 +14,5 @@
     <string name="plugin_collecting">%1$s is collecting data...</string>
     <string name="plugin_stopping">%1$s is stopping</string>
     <string name="plugin_stop_collecting">%1$s has stopped collecting data...</string>
+    <string name="data_viewer">Data Viewer</string>
 </resources>

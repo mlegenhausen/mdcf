@@ -11,8 +11,8 @@ import android.location.LocationManager;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
-import de.uniluebeck.itm.mdc.persistence.NodeRepository;
 import de.uniluebeck.itm.mdc.persistence.PersistenceManagerImpl;
+import de.uniluebeck.itm.mdc.persistence.PluginConfigurationRepository;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration.State;
 import de.uniluebeck.itm.mdcf.Plugin;
@@ -42,7 +42,7 @@ public class PluginTask implements Runnable, ServiceConnection {
 		this.configuration = configuration;
 		locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 		secureLocationManager = new SecureLocationManagerImpl(locationManager);
-		persistenceManager = new PersistenceManagerImpl(new NodeRepository(context), configuration.getWorkspace());
+		persistenceManager = new PersistenceManagerImpl(new PluginConfigurationRepository(context), configuration);
 	}
 	
 	@Override

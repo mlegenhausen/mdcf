@@ -79,4 +79,9 @@ public class Value implements Parcelable {
 	public int getType() {
 		return type;
 	}
+	
+	@Override
+	public String toString() {
+		return value.toString();
+	}
 }

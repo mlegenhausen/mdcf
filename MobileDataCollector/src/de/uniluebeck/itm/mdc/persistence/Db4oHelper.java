@@ -47,8 +47,8 @@ public class Db4oHelper {
      */
     private EmbeddedConfiguration dbConfig() throws IOException {
     	EmbeddedConfiguration configuration = Db4oEmbedded.newConfiguration();
-    	configuration.common().objectClass(PluginConfiguration.class);
-    	configuration.common().objectClass(PluginInfo.class);
+    	configuration.common().objectClass(PluginConfiguration.class).objectField("pluginInfo").indexed(true);
+    	configuration.common().objectClass(PluginInfo.class).objectField("action").indexed(true);
     	configuration.common().objectClass(Node.class).objectField("id").indexed(true);
     	configuration.common().objectClass(Node.class).cascadeOnDelete(true);
     	configuration.common().objectClass(Node.class).cascadeOnUpdate(true);
@@ -71,7 +71,8 @@ public class Db4oHelper {
      * Closes the database
      */
     public void close() {
-	   if (oc != null)
+	   if (oc != null) {
            oc.close();
+	   }
 	}
 }
