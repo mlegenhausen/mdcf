@@ -12,7 +12,7 @@
 			</intent-filter>
 		</activity>
 		
-		<activity android:name="DataViewer" android:label="@string/data_viewer"/>
+		<activity android:name="ListDataViewer" android:label="@string/data_viewer"/>
 		
 		<receiver android:name=".PackageAddedBroadcastReceiver">
 			<intent-filter>

@@ -1,5 +1,10 @@
 package de.uniluebeck.itm.mdc;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import android.app.ListActivity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -22,11 +27,6 @@ import de.uniluebeck.itm.mdc.service.PluginServiceEvent;
 import de.uniluebeck.itm.mdc.service.PluginServiceListener;
 import de.uniluebeck.itm.mdcf.PluginInfo;
 import de.uniluebeck.itm.mdcf.PluginIntent;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class MobileDataCollector extends ListActivity implements ServiceConnection, PluginServiceListener {
 	
@@ -113,7 +113,7 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     		break;
     	case DATAVIEWER_ID:
     		PluginInfo pluginInfo = pluginConfigurations.get(info.position).getPluginInfo();
-    		Intent intent = new Intent(this, DataViewer.class);
+    		Intent intent = new Intent(this, ListDataViewer.class);
     		intent.putExtra(PluginIntent.PLUGIN_INFO, pluginInfo);
     		startActivity(intent);
     		break;

@@ -7,8 +7,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
-import android.app.ExpandableListActivity;
+import android.app.ListActivity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -17,26 +18,26 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.SimpleExpandableListAdapter;
+import android.view.View;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration;
 import de.uniluebeck.itm.mdc.service.PluginService;
 import de.uniluebeck.itm.mdcf.PluginInfo;
 import de.uniluebeck.itm.mdcf.PluginIntent;
+import de.uniluebeck.itm.mdcf.persistence.Item;
 import de.uniluebeck.itm.mdcf.persistence.Node;
+import de.uniluebeck.itm.mdcf.persistence.Property;
 
-public class DataViewer extends ExpandableListActivity implements ServiceConnection {
-
-	private final static String TAG = DataViewer.class.getName();
+public class ListDataViewer extends ListActivity implements ServiceConnection {
 	
 	private final static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
 	
 	private final static String NODE_FIELD = "name";
 	
-	private final static String PROPERTY_FIELD = "property";
-	
 	private final static int REFRESH = 0;
 	
-	private SimpleExpandableListAdapter adapter;
+	private SimpleAdapter adapter;
 	
 	private PluginService service;
 	
@@ -44,25 +45,25 @@ public class DataViewer extends ExpandableListActivity implements ServiceConnect
 	
 	private PluginConfiguration pluginConfiguration;
 	
-	private List<Map<String, String>> groups = new ArrayList<Map<String, String>>();
+	private Node root = null;
 	
-	private List<List<Map<String, String>>> children = new ArrayList<List<Map<String, String>>>();
+	private List<Item> items = new ArrayList<Item>();
+	
+	private Stack<Node> history = new Stack<Node>();
+	
+	private List<Map<String, String>> itemMapping = new ArrayList<Map<String, String>>();
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
 		pluginInfo = getIntent().getParcelableExtra(PluginIntent.PLUGIN_INFO);
-		adapter = new SimpleExpandableListAdapter(
+		adapter = new SimpleAdapter(
 			this, 
-			groups, 
+			itemMapping, 
 			R.layout.node_row, 
 			new String[] { NODE_FIELD }, 
-			new int[] { R.id.name }, 
-			children, 
-			R.layout.property_row, 
-			new String[] { PROPERTY_FIELD }, 
-			new int[] { R.id.property }
+			new int[] { R.id.name }
 		);
 		setListAdapter(adapter);
 	}
@@ -80,41 +81,37 @@ public class DataViewer extends ExpandableListActivity implements ServiceConnect
 	}
 	
 	private void refresh() {
-		groups.clear();
-		children.clear();
 		pluginConfiguration = service.getPluginConfiguration(pluginInfo);
-		final Node workspace = pluginConfiguration.getWorkspace();
-		final Iterator<Node> iterator = workspace.getNodes();
-		while (iterator.hasNext()) {
-			final Map<String, String> nodeMap = new HashMap<String, String>();
-			final Node node = iterator.next();
-			nodeMap.put(NODE_FIELD, DATE_FORMAT.format(new Date(node.getTimestamp())));
-			groups.add(nodeMap);
-			
-			final List<Map<String, String>> subList = new ArrayList<Map<String, String>>();
-			mapNodes(subList, node);
-			mapProperties(subList, node, PROPERTY_FIELD);
-			children.add(subList);
-		}
-		mapProperties(groups, workspace, NODE_FIELD);
+		showItems(pluginConfiguration.getWorkspace());
+	}
+	
+	private void showItems(Node root) {
+		this.root = root;
+		itemMapping.clear();
+		items.clear();
+		mapNodes(root);
+		mapProperties(root);
 		adapter.notifyDataSetChanged();
 	}
 	
-	private static void mapProperties(final List<Map<String, String>> list, final Node node, final String id) {		
-		for (final String property : node.getProperties()) {
+	private void mapProperties(final Node node) {		
+		for (final String name : node.getProperties()) {
+			final Property property = node.getProperty(name);
 			final Map<String, String> map = new HashMap<String, String>();
-			map.put(id, property + ": " +  node.getProperty(property).getValue().toString());
-			list.add(map);
+			map.put(NODE_FIELD, name + ": " +  property.getValue().toString());
+			itemMapping.add(map);
+			items.add(property);
 		}
 	}
 	
-	private static void mapNodes(final List<Map<String, String>> list, final Node node) {
-		final Iterator<Node> iterator = node.getNodes();
+	private void mapNodes(final Node root) {
+		final Iterator<Node> iterator = root.getNodes();
 		while (iterator.hasNext()) {
-			final Node subNode = iterator.next();
-			final Map<String, String> subMap = new HashMap<String, String>();
-			subMap.put(PROPERTY_FIELD, DATE_FORMAT.format(new Date(subNode.getTimestamp())));
-			list.add(subMap);
+			final Node node = iterator.next();
+			final Map<String, String> map = new HashMap<String, String>();
+			map.put(NODE_FIELD, DATE_FORMAT.format(new Date(node.getTimestamp())));
+			itemMapping.add(map);
+			items.add(node);
 		}
 	}
 
@@ -143,5 +140,23 @@ public class DataViewer extends ExpandableListActivity implements ServiceConnect
 			break;
 		}
 		return true;
+	}
+	
+	@Override
+	protected void onListItemClick(ListView l, View v, int position, long id) {
+		final Item item = items.get(position);
+		if (item instanceof Node) {
+			history.push(root);
+			showItems((Node) item);
+		}
+	}
+	
+	@Override
+	public void onBackPressed() {
+		if (!history.isEmpty()) {
+			showItems(history.pop());
+		} else {
+			super.onBackPressed();
+		}
 	}
 }
