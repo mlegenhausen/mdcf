@@ -7,8 +7,9 @@
  
      <TextView android:id="@+id/name"
          android:textSize="12pt"
-         android:padding="7px"
          android:layout_width="fill_parent"
-         android:layout_height="wrap_content"/>
-
+         android:layout_height="wrap_content"
+         android:paddingLeft="60px"
+         android:paddingTop="7px"
+         android:paddingBottom="7px"/>
 </LinearLayout>
