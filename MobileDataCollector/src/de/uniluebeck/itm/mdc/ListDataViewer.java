@@ -8,6 +8,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import android.app.ListActivity;
 import android.content.ComponentName;
@@ -21,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import de.uniluebeck.itm.mdc.net.WorkspaceTransmitionTask;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration;
 import de.uniluebeck.itm.mdc.service.PluginService;
 import de.uniluebeck.itm.mdcf.PluginInfo;
@@ -36,6 +39,12 @@ public class ListDataViewer extends ListActivity implements ServiceConnection {
 	private final static String NODE_FIELD = "name";
 	
 	private final static int REFRESH = 0;
+	
+	private final static int TRANSFER = 1;
+	
+	private final static int DIALOG_PROGRESS_ID = 0;
+	
+	private final ExecutorService executor = Executors.newSingleThreadExecutor();
 	
 	private SimpleAdapter adapter;
 	
@@ -114,6 +123,12 @@ public class ListDataViewer extends ListActivity implements ServiceConnection {
 			items.add(node);
 		}
 	}
+	
+	private void transfer() {
+		final String url = pluginConfiguration.getPluginInfo().getUrl();
+		final Node workspace = pluginConfiguration.getWorkspace();
+		new WorkspaceTransmitionTask(this, url).execute(workspace);
+	}
 
 	@Override
 	public void onServiceConnected(final ComponentName name, final IBinder binder) {
@@ -129,6 +144,7 @@ public class ListDataViewer extends ListActivity implements ServiceConnection {
 	@Override
 	public boolean onCreateOptionsMenu(final Menu menu) {
 		menu.add(0, REFRESH, 0, "Refresh");
+		menu.add(0, TRANSFER, 0, "Transfer");
 		return true;
 	}
 	
@@ -137,6 +153,9 @@ public class ListDataViewer extends ListActivity implements ServiceConnection {
 		switch (item.getItemId()) {
 		case REFRESH:
 			refresh();
+			break;
+		case TRANSFER:
+			transfer();
 			break;
 		}
 		return true;

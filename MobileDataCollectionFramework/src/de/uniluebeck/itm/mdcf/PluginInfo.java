@@ -52,6 +52,7 @@ public class PluginInfo implements Parcelable {
 		parcel.writeString(version);
 		parcel.writeInt(period);
 		parcel.writeInt(duration);
+		parcel.writeString(url);
 	}
 	
 	public void readFromParcel(Parcel parcel) {
@@ -60,6 +61,7 @@ public class PluginInfo implements Parcelable {
 		version = parcel.readString();
 		period = parcel.readInt();
 		duration = parcel.readInt();
+		url = parcel.readString();
 	}
 
 	public String getName() {
