@@ -25,4 +25,6 @@ public class Notifications {
 		notification.icon = R.drawable.stat_sample;
 		return notification;
 	}
+	
+	
 }

@@ -44,7 +44,10 @@ public class PluginTask implements Runnable, ServiceConnection {
 	
 	@Override
 	public void run() {
-		context.bindService(new Intent(configuration.getPluginInfo().getAction()), this, Context.BIND_AUTO_CREATE);
+		boolean result = context.bindService(new Intent(configuration.getPluginInfo().getAction()), this, Context.BIND_AUTO_CREATE);
+		if (!result) {
+			notifyNotFound();
+		}
 	}
 
 	@Override
@@ -116,6 +119,12 @@ public class PluginTask implements Runnable, ServiceConnection {
 	private void notifyStateChange() {
 		for (PluginTaskListener listener : listeners.toArray(new PluginTaskListener[0])) {
 			listener.onStateChange(new PluginTaskEvent(this, configuration));
+		}
+	}
+	
+	private void notifyNotFound() {
+		for (PluginTaskListener listener : listeners.toArray(new PluginTaskListener[0])) {
+			listener.onNotFound(new PluginTaskEvent(this, configuration));
 		}
 	}
 	

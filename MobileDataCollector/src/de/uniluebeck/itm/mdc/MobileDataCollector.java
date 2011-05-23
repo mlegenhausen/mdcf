@@ -48,6 +48,16 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 	
 	private PluginService service;
 	
+	private Map<String, String> mapPlugin(PluginConfiguration plugin) {
+		final Map<String, String> map = new HashMap<String, String>();
+		map.put(KEY_PLUGIN, plugin.getPluginInfo().getName());
+		return map;
+	}
+	
+	private void addPlugin(PluginConfiguration plugin) {
+		pluginMappings.add(mapPlugin(plugin));
+	}
+	
 	private void loadPlugins() {
 		pluginMappings.clear();
 		pluginConfigurations = service.getPluginConfigurations();
@@ -57,10 +67,12 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 		listAdapter.notifyDataSetChanged();
 	}
 	
-	private void addPlugin(PluginConfiguration plugin) {
-		final Map<String, String> map = new HashMap<String, String>();
-		map.put(KEY_PLUGIN, plugin.getPluginInfo().getName());
-		pluginMappings.add(map);
+	private void updatePlugin(PluginConfiguration plugin) {
+		int index = pluginConfigurations.indexOf(plugin);
+		if (index > -1) {
+			pluginMappings.set(index, mapPlugin(plugin));
+			listAdapter.notifyDataSetChanged();
+		}
 	}
 	
     /**
@@ -145,6 +157,28 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 			public void run() {
 				Toast.makeText(MobileDataCollector.this, text, Toast.LENGTH_LONG);
 				loadPlugins();
+			}
+		});
+	}
+	
+	@Override
+	public void onStateChanged(PluginServiceEvent event) {
+		final PluginConfiguration plugin = event.getConfiguration();
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				updatePlugin(plugin);
+			}
+		});
+	}
+	
+	@Override
+	public void onModeChanged(PluginServiceEvent event) {
+		final PluginConfiguration plugin = event.getConfiguration();
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				updatePlugin(plugin);
 			}
 		});
 	}

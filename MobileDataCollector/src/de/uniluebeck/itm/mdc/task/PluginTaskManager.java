@@ -8,7 +8,9 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import android.content.Context;
+import de.uniluebeck.itm.mdc.persistence.PluginConfigurationRepository;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration;
+import de.uniluebeck.itm.mdc.service.PluginConfiguration.Mode;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration.State;
 
 public class PluginTaskManager implements PluginTaskListener {
@@ -21,14 +23,20 @@ public class PluginTaskManager implements PluginTaskListener {
 	
 	private final Context context;
 	
-	public PluginTaskManager(Context context) {
+	private final PluginConfigurationRepository repository;
+	
+	public PluginTaskManager(Context context, PluginConfigurationRepository repository) {		
 		this.context = context;
+		this.repository = repository;
 	}
 	
-	public PluginTask activatePluginConfiguration(PluginConfiguration configuration) {
+	public PluginTask activate(PluginConfiguration configuration) {
 		if (tasks.containsKey(configuration)) {
 			return tasks.get(configuration);
 		}
+		configuration.setMode(Mode.ACTIVATED);
+		repository.store(configuration);
+		
 		PluginTask task = new PluginTask(context, configuration);
 		task.addListener(this);
 		tasks.put(configuration, task);
@@ -37,7 +45,10 @@ public class PluginTaskManager implements PluginTaskListener {
 		return task;
 	}
 	
-	public PluginTask deactivatePluginConfiguration(PluginConfiguration configuration) {
+	public PluginTask deactivate(PluginConfiguration configuration) {
+		configuration.setMode(Mode.DEACTIVATED);
+		repository.store(configuration);
+		
 		PluginTask task = tasks.remove(configuration);
 		if (task != null) {
 			task.destroy();
@@ -49,7 +60,7 @@ public class PluginTaskManager implements PluginTaskListener {
 	
 	public void destroy() {
 		for (PluginConfiguration configuration : tasks.keySet()) {
-			deactivatePluginConfiguration(configuration);
+			deactivate(configuration);
 		}
 	}
 
@@ -63,5 +74,10 @@ public class PluginTaskManager implements PluginTaskListener {
 			ScheduledFuture<?> future = scheduler.schedule(task, period, TimeUnit.MILLISECONDS);
 			futures.put(configuration, future);
 		}
+	}
+	
+	@Override
+	public void onNotFound(PluginTaskEvent event) {
+		deactivate(event.getConfiguration());
 	}
 }

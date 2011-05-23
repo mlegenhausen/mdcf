@@ -34,9 +34,9 @@ public class PluginService extends Service implements PluginTaskListener {
 	
 	private final List<PluginServiceListener> listeners = new ArrayList<PluginServiceListener>();
 	
-	private final PluginTaskManager manager = new PluginTaskManager(this);
-	
 	private final IBinder binder = new PluginServiceBinder();
+	
+	private PluginTaskManager pluginTaskManager;
 	
 	private PluginConfigurationRepository repository;
 	
@@ -47,6 +47,7 @@ public class PluginService extends Service implements PluginTaskListener {
 		super.onCreate();
 		notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		repository = new PluginConfigurationRepository(this);
+		pluginTaskManager = new PluginTaskManager(this, repository);
 		initService();
 	}
 	
@@ -83,7 +84,7 @@ public class PluginService extends Service implements PluginTaskListener {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		manager.destroy();
+		pluginTaskManager.destroy();
 		repository.close();
 		stopForeground(true);
 		Log.i(LOG_TAG, "MobileDataCollectorService destroyed");
@@ -102,8 +103,10 @@ public class PluginService extends Service implements PluginTaskListener {
 			repository.store(configuration);
 			notifyRegistered(configuration);
 			Log.i(LOG_TAG, "Service registered: " + configuration.getPluginInfo().getAction());
-		} else if (Mode.ACTIVATED.equals(configuration.getMode())) {
-			activate(configuration);
+		} else {
+			if (Mode.ACTIVATED.equals(configuration.getMode())) {
+				activate(configuration);
+			}
 		}
 	}
 	
@@ -113,16 +116,24 @@ public class PluginService extends Service implements PluginTaskListener {
 		}
 	}
 	
+	private void notifyStateChanged(PluginConfiguration configuration) {
+		for (final PluginServiceListener listener : listeners.toArray(new PluginServiceListener[0])) {
+			listener.onStateChanged(new PluginServiceEvent(this, configuration));
+		}
+	}
+	
+	private void notifyModeChanged(PluginConfiguration configuration) {
+		for (final PluginServiceListener listener : listeners.toArray(new PluginServiceListener[0])) {
+			listener.onModeChanged(new PluginServiceEvent(this, configuration));
+		}
+	}
+	
 	public void activate(PluginConfiguration configuration) {
-		configuration.setMode(Mode.ACTIVATED);
-		repository.store(configuration);
-		manager.activatePluginConfiguration(configuration).addListener(this);
+		pluginTaskManager.activate(configuration).addListener(this);
 	}
 	
 	public void deactivate(PluginConfiguration configuration) {
-		configuration.setMode(Mode.DEACTIVATED);
-		repository.store(configuration);
-		manager.deactivatePluginConfiguration(configuration).removeListener(this);
+		pluginTaskManager.deactivate(configuration).removeListener(this);
 	}
 	
 	public void addListener(PluginServiceListener listener) {
@@ -169,5 +180,14 @@ public class PluginService extends Service implements PluginTaskListener {
 			Notification notification = Notifications.createNotification(this, R.string.notification_task_wait);
 			notificationManager.notify(R.string.foreground_service, notification);
 		}
+		notifyStateChanged(configuration);
+	}
+	
+	@Override
+	public void onNotFound(PluginTaskEvent event) {
+		String name = event.getConfiguration().getPluginInfo().getName();
+		Notification notification = Notifications.createNotification(this, name + " was not found");
+		notificationManager.notify(R.string.foreground_service, notification);
+		notifyModeChanged(event.getConfiguration());
 	}
 }
