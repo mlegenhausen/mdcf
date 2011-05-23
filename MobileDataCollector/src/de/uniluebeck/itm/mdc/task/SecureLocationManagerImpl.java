@@ -4,9 +4,9 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.RemoteException;
 import android.util.Log;
-import de.uniluebeck.itm.mdcf.location.SecureLocationManager.Stub;
+import de.uniluebeck.itm.mdcf.service.SecureLocationManager;
 
-public class SecureLocationManagerImpl extends Stub {
+public class SecureLocationManagerImpl extends SecureLocationManager.Stub {
 
 	private static final String TAG = "SecureLocationManager";
 	

@@ -1,4 +1,4 @@
-package de.uniluebeck.itm.mdcf.location;
+package de.uniluebeck.itm.mdcf.service;
 
 import android.location.Location;
 

@@ -1,5 +1,8 @@
 package de.uniluebeck.itm.mdcf;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -27,6 +30,8 @@ public class PluginInfo implements Parcelable {
     
     private int duration;
     
+    private List<String> services = new ArrayList<String>();
+    
     public PluginInfo() {
 		
 	}
@@ -53,6 +58,7 @@ public class PluginInfo implements Parcelable {
 		parcel.writeInt(period);
 		parcel.writeInt(duration);
 		parcel.writeString(url);
+		parcel.writeStringList(services);
 	}
 	
 	public void readFromParcel(Parcel parcel) {
@@ -62,6 +68,7 @@ public class PluginInfo implements Parcelable {
 		period = parcel.readInt();
 		duration = parcel.readInt();
 		url = parcel.readString();
+		parcel.readStringList(services);
 	}
 
 	public String getName() {
@@ -110,6 +117,14 @@ public class PluginInfo implements Parcelable {
 
 	public void setVersion(String version) {
 		this.version = version;
+	}
+	
+	public List<String> getServices() {
+		return services;
+	}
+	
+	public void setServices(List<String> services) {
+		this.services = services;
 	}
 
 	@Override

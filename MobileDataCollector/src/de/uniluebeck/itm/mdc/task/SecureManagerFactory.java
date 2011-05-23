@@ -1,0 +1,41 @@
+package de.uniluebeck.itm.mdc.task;
+
+import android.content.Context;
+import android.location.LocationManager;
+import android.media.AudioManager;
+import android.net.ConnectivityManager;
+import android.net.wifi.WifiManager;
+import android.telephony.TelephonyManager;
+import de.uniluebeck.itm.mdcf.service.SecureAudioManager;
+import de.uniluebeck.itm.mdcf.service.SecureConnectivityManager;
+import de.uniluebeck.itm.mdcf.service.SecureLocationManager;
+import de.uniluebeck.itm.mdcf.service.SecureTelephonyManager;
+import de.uniluebeck.itm.mdcf.service.SecureWifiManager;
+
+public class SecureManagerFactory {
+
+	public static SecureLocationManager createSecureLocationManager(Context context) {
+		LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+		return new SecureLocationManagerImpl(locationManager);
+	}
+	
+	public static SecureWifiManager createSecureWifiManager(Context context) {
+		WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+		return new SecureWifiManagerImpl(wifiManager);
+	}
+	
+	public static SecureAudioManager createSecureAudioManager(Context context) {
+		AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+		return new SecureAudioManagerImpl(audioManager);
+	}
+	
+	public static SecureConnectivityManager createSecureConnectivityManager(Context context) {
+		ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+		return new SecureConnectivityManagerImpl(connectivityManager);
+	}
+
+	public static SecureTelephonyManager createSecureTelephonyManager(Context context) {
+		TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+		return new SecureTelephonyManagerImpl(telephonyManager);
+	}
+}
