@@ -132,7 +132,8 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     	PluginConfiguration plugin = pluginConfigurations.get(info.position);
     	switch (item.getItemId()) {
     	case ACTIVATE_ID:
-    		service.activate(plugin);
+    		startActivite(plugin);
+    		//service.activate(plugin);
     		break;
     	case DEACTIVATE_ID:
     		service.deactivate(plugin);
@@ -148,6 +149,13 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     		break;
     	}
     	return super.onContextItemSelected(item);
+    }
+    
+    private void startActivite(PluginConfiguration plugin) {
+    	PluginInfo pluginInfo = plugin.getPluginInfo();
+    	Intent intent = new Intent(this, ActivationActivity.class);
+    	intent.putExtra(PluginIntent.PLUGIN_INFO, pluginInfo);
+    	startActivity(intent);
     }
     
     private void startDataViewer(PluginConfiguration plugin) {
