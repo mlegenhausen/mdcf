@@ -20,6 +20,8 @@ public class PluginInfo implements Parcelable {
     
     private String name;
     
+    private String pkg;
+    
     private String action;
     
     private String version;
@@ -53,6 +55,7 @@ public class PluginInfo implements Parcelable {
 	@Override
 	public void writeToParcel(Parcel parcel, int index) {
 		parcel.writeString(action);
+		parcel.writeString(pkg);
 		parcel.writeString(name);
 		parcel.writeString(version);
 		parcel.writeInt(period);
@@ -63,6 +66,7 @@ public class PluginInfo implements Parcelable {
 	
 	public void readFromParcel(Parcel parcel) {
 		action = parcel.readString();
+		pkg = parcel.readString();
 		name = parcel.readString();
 		version = parcel.readString();
 		period = parcel.readInt();
@@ -77,6 +81,14 @@ public class PluginInfo implements Parcelable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	public String getPackage() {
+		return pkg;
+	}
+	
+	public void setPackage(String pkg) {
+		this.pkg = pkg;
 	}
 
 	public String getAction() {

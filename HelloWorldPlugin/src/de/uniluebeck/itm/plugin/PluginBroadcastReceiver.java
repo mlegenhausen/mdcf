@@ -14,6 +14,7 @@ public class PluginBroadcastReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		final PluginInfo configuration = new PluginInfo("de.uniluebeck.itm.plugin.HELLO_WORLD", "Hello World Plugin");
+		configuration.setPackage("de.uniluebeck.itm.plugin");
 		configuration.setPeriod(30000);
 		configuration.setUrl("http://192.168.1.103/mdcf/receiver.php");
 		configuration.getServices().add(Context.LOCATION_SERVICE);

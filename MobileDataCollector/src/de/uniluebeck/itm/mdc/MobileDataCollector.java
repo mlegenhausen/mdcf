@@ -10,6 +10,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -39,6 +40,10 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 	private static final int DEACTIVATE_ID = 2;
 	
 	private static final int DATAVIEWER_ID = 3;
+	
+	private static final int DETAILS_ID = 4;
+	
+	private static final int UNINSTALL_ID = 5;
 	
 	private SimpleAdapter listAdapter;
 	
@@ -111,26 +116,50 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     		menu.add(0, DEACTIVATE_ID, 0, R.string.menu_deactivate);
     	}
     	menu.add(0, DATAVIEWER_ID, 1, R.string.menu_dataviewer);
+    	menu.add(0, DETAILS_ID, 2, R.string.menu_details);
+    	menu.add(0, UNINSTALL_ID, 3, R.string.menu_uninstall);
     }
     
     @Override
     public boolean onContextItemSelected(MenuItem item) {
     	AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+    	PluginConfiguration plugin = pluginConfigurations.get(info.position);
     	switch (item.getItemId()) {
     	case ACTIVATE_ID:
-    		service.activate(pluginConfigurations.get(info.position));
+    		service.activate(plugin);
     		break;
     	case DEACTIVATE_ID:
-    		service.deactivate(pluginConfigurations.get(info.position));
+    		service.deactivate(plugin);
     		break;
     	case DATAVIEWER_ID:
-    		PluginInfo pluginInfo = pluginConfigurations.get(info.position).getPluginInfo();
-    		Intent intent = new Intent(this, ListDataViewer.class);
-    		intent.putExtra(PluginIntent.PLUGIN_INFO, pluginInfo);
-    		startActivity(intent);
+    		startDataViewer(plugin);
+    		break;
+    	case DETAILS_ID:
+    		startDetails(plugin);
+    		break;
+    	case UNINSTALL_ID:
+    		startUninstall(plugin);
     		break;
     	}
     	return super.onContextItemSelected(item);
+    }
+    
+    private void startDataViewer(PluginConfiguration plugin) {
+    	PluginInfo pluginInfo = plugin.getPluginInfo();
+		Intent intent = new Intent(this, ListDataViewer.class);
+		intent.putExtra(PluginIntent.PLUGIN_INFO, pluginInfo);
+		startActivity(intent);
+    }
+    
+    private void startDetails(PluginConfiguration plugin) {
+    	
+    }
+    
+    private void startUninstall(PluginConfiguration plugin) {
+    	String uri = "package:" + plugin.getPluginInfo().getPackage();
+    	Intent intent = new Intent(Intent.ACTION_DELETE);
+    	intent.setData(Uri.parse(uri));
+    	startActivity(intent);
     }
 
 	@Override
