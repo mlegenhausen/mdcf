@@ -19,6 +19,7 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration;
@@ -103,6 +104,11 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     protected void onDestroy() {
     	super.onDestroy();
     	unbindService(this);
+    }
+    
+    @Override
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+    	openContextMenu(v);
     }
     
     @Override
