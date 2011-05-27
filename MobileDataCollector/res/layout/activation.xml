@@ -7,28 +7,135 @@
 	<ScrollView
 	    android:layout_width="fill_parent"
 	    android:layout_height="fill_parent"
-	    android:layout_marginBottom="54dip" 
-	    android:padding="6dip"
+	    android:layout_marginTop="5px"
 	    android:fadingEdge="none"
 	    android:scrollbarStyle="outsideInset">
-	    <LinearLayout
-	        android:layout_width="fill_parent"
-	        android:layout_height="fill_parent"
-	        android:orientation="vertical">
-	      <TextView
-	        android:text="Hallo Welt"
-	        android:layout_height="wrap_content"
-	        android:layout_width="fill_parent"
-	        android:textAppearance="?android:attr/textAppearanceMedium"
-	        android:textColor="?android:attr/textColorPrimary"
-	        android:paddingBottom="10dip"
-	      />
-	    <View
-	        android:layout_width="fill_parent"
-	        android:layout_height="0dip"
-	        android:layout_weight="1"
-	        />
-	    </LinearLayout>
+	    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    		android:orientation="vertical"
+		    android:layout_width="fill_parent"
+		    android:layout_height="fill_parent">
+    		
+   			<TextView
+		      	android:text="Name:"
+		        android:layout_height="wrap_content"
+		        android:layout_width="fill_parent"
+		        android:textAppearance="?android:attr/textAppearanceMedium"
+		        android:textColor="?android:attr/textColorPrimary"
+		        android:background="#FF909090"
+		        android:paddingLeft="5px"
+		  	/>
+   			<TextView
+		      	android:id="@+id/activation_name"
+		        android:layout_height="wrap_content"
+		        android:layout_width="fill_parent"
+		        android:textAppearance="?android:attr/textAppearanceMedium"
+		        android:textColor="?android:attr/textColorPrimary"
+		        android:paddingLeft="5px"
+		        android:paddingBottom="10px"
+		  	/>
+   			<TextView
+		      	android:text="Version:"
+		        android:layout_height="wrap_content"
+		        android:layout_width="fill_parent"
+		        android:textAppearance="?android:attr/textAppearanceMedium"
+		        android:textColor="?android:attr/textColorPrimary"
+		        android:background="#FF909090"
+		        android:paddingLeft="5px"
+		  	/>
+   			<TextView
+		      	android:id="@+id/activation_version"
+		        android:layout_height="wrap_content"
+		        android:layout_width="fill_parent"
+		        android:textAppearance="?android:attr/textAppearanceMedium"
+		        android:textColor="?android:attr/textColorPrimary"
+		        android:paddingLeft="5px"
+		        android:paddingBottom="10px"
+		  	/>
+   			<TextView
+		      	android:text="URL:"
+		        android:layout_height="wrap_content"
+		        android:layout_width="fill_parent"
+		        android:textAppearance="?android:attr/textAppearanceMedium"
+		        android:textColor="?android:attr/textColorPrimary"
+		        android:background="#FF909090"
+		        android:paddingLeft="5px"
+		  	/>
+   			<TextView
+		      	android:id="@+id/activation_url"
+		        android:layout_height="wrap_content"
+		        android:layout_width="fill_parent"
+		        android:textAppearance="?android:attr/textAppearanceMedium"
+		        android:textColor="?android:attr/textColorPrimary"
+		        android:paddingLeft="5px"
+		        android:paddingBottom="10px"
+		  	/>
+   			<TextView
+		      	android:text="Period:"
+		        android:layout_height="wrap_content"
+		        android:layout_width="fill_parent"
+		        android:textAppearance="?android:attr/textAppearanceMedium"
+		        android:textColor="?android:attr/textColorPrimary"
+		        android:background="#FF909090"
+		        android:paddingLeft="5px"
+		  	/>
+   			<TextView
+		      	android:id="@+id/activation_period"
+		        android:layout_height="wrap_content"
+		        android:layout_width="fill_parent"
+		        android:textAppearance="?android:attr/textAppearanceMedium"
+		        android:textColor="?android:attr/textColorPrimary"
+		        android:paddingLeft="5px"
+		        android:paddingBottom="10px"
+		  	/>
+   			<TextView
+		      	android:text="Maximum Duration for a Run:"
+		        android:layout_height="wrap_content"
+		        android:layout_width="fill_parent"
+		        android:textAppearance="?android:attr/textAppearanceMedium"
+		        android:textColor="?android:attr/textColorPrimary"
+		        android:background="#FF909090"
+		        android:paddingLeft="5px"
+		  	/>
+   			<TextView
+		      	android:id="@+id/activation_duration"
+		        android:layout_height="wrap_content"
+		        android:layout_width="fill_parent"
+		        android:textAppearance="?android:attr/textAppearanceMedium"
+		        android:textColor="?android:attr/textColorPrimary"
+		        android:paddingLeft="5px"
+		        android:paddingBottom="10px"
+		  	/>
+		        
+	        <TextView
+		      	android:text="Requested Services:"
+		        android:layout_height="wrap_content"
+		        android:layout_width="fill_parent"
+		        android:textAppearance="?android:attr/textAppearanceMedium"
+		        android:textColor="?android:attr/textColorPrimary"
+		        android:background="#FF909090"
+		        android:paddingLeft="5px"
+		  	/>
+		        
+		    <TextView
+		      	android:text="Description:"
+		        android:layout_height="wrap_content"
+		        android:layout_width="fill_parent"
+		        android:textAppearance="?android:attr/textAppearanceMedium"
+		        android:textColor="?android:attr/textColorPrimary"
+		        android:background="#FF909090"
+		        android:paddingLeft="5px"
+		  	/>
+		  	<TextView
+		      	android:id="@+id/activation_description"
+		        android:layout_height="wrap_content"
+		        android:layout_width="fill_parent"
+		        android:textAppearance="?android:attr/textAppearanceMedium"
+		        android:textColor="?android:attr/textColorPrimary"
+		        android:paddingLeft="5px"
+		        android:paddingBottom="10px"
+		  	/>
+		    
+    	</LinearLayout>
     </ScrollView>
     <RelativeLayout
         android:layout_marginTop="-45dip" 
@@ -42,19 +149,15 @@
             android:id="@+id/activate"
             android:text="@string/activate"
             android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
             android:layout_marginBottom="-4dip" 
             android:layout_alignParentLeft="true"
-            android:layout_centerVertical="false" 
-            />
+            android:layout_centerVertical="false" android:layout_width="wrap_content"/>
         <Button
             android:id="@+id/cancel_activitation"
             android:text="@string/cancel"
             android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
             android:layout_marginBottom="-4dip" 
             android:layout_alignParentRight="true"
-            android:layout_centerVertical="false" 
-            />
+            android:layout_centerVertical="false" android:layout_width="wrap_content"/>
     </RelativeLayout>
 </LinearLayout>

@@ -34,6 +34,8 @@ public class PluginInfo implements Parcelable {
     
     private List<String> services = new ArrayList<String>();
     
+    private String description;
+    
     public PluginInfo() {
 		
 	}
@@ -62,6 +64,7 @@ public class PluginInfo implements Parcelable {
 		parcel.writeInt(duration);
 		parcel.writeString(url);
 		parcel.writeStringList(services);
+		parcel.writeString(description);
 	}
 	
 	public void readFromParcel(Parcel parcel) {
@@ -73,6 +76,7 @@ public class PluginInfo implements Parcelable {
 		duration = parcel.readInt();
 		url = parcel.readString();
 		parcel.readStringList(services);
+		description = parcel.readString();
 	}
 
 	public String getName() {
@@ -137,6 +141,14 @@ public class PluginInfo implements Parcelable {
 	
 	public void setServices(List<String> services) {
 		this.services = services;
+	}
+	
+	public String getDescription() {
+		return description;
+	}
+	
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	@Override
