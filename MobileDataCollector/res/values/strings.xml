@@ -18,5 +18,6 @@
     <string name="plugin_stop_collecting">%1$s has stopped collecting data...</string>
     <string name="data_viewer">Data Viewer</string>
     <string name="activate">Activate</string>
+    <string name="deactivate">Deactivate</string>
     <string name="cancel">Cancel</string>
 </resources>

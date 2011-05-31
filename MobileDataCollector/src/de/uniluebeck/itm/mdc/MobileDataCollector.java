@@ -142,7 +142,7 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     		startDataViewer(plugin);
     		break;
     	case DETAILS_ID:
-    		startDetails(plugin);
+    		startActivite(plugin);
     		break;
     	case UNINSTALL_ID:
     		startUninstall(plugin);
@@ -163,10 +163,6 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 		Intent intent = new Intent(this, ListDataViewer.class);
 		intent.putExtra(PluginIntent.PLUGIN_INFO, pluginInfo);
 		startActivity(intent);
-    }
-    
-    private void startDetails(PluginConfiguration plugin) {
-    	
     }
     
     private void startUninstall(PluginConfiguration plugin) {

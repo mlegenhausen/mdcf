@@ -115,6 +115,14 @@
 		        android:background="#FF909090"
 		        android:paddingLeft="5px"
 		  	/>
+		  	<LinearLayout
+		  		android:id="@+id/activation_services"
+	    		android:orientation="vertical"
+			    android:layout_width="fill_parent"
+			    android:layout_height="wrap_content"
+			    android:paddingBottom="10px">
+		    
+		    </LinearLayout>
 		        
 		    <TextView
 		      	android:text="Description:"
@@ -151,13 +159,23 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="-4dip" 
             android:layout_alignParentLeft="true"
-            android:layout_centerVertical="false" android:layout_width="wrap_content"/>
+            android:layout_centerVertical="false"
+            android:layout_width="wrap_content"/>
+        <Button
+            android:id="@+id/deactivate"
+            android:text="@string/deactivate"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="-4dip" 
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="false" 
+            android:layout_width="wrap_content"/>
         <Button
             android:id="@+id/cancel_activitation"
             android:text="@string/cancel"
             android:layout_height="wrap_content"
             android:layout_marginBottom="-4dip" 
             android:layout_alignParentRight="true"
-            android:layout_centerVertical="false" android:layout_width="wrap_content"/>
+            android:layout_centerVertical="false" 
+           	android:layout_width="wrap_content"/>
     </RelativeLayout>
 </LinearLayout>
