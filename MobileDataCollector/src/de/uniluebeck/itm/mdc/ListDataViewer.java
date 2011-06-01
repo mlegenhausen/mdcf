@@ -8,8 +8,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import android.app.ListActivity;
 import android.content.ComponentName;
@@ -41,10 +39,6 @@ public class ListDataViewer extends ListActivity implements ServiceConnection {
 	private final static int REFRESH = 0;
 	
 	private final static int TRANSFER = 1;
-	
-	private final static int DIALOG_PROGRESS_ID = 0;
-	
-	private final ExecutorService executor = Executors.newSingleThreadExecutor();
 	
 	private SimpleAdapter adapter;
 	

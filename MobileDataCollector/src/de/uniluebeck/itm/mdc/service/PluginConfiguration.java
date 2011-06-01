@@ -17,7 +17,7 @@ public class PluginConfiguration implements Serializable {
 	}
 	
 	public enum State {
-		RESOLVED, WAITING, RUNNING, STOPPING
+		RESOLVED, WAITING, RUNNING
 	}
 	
 	private PluginInfo pluginInfo;

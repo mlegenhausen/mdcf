@@ -53,19 +53,10 @@ public abstract class AbstractPlugin extends Plugin.Stub {
 	}
 
 	@Override
-	public void start() throws RemoteException {
+	public void run() throws RemoteException {
 		try {
-			onStart();
+			onRun();
 		} catch(Exception e) {
-			
-		}
-	}
-
-	@Override
-	public void stop() throws RemoteException {
-		try {
-			onStop();
-		} catch (Exception e) {
 			
 		}
 	}
@@ -94,9 +85,5 @@ public abstract class AbstractPlugin extends Plugin.Stub {
 		return telephonyManager;
 	}
 	
-	protected abstract void onStart() throws Exception;
-	
-	protected void onStop() throws Exception {
-		
-	}
+	protected abstract void onRun() throws Exception;
 }

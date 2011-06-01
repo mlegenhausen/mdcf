@@ -21,7 +21,5 @@ interface Plugin {
 	
 	void setPersistenceManager(PersistenceManager persistenceManager);
 	
-	void start();
-	
-	void stop();
+	void run();
 }
