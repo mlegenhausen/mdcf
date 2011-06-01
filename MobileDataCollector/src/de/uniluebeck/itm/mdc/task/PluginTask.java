@@ -2,7 +2,13 @@ package de.uniluebeck.itm.mdc.task;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import com.google.common.util.concurrent.SimpleTimeLimiter;
+import com.google.common.util.concurrent.TimeLimiter;
+import com.google.common.util.concurrent.UncheckedTimeoutException;
+
+import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -34,7 +40,11 @@ public class PluginTask implements Runnable, ServiceConnection {
 	
 	private final PersistenceManager persistenceManager;
 	
+	private final TimeLimiter timeLimiter = new SimpleTimeLimiter();
+	
 	private Plugin plugin;
+	
+	private Plugin pluginProxy;
 	
 	public PluginTask(final Context context, final PluginConfiguration configuration) {
 		this.context = context;
@@ -46,7 +56,7 @@ public class PluginTask implements Runnable, ServiceConnection {
 	public void run() {
 		boolean result = context.bindService(new Intent(configuration.getPluginInfo().getAction()), this, Context.BIND_AUTO_CREATE);
 		if (!result) {
-			notifyNotFound();
+			fireNotFound();
 		}
 	}
 
@@ -54,6 +64,8 @@ public class PluginTask implements Runnable, ServiceConnection {
 	public void onServiceConnected(ComponentName componentName, IBinder binder) {
 		Log.i(LOG_TAG, "Service connected");
 		plugin = Plugin.Stub.asInterface(binder);
+		int timeout = configuration.getPluginInfo().getDuration();
+		pluginProxy = timeLimiter.newProxy(plugin, Plugin.class, timeout, TimeUnit.MILLISECONDS);
 		try {
 			initPlugin();
 			execute();
@@ -97,18 +109,25 @@ public class PluginTask implements Runnable, ServiceConnection {
 	
 	private void execute() throws RemoteException {
 		configuration.setState(State.RUNNING);
-		notifyStateChange();
-		plugin.start();
-		configuration.setState(State.STOPPING);
-		notifyStateChange();
-		plugin.stop();
-		configuration.setState(State.WAITING);
-		notifyStateChange();
+		fireStateChange();
+		try {
+			pluginProxy.run();
+		} catch (UncheckedTimeoutException e) {
+			killPlugin();
+		} finally {
+			configuration.setState(State.WAITING);
+			fireStateChange();
+		}
+	}
+	
+	private void killPlugin() {
+		ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+		activityManager.killBackgroundProcesses(configuration.getPluginInfo().getPackage());
 	}
 	
 	public void destroy() {
 		configuration.setState(State.RESOLVED);
-		notifyStateChange();
+		fireStateChange();
 	}
 
 	@Override
@@ -116,13 +135,13 @@ public class PluginTask implements Runnable, ServiceConnection {
 		Log.i(LOG_TAG, "Service disconnected");
 	}
 	
-	private void notifyStateChange() {
+	private void fireStateChange() {
 		for (PluginTaskListener listener : listeners.toArray(new PluginTaskListener[0])) {
 			listener.onStateChange(new PluginTaskEvent(this, configuration));
 		}
 	}
 	
-	private void notifyNotFound() {
+	private void fireNotFound() {
 		for (PluginTaskListener listener : listeners.toArray(new PluginTaskListener[0])) {
 			listener.onNotFound(new PluginTaskEvent(this, configuration));
 		}

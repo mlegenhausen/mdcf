@@ -6,6 +6,8 @@
     <string name="menu_activate">Activate</string>
     <string name="menu_deactivate">Deactivate</string>
     <string name="menu_dataviewer">Data Viewer</string>
+    <string name="menu_details">Details</string>
+    <string name="menu_uninstall">Uninstall</string>
     <string name="toast_plugin_registered">%1$s was updated</string>
     <string name="toast_plugin_unregistered">%1$s was removed</string>
     <string name="notification_mdc_started">Mobile Data Collector started</string>
@@ -15,4 +17,7 @@
     <string name="plugin_stopping">%1$s is stopping</string>
     <string name="plugin_stop_collecting">%1$s has stopped collecting data...</string>
     <string name="data_viewer">Data Viewer</string>
+    <string name="activate">Activate</string>
+    <string name="deactivate">Deactivate</string>
+    <string name="cancel">Cancel</string>
 </resources>

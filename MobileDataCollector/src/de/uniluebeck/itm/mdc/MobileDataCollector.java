@@ -10,6 +10,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -18,6 +19,7 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration;
@@ -39,6 +41,10 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 	private static final int DEACTIVATE_ID = 2;
 	
 	private static final int DATAVIEWER_ID = 3;
+	
+	private static final int DETAILS_ID = 4;
+	
+	private static final int UNINSTALL_ID = 5;
 	
 	private SimpleAdapter listAdapter;
 	
@@ -101,6 +107,11 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     }
     
     @Override
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+    	openContextMenu(v);
+    }
+    
+    @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
     	super.onCreateContextMenu(menu, v, menuInfo);
     	AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
@@ -111,26 +122,54 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     		menu.add(0, DEACTIVATE_ID, 0, R.string.menu_deactivate);
     	}
     	menu.add(0, DATAVIEWER_ID, 1, R.string.menu_dataviewer);
+    	menu.add(0, DETAILS_ID, 2, R.string.menu_details);
+    	menu.add(0, UNINSTALL_ID, 3, R.string.menu_uninstall);
     }
     
     @Override
     public boolean onContextItemSelected(MenuItem item) {
     	AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+    	PluginConfiguration plugin = pluginConfigurations.get(info.position);
     	switch (item.getItemId()) {
     	case ACTIVATE_ID:
-    		service.activate(pluginConfigurations.get(info.position));
+    		startActivite(plugin);
+    		//service.activate(plugin);
     		break;
     	case DEACTIVATE_ID:
-    		service.deactivate(pluginConfigurations.get(info.position));
+    		service.deactivate(plugin);
     		break;
     	case DATAVIEWER_ID:
-    		PluginInfo pluginInfo = pluginConfigurations.get(info.position).getPluginInfo();
-    		Intent intent = new Intent(this, ListDataViewer.class);
-    		intent.putExtra(PluginIntent.PLUGIN_INFO, pluginInfo);
-    		startActivity(intent);
+    		startDataViewer(plugin);
+    		break;
+    	case DETAILS_ID:
+    		startActivite(plugin);
+    		break;
+    	case UNINSTALL_ID:
+    		startUninstall(plugin);
     		break;
     	}
     	return super.onContextItemSelected(item);
+    }
+    
+    private void startActivite(PluginConfiguration plugin) {
+    	PluginInfo pluginInfo = plugin.getPluginInfo();
+    	Intent intent = new Intent(this, ActivationActivity.class);
+    	intent.putExtra(PluginIntent.PLUGIN_INFO, pluginInfo);
+    	startActivity(intent);
+    }
+    
+    private void startDataViewer(PluginConfiguration plugin) {
+    	PluginInfo pluginInfo = plugin.getPluginInfo();
+		Intent intent = new Intent(this, ListDataViewer.class);
+		intent.putExtra(PluginIntent.PLUGIN_INFO, pluginInfo);
+		startActivity(intent);
+    }
+    
+    private void startUninstall(PluginConfiguration plugin) {
+    	String uri = "package:" + plugin.getPluginInfo().getPackage();
+    	Intent intent = new Intent(Intent.ACTION_DELETE);
+    	intent.setData(Uri.parse(uri));
+    	startActivity(intent);
     }
 
 	@Override

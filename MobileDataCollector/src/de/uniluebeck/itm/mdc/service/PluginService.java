@@ -152,17 +152,10 @@ public class PluginService extends Service implements PluginTaskListener {
 		return repository.findByPluginInfo(info);
 	}
 	
-	private void notifyPluginRunning(String name) {
+	private void showPluginRunningNotification(String name) {
 		String content = String.format(getString(R.string.plugin_collecting), name);
 		Notification notification = Notifications.createNotification(this, content);
 		notification.tickerText = String.format(getString(R.string.plugin_running), name);
-		notificationManager.notify(R.string.foreground_service, notification);
-	}
-	
-	private void notifyPluginStopping(String name) {
-		String content = String.format(getString(R.string.plugin_stop_collecting), name);
-		Notification notification = Notifications.createNotification(this, content);
-		notification.tickerText = String.format(getString(R.string.plugin_stopping), name);
 		notificationManager.notify(R.string.foreground_service, notification);
 	}
 
@@ -173,9 +166,7 @@ public class PluginService extends Service implements PluginTaskListener {
 		State state = configuration.getState();
 		String name = info.getName();
 		if (State.RUNNING.equals(state)) {
-			notifyPluginRunning(name);
-		} else if (State.STOPPING.equals(state)) {
-			notifyPluginStopping(name);
+			showPluginRunningNotification(name);
 		} else if (State.WAITING.equals(state)) {
 			Notification notification = Notifications.createNotification(this, R.string.notification_task_wait);
 			notificationManager.notify(R.string.foreground_service, notification);

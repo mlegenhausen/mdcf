@@ -16,7 +16,7 @@ public class PluginImpl extends AbstractPlugin {
 	}
 
 	@Override
-	protected void onStart() throws Exception {
+	protected void onRun() throws Exception {
 		Log.i(LOG_TAG, "Start plugin");
 		//Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 		//Log.i(LOG_TAG, "latitude: " + location.getLatitude() + " longitude: " + location.getLongitude());
