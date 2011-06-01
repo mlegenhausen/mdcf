@@ -101,7 +101,7 @@ public class PluginService extends Service implements PluginTaskListener {
 		if (configuration == null) {
 			configuration = new PluginConfiguration(info);
 			repository.store(configuration);
-			notifyRegistered(configuration);
+			fireRegistered(configuration);
 			Log.i(LOG_TAG, "Service registered: " + configuration.getPluginInfo().getAction());
 		} else {
 			if (Mode.ACTIVATED.equals(configuration.getMode())) {
@@ -110,19 +110,19 @@ public class PluginService extends Service implements PluginTaskListener {
 		}
 	}
 	
-	private void notifyRegistered(PluginConfiguration configuration) {
+	private void fireRegistered(PluginConfiguration configuration) {
 		for (final PluginServiceListener listener : listeners.toArray(new PluginServiceListener[0])) {
 			listener.onRegistered(new PluginServiceEvent(this, configuration));
 		}
 	}
 	
-	private void notifyStateChanged(PluginConfiguration configuration) {
+	private void fireStateChanged(PluginConfiguration configuration) {
 		for (final PluginServiceListener listener : listeners.toArray(new PluginServiceListener[0])) {
 			listener.onStateChanged(new PluginServiceEvent(this, configuration));
 		}
 	}
 	
-	private void notifyModeChanged(PluginConfiguration configuration) {
+	private void fireModeChanged(PluginConfiguration configuration) {
 		for (final PluginServiceListener listener : listeners.toArray(new PluginServiceListener[0])) {
 			listener.onModeChanged(new PluginServiceEvent(this, configuration));
 		}
@@ -171,7 +171,7 @@ public class PluginService extends Service implements PluginTaskListener {
 			Notification notification = Notifications.createNotification(this, R.string.notification_task_wait);
 			notificationManager.notify(R.string.foreground_service, notification);
 		}
-		notifyStateChanged(configuration);
+		fireStateChanged(configuration);
 	}
 	
 	@Override
@@ -179,6 +179,6 @@ public class PluginService extends Service implements PluginTaskListener {
 		String name = event.getConfiguration().getPluginInfo().getName();
 		Notification notification = Notifications.createNotification(this, name + " was not found");
 		notificationManager.notify(R.string.foreground_service, notification);
-		notifyModeChanged(event.getConfiguration());
+		fireModeChanged(event.getConfiguration());
 	}
 }
