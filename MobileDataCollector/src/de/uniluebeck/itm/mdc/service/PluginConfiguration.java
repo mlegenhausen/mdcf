@@ -1,6 +1,8 @@
 package de.uniluebeck.itm.mdc.service;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import de.uniluebeck.itm.mdcf.PluginInfo;
 import de.uniluebeck.itm.mdcf.persistence.Node;
@@ -25,6 +27,8 @@ public class PluginConfiguration implements Serializable {
 	private Mode mode = Mode.NEW;
 	
 	private State state = State.RESOLVED;
+	
+	private List<String> permissions = new ArrayList<String>();
 	
 	private Node workspace = new Node();
 	
@@ -54,6 +58,14 @@ public class PluginConfiguration implements Serializable {
 
 	public void setState(State state) {
 		this.state = state;
+	}
+	
+	public List<String> getPermissions() {
+		return permissions;
+	}
+	
+	public void setPermissions(List<String> permissions) {
+		this.permissions = permissions;
 	}
 	
 	public Node getWorkspace() {

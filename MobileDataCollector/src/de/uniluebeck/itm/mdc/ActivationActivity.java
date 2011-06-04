@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -26,6 +27,8 @@ import de.uniluebeck.itm.mdcf.PluginIntent;
 
 public class ActivationActivity extends Activity implements ServiceConnection {
 
+	private static final String TAG = ActivationActivity.class.getName();
+	
 	private static final Map<String, String> SERVICE_MAPPING = new HashMap<String, String>();
 	
 	private PluginService service;
@@ -45,6 +48,8 @@ public class ActivationActivity extends Activity implements ServiceConnection {
 	private LinearLayout serviceLayout;
 	
 	private TextView description;
+	
+	private LinearLayout permissionLayout;
 	
 	private Button activateButton;
 	
@@ -70,6 +75,7 @@ public class ActivationActivity extends Activity implements ServiceConnection {
 		duration = (TextView) findViewById(R.id.activation_duration);
 		serviceLayout = (LinearLayout) findViewById(R.id.activation_services);
 		description = (TextView) findViewById(R.id.activation_description);
+		permissionLayout = (LinearLayout) findViewById(R.id.activation_permissions);
 		
 		activateButton = (Button) findViewById(R.id.activate);
 		activateButton.setOnClickListener(new View.OnClickListener() {
@@ -148,5 +154,13 @@ public class ActivationActivity extends Activity implements ServiceConnection {
 			serviceLayout.addView(textView);
 		}
 		description.setText(Objects.firstNonNull(Strings.emptyToNull(info.getDescription()), "Unknown"));
+		for (String permission : configuration.getPermissions()) {
+			Log.i(TAG, "Show permission" + permission);
+			TextView textView = new TextView(this);
+			textView.setTextAppearance(this, android.R.attr.textAppearanceMedium);
+			textView.setPadding(5, 3, 3, 3);
+			textView.setText(permission);
+			permissionLayout.addView(textView);
+		}
 	}
 }

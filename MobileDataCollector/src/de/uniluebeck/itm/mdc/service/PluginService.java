@@ -42,12 +42,15 @@ public class PluginService extends Service implements PluginTaskListener {
 	
 	private NotificationManager notificationManager;
 	
+	private PluginPermissionChecker checker;
+	
 	@Override
 	public void onCreate() {
 		super.onCreate();
 		notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		repository = new PluginConfigurationRepository(this);
 		pluginTaskManager = new PluginTaskManager(this, repository);
+		checker = new PluginPermissionChecker(this);
 		initService();
 	}
 	
@@ -100,10 +103,12 @@ public class PluginService extends Service implements PluginTaskListener {
 		PluginConfiguration configuration = repository.findByPluginInfo(info);
 		if (configuration == null) {
 			configuration = new PluginConfiguration(info);
+			configuration = checker.updatePermissions(configuration);
 			repository.store(configuration);
 			fireRegistered(configuration);
 			Log.i(LOG_TAG, "Service registered: " + configuration.getPluginInfo().getAction());
 		} else {
+			// Update Plugin configuration.
 			if (Mode.ACTIVATED.equals(configuration.getMode())) {
 				activate(configuration);
 			}

@@ -9,7 +9,8 @@
 	    android:layout_height="fill_parent"
 	    android:layout_marginTop="5px"
 	    android:fadingEdge="none"
-	    android:scrollbarStyle="outsideInset">
+	    android:scrollbarStyle="outsideInset"
+	    android:layout_marginBottom="65px">
 	    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     		android:orientation="vertical"
 		    android:layout_width="fill_parent"
@@ -125,6 +126,24 @@
 		    </LinearLayout>
 		        
 		    <TextView
+		  		android:text="Requested Dangerous Permissions"
+		  		android:layout_height="wrap_content"
+		        android:layout_width="fill_parent"
+		        android:textAppearance="?android:attr/textAppearanceMedium"
+		        android:textColor="?android:attr/textColorPrimary"
+		        android:background="#FF909090"
+		        android:paddingLeft="5px"
+		    />
+		    
+		   	<LinearLayout
+		  		android:id="@+id/activation_permissions"
+	    		android:orientation="vertical"
+			    android:layout_width="fill_parent"
+			    android:layout_height="wrap_content"
+			    android:paddingBottom="10px"
+		    />
+		        
+		    <TextView
 		      	android:text="Description:"
 		        android:layout_height="wrap_content"
 		        android:layout_width="fill_parent"
@@ -142,7 +161,6 @@
 		        android:paddingLeft="5px"
 		        android:paddingBottom="10px"
 		  	/>
-		    
     	</LinearLayout>
     </ScrollView>
     <RelativeLayout
