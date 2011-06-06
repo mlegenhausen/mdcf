@@ -9,6 +9,8 @@ import com.db4o.Db4oEmbedded;
 import com.db4o.ObjectContainer;
 import com.db4o.config.EmbeddedConfiguration;
 
+import de.uniluebeck.itm.mdc.log.LogEntry;
+import de.uniluebeck.itm.mdc.log.LogRecord;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration;
 import de.uniluebeck.itm.mdcf.PluginInfo;
 import de.uniluebeck.itm.mdcf.persistence.Node;
@@ -47,16 +49,28 @@ public class Db4oHelper {
      */
     private EmbeddedConfiguration dbConfig() throws IOException {
     	EmbeddedConfiguration configuration = Db4oEmbedded.newConfiguration();
+    	
     	configuration.common().objectClass(PluginConfiguration.class).objectField("pluginInfo").indexed(true);
+    	configuration.common().objectClass(PluginConfiguration.class).cascadeOnUpdate(true);
+    	
     	configuration.common().objectClass(PluginInfo.class).objectField("action").indexed(true);
+    	
     	configuration.common().objectClass(Node.class).objectField("id").indexed(true);
     	configuration.common().objectClass(Node.class).cascadeOnDelete(true);
     	configuration.common().objectClass(Node.class).cascadeOnUpdate(true);
     	configuration.common().objectClass(Node.class).cascadeOnActivate(true);
+    	
     	configuration.common().objectClass(Property.class).objectField("id").indexed(true);
     	configuration.common().objectClass(Property.class).cascadeOnDelete(true);
     	configuration.common().objectClass(Property.class).cascadeOnUpdate(true);
     	configuration.common().objectClass(Property.class).cascadeOnActivate(true);
+    	
+    	configuration.common().objectClass(LogRecord.class).objectField("id").indexed(true);
+    	configuration.common().objectClass(LogRecord.class).cascadeOnUpdate(true);
+    	configuration.common().objectClass(LogRecord.class).cascadeOnDelete(true);
+    	
+    	configuration.common().objectClass(LogEntry.class).objectField("id").indexed(true);
+    	
     	return configuration;
 	}
 
@@ -64,7 +78,7 @@ public class Db4oHelper {
      * Returns the path for the database location
      */
     private String db4oDBFullPath(Context contex) {
-    	return contex.getDir("data", 0) + "/" + "plugin.db4o";
+    	return contex.getDir("data", 0) + "/plugin.db4o";
     }
 
     /**
