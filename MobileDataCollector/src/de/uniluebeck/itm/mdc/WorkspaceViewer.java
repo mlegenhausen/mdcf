@@ -16,7 +16,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,8 +31,6 @@ import de.uniluebeck.itm.mdcf.persistence.Node;
 import de.uniluebeck.itm.mdcf.persistence.Property;
 
 public class WorkspaceViewer extends ListActivity implements ServiceConnection {
-	
-	private static final String TAG = WorkspaceViewer.class.getName();
 	
 	private final static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
 	
@@ -62,7 +59,6 @@ public class WorkspaceViewer extends ListActivity implements ServiceConnection {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Log.d(TAG, "onCreate");
 		
 		pluginInfo = getIntent().getParcelableExtra(PluginIntent.PLUGIN_INFO);
 		adapter = new SimpleAdapter(
@@ -78,7 +74,6 @@ public class WorkspaceViewer extends ListActivity implements ServiceConnection {
 	@Override
 	protected void onStart() {
 		super.onStart();
-		Log.d(TAG, "onStart");
 		// Referee to issue 2483
 		getApplicationContext().bindService(new Intent(this, PluginService.class), this, Context.BIND_AUTO_CREATE);
 	}
@@ -108,7 +103,6 @@ public class WorkspaceViewer extends ListActivity implements ServiceConnection {
 			final Property property = node.getProperty(name);
 			final Map<String, String> map = new HashMap<String, String>();
 			String value = name + ": " +  property.getValue().toString();
-			Log.d(TAG, value);
 			map.put(NODE_FIELD, value);
 			itemMapping.add(map);
 			items.add(property);
@@ -134,7 +128,6 @@ public class WorkspaceViewer extends ListActivity implements ServiceConnection {
 
 	@Override
 	public void onServiceConnected(final ComponentName name, final IBinder binder) {
-		Log.d(TAG, "onServiceConnected");
 		service = ((PluginService.PluginServiceBinder) binder).getService();
 		refresh();
 	}

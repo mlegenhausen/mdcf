@@ -32,6 +32,10 @@ public class LogRecord {
 	public void setTimestamp(long timestamp) {
 		this.timestamp = timestamp;
 	}
+	
+	public List<LogEntry> getEntries() {
+		return entries;
+	}
 
 	public void add(LogEntry entry) {
 		entries.add(entry);
