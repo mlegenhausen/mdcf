@@ -78,7 +78,7 @@ public class PluginTask implements Runnable, ServiceConnection {
 		} catch (RemoteException e) {
 			Log.e(LOG_TAG, "Unable to call proceed.", e);
 		} finally {
-			//repository.store(configuration);
+			repository.store(configuration);
 			context.unbindService(this);
 		}
 	}
