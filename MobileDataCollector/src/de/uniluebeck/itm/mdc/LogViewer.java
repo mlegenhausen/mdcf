@@ -14,6 +14,8 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.SimpleExpandableListAdapter;
 import de.uniluebeck.itm.mdc.log.LogEntry;
 import de.uniluebeck.itm.mdc.log.LogRecord;
@@ -29,6 +31,8 @@ public class LogViewer extends ExpandableListActivity implements ServiceConnecti
 	private static final String GROUP_NAME = "name";
 	
 	private static final String CHILD_MESSAGE = "message";
+	
+	private final static int REFRESH = 0;
 	
 	private PluginService service;
 	
@@ -73,6 +77,22 @@ public class LogViewer extends ExpandableListActivity implements ServiceConnecti
 	@Override
 	public void onServiceDisconnected(ComponentName componentName) {
 		
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(final Menu menu) {
+		menu.add(0, REFRESH, 0, "Refresh");
+		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(final MenuItem item) {
+		switch (item.getItemId()) {
+		case REFRESH:
+			refresh();
+			break;
+		}
+		return true;
 	}
 	
 	private void refresh() {
