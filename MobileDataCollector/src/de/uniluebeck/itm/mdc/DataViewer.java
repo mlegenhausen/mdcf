@@ -24,13 +24,21 @@ public class DataViewer extends TabActivity {
 	    intent.setClass(this, LogViewer.class);
 
 	    // Initialize a TabSpec for each tab and add it to the TabHost
-	    spec = tabHost.newTabSpec("log").setIndicator("Log", res.getDrawable(R.drawable.data_viewer_log_tab)).setContent(intent);
+	    spec = tabHost.newTabSpec("log")
+	    	.setIndicator(
+	    		getText(R.string.log), 
+	    		res.getDrawable(R.drawable.data_viewer_log_tab))
+	    	.setContent(intent);
 	    tabHost.addTab(spec);
 
 	    // Do the same for the other tabs
 	    intent = (Intent) getIntent().clone();
 	    intent.setClass(this, WorkspaceViewer.class);
-	    spec = tabHost.newTabSpec("workspace").setIndicator("Workspace", res.getDrawable(R.drawable.data_viewer_workspace_tab)).setContent(intent);
+	    spec = tabHost.newTabSpec("workspace")
+	    	.setIndicator(
+	    		getText(R.string.workspace), 
+	    		res.getDrawable(R.drawable.data_viewer_workspace_tab))
+	    	.setContent(intent);
 	    tabHost.addTab(spec);
 
 	    tabHost.setCurrentTab(0);

@@ -139,8 +139,8 @@ public class WorkspaceViewer extends ListActivity implements ServiceConnection {
 	
 	@Override
 	public boolean onCreateOptionsMenu(final Menu menu) {
-		menu.add(0, REFRESH, 0, "Refresh");
-		menu.add(0, TRANSFER, 0, "Transfer");
+		menu.add(0, REFRESH, 0, getText(R.string.refresh));
+		menu.add(0, TRANSFER, 0, getText(R.string.transfer));
 		return true;
 	}
 	
