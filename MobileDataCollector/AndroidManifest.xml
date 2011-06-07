@@ -13,7 +13,9 @@
 		</activity>
 		
 		<activity android:name="ActivationActivity" android:label="@string/activate"/>
-		<activity android:name="ListDataViewer" android:label="@string/data_viewer"/>
+		<activity android:name="DataViewer" android:label="@string/data_viewer"/>
+		<activity android:name="WorkspaceViewer" android:label="@string/workspace_viewer"/>
+		<activity android:name="LogViewer" android:label="@string/log_viewer"/>
 		
 		<receiver android:name=".PackageAddedBroadcastReceiver">
 			<intent-filter>
