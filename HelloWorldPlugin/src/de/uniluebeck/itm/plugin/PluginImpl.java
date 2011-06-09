@@ -2,6 +2,7 @@ package de.uniluebeck.itm.plugin;
 
 import android.content.Context;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.RemoteException;
 import android.util.Log;
 import de.uniluebeck.itm.mdcf.AbstractPlugin;
@@ -18,9 +19,9 @@ public class PluginImpl extends AbstractPlugin {
 	@Override
 	protected void onRun() throws Exception {
 		Log.i(LOG_TAG, "Start plugin");
-		//Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-		//Log.i(LOG_TAG, "latitude: " + location.getLatitude() + " longitude: " + location.getLongitude());
-		storeLocation(null);
+		Location location = getLocationManager().getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+		Log.i(LOG_TAG, "latitude: " + location.getLatitude() + " longitude: " + location.getLongitude());
+		storeLocation(location);
 	}
 	
 	private void storeLocation(Location location) throws RemoteException {
@@ -28,8 +29,8 @@ public class PluginImpl extends AbstractPlugin {
 		workspace.setProperty("Version", "1.0");
 		Log.i(LOG_TAG, "Workspace received");
 		Node node = new Node();
-		node.setProperty("Latitude", 150.0);
-		node.setProperty("Longitude", 42.0);
+		node.setProperty("Latitude", location.getLatitude());
+		node.setProperty("Longitude", location.getLongitude());
 		workspace.addNode(node);
 		Log.i(LOG_TAG, "Saving workspace...");
 		getPersistenceManager().save(workspace);

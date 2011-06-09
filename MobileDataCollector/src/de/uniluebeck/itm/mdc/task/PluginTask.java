@@ -121,6 +121,7 @@ public class PluginTask implements Runnable, ServiceConnection {
 		try {
 			pluginProxy.run();
 		} catch (UncheckedTimeoutException e) {
+			Log.w(LOG_TAG, "Timeout was reached.");
 			killPlugin();
 		} finally {
 			configuration.setState(State.WAITING);

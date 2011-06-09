@@ -28,5 +28,4 @@ public class SecureLocationManagerImpl extends SecureLocationManager.Stub {
 		logRecord.add(Confidentiality.HIGH, "Last known location fetched at %s, %s", location.getLatitude(), location.getLongitude());
 		return location;
 	}
-
 }
