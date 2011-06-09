@@ -26,6 +26,8 @@ public class PluginConfiguration implements Serializable {
 	
 	private PluginInfo pluginInfo;
 	
+	private long lastExecuted = -1;
+	
 	private Mode mode = Mode.NEW;
 	
 	private State state = State.RESOLVED;
@@ -38,6 +40,14 @@ public class PluginConfiguration implements Serializable {
 	
 	public PluginConfiguration(PluginInfo pluginInfo) {
 		this.pluginInfo = pluginInfo;
+	}
+	
+	public long getLastExecuted() {
+		return lastExecuted;
+	}
+	
+	public void setLastExecuted(long lastExecuted) {
+		this.lastExecuted = lastExecuted;
 	}
 	
 	public LogRecord createLogRecord() {

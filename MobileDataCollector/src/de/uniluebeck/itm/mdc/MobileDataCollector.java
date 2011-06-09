@@ -1,6 +1,8 @@
 package de.uniluebeck.itm.mdc;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +35,8 @@ import de.uniluebeck.itm.mdcf.PluginIntent;
 public class MobileDataCollector extends ListActivity implements ServiceConnection, PluginServiceListener {
 	
 	private static final String TAG = MobileDataCollector.class.getName();
+	
+	private final static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
 	
 	private	static final String KEY_PLUGIN = "plugin";
 	
@@ -70,8 +74,21 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 		final Map<String, String> map = new HashMap<String, String>();
 		map.put(KEY_PLUGIN, plugin.getPluginInfo().getName());
 		map.put(KEY_MODE, MODE_MAPPING.get(plugin.getMode()));
-		map.put(KEY_STATE, plugin.getState().toString());
+		map.put(KEY_STATE, formatState(plugin));
 		return map;
+	}
+	
+	private String formatState(PluginConfiguration plugin) {
+		String result = "";
+		switch (plugin.getState()) {
+		case WAITING:
+			result = "Last Execution: " + DATE_FORMAT.format(new Date(plugin.getLastExecuted()));
+			break;
+		case RUNNING:
+			result = "Executing...";
+			break;
+		}
+		return result;
 	}
 	
 	private void addPlugin(PluginConfiguration plugin) {
