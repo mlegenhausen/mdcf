@@ -6,11 +6,8 @@ import java.util.List;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.util.Log;
 
 public class PluginPermissionChecker {
-	
-	private static final String TAG = PluginPermissionChecker.class.getName();
 	
 	private static final String[] DENIED_PERMISSIONS = {
 		Manifest.permission.INTERNET,

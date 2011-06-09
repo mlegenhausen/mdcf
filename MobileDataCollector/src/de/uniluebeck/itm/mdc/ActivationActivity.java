@@ -4,13 +4,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -26,10 +28,10 @@ import de.uniluebeck.itm.mdcf.PluginInfo;
 import de.uniluebeck.itm.mdcf.PluginIntent;
 
 public class ActivationActivity extends Activity implements ServiceConnection {
-
-	private static final String TAG = ActivationActivity.class.getName();
 	
 	private static final Map<String, String> SERVICE_MAPPING = new HashMap<String, String>();
+	
+	private static final int DANGEROUS_PERMISSIONS_DIALOG = 0;
 	
 	private PluginService service;
 	
@@ -81,8 +83,11 @@ public class ActivationActivity extends Activity implements ServiceConnection {
 		activateButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				service.activate(configuration);
-				finish();
+				if (!configuration.getPermissions().isEmpty()) {
+					showDialog(DANGEROUS_PERMISSIONS_DIALOG);
+				} else {
+					activateAndFinish();
+				}
 			}
 		});
 		
@@ -105,6 +110,11 @@ public class ActivationActivity extends Activity implements ServiceConnection {
 		});
 	}
 	
+	private void activateAndFinish() {
+		service.activate(configuration);
+		finish();
+	}
+	
 	@Override
     protected void onStart() {
     	super.onStart();
@@ -115,6 +125,33 @@ public class ActivationActivity extends Activity implements ServiceConnection {
 	protected void onDestroy() {
 		super.onDestroy();
 		unbindService(this);
+	}
+	
+	@Override
+	protected Dialog onCreateDialog(int id) {
+		Dialog dialog = null;
+		switch(id) {
+		case DANGEROUS_PERMISSIONS_DIALOG:
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setTitle("Dangerous Permissions found")
+				.setMessage("You are about to activate a Plugin with dangerous permissions.\nDo you want to continue?")
+				.setCancelable(true)
+				.setPositiveButton(R.string.activate, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						activateAndFinish();
+					}
+				})
+				.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				});
+			dialog = builder.create();
+			break;
+		}
+		return dialog;
 	}
 
 	@Override
@@ -155,7 +192,6 @@ public class ActivationActivity extends Activity implements ServiceConnection {
 		}
 		description.setText(Objects.firstNonNull(Strings.emptyToNull(info.getDescription()), "Unknown"));
 		for (String permission : configuration.getPermissions()) {
-			Log.i(TAG, "Show permission" + permission);
 			TextView textView = new TextView(this);
 			textView.setTextAppearance(this, android.R.attr.textAppearanceMedium);
 			textView.setPadding(5, 3, 3, 3);
