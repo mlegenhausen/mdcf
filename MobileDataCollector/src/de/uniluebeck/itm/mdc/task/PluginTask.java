@@ -124,6 +124,7 @@ public class PluginTask implements Runnable, ServiceConnection {
 			Log.w(LOG_TAG, "Timeout was reached.");
 			killPlugin();
 		} finally {
+			configuration.setLastExecuted(System.currentTimeMillis());
 			configuration.setState(State.WAITING);
 			fireStateChange();
 		}
