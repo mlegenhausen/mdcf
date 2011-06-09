@@ -160,7 +160,7 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     
     private void startDataViewer(PluginConfiguration plugin) {
     	PluginInfo pluginInfo = plugin.getPluginInfo();
-		Intent intent = new Intent(this, ListDataViewer.class);
+		Intent intent = new Intent(this, DataViewer.class);
 		intent.putExtra(PluginIntent.PLUGIN_INFO, pluginInfo);
 		startActivity(intent);
     }

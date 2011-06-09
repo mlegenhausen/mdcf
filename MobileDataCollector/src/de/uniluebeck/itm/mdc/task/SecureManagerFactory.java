@@ -6,6 +6,7 @@ import android.media.AudioManager;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
 import android.telephony.TelephonyManager;
+import de.uniluebeck.itm.mdc.log.LogRecord;
 import de.uniluebeck.itm.mdcf.service.SecureAudioManager;
 import de.uniluebeck.itm.mdcf.service.SecureConnectivityManager;
 import de.uniluebeck.itm.mdcf.service.SecureLocationManager;
@@ -14,27 +15,27 @@ import de.uniluebeck.itm.mdcf.service.SecureWifiManager;
 
 public class SecureManagerFactory {
 
-	public static SecureLocationManager createSecureLocationManager(Context context) {
+	public static SecureLocationManager createSecureLocationManager(Context context, LogRecord logRecord) {
 		LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-		return new SecureLocationManagerImpl(locationManager);
+		return new SecureLocationManagerImpl(locationManager, logRecord);
 	}
 	
-	public static SecureWifiManager createSecureWifiManager(Context context) {
+	public static SecureWifiManager createSecureWifiManager(Context context, LogRecord logRecord) {
 		WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
 		return new SecureWifiManagerImpl(wifiManager);
 	}
 	
-	public static SecureAudioManager createSecureAudioManager(Context context) {
+	public static SecureAudioManager createSecureAudioManager(Context context, LogRecord logRecord) {
 		AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 		return new SecureAudioManagerImpl(audioManager);
 	}
 	
-	public static SecureConnectivityManager createSecureConnectivityManager(Context context) {
+	public static SecureConnectivityManager createSecureConnectivityManager(Context context, LogRecord logRecord) {
 		ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 		return new SecureConnectivityManagerImpl(connectivityManager);
 	}
 
-	public static SecureTelephonyManager createSecureTelephonyManager(Context context) {
+	public static SecureTelephonyManager createSecureTelephonyManager(Context context, LogRecord logRecord) {
 		TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 		return new SecureTelephonyManagerImpl(telephonyManager);
 	}

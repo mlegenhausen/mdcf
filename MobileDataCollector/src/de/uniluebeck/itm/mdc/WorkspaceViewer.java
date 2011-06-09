@@ -30,7 +30,7 @@ import de.uniluebeck.itm.mdcf.persistence.Item;
 import de.uniluebeck.itm.mdcf.persistence.Node;
 import de.uniluebeck.itm.mdcf.persistence.Property;
 
-public class ListDataViewer extends ListActivity implements ServiceConnection {
+public class WorkspaceViewer extends ListActivity implements ServiceConnection {
 	
 	private final static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
 	
@@ -74,13 +74,14 @@ public class ListDataViewer extends ListActivity implements ServiceConnection {
 	@Override
 	protected void onStart() {
 		super.onStart();
-		bindService(new Intent(this, PluginService.class), this, Context.BIND_AUTO_CREATE);
+		// Referee to issue 2483
+		getApplicationContext().bindService(new Intent(this, PluginService.class), this, Context.BIND_AUTO_CREATE);
 	}
 	
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		unbindService(this);
+		getApplicationContext().unbindService(this);
 	}
 	
 	private void refresh() {
@@ -101,7 +102,8 @@ public class ListDataViewer extends ListActivity implements ServiceConnection {
 		for (final String name : node.getProperties()) {
 			final Property property = node.getProperty(name);
 			final Map<String, String> map = new HashMap<String, String>();
-			map.put(NODE_FIELD, name + ": " +  property.getValue().toString());
+			String value = name + ": " +  property.getValue().toString();
+			map.put(NODE_FIELD, value);
 			itemMapping.add(map);
 			items.add(property);
 		}
@@ -137,8 +139,8 @@ public class ListDataViewer extends ListActivity implements ServiceConnection {
 	
 	@Override
 	public boolean onCreateOptionsMenu(final Menu menu) {
-		menu.add(0, REFRESH, 0, "Refresh");
-		menu.add(0, TRANSFER, 0, "Transfer");
+		menu.add(0, REFRESH, 0, getText(R.string.refresh));
+		menu.add(0, TRANSFER, 0, getText(R.string.transfer));
 		return true;
 	}
 	

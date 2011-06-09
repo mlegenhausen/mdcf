@@ -16,6 +16,7 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
+import de.uniluebeck.itm.mdc.log.LogRecord;
 import de.uniluebeck.itm.mdc.persistence.PersistenceManagerImpl;
 import de.uniluebeck.itm.mdc.persistence.PluginConfigurationRepository;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration;
@@ -40,14 +41,17 @@ public class PluginTask implements Runnable, ServiceConnection {
 	
 	private final PersistenceManager persistenceManager;
 	
+	private final PluginConfigurationRepository repository;
+	
 	private final TimeLimiter timeLimiter = new SimpleTimeLimiter();
 	
 	private Plugin plugin;
 	
 	private Plugin pluginProxy;
 	
-	public PluginTask(final Context context, final PluginConfiguration configuration) {
+	public PluginTask(final Context context, PluginConfigurationRepository repository, final PluginConfiguration configuration) {
 		this.context = context;
+		this.repository = repository;
 		this.configuration = configuration;
 		persistenceManager = new PersistenceManagerImpl(new PluginConfigurationRepository(context), configuration);
 	}
@@ -66,43 +70,47 @@ public class PluginTask implements Runnable, ServiceConnection {
 		plugin = Plugin.Stub.asInterface(binder);
 		int timeout = configuration.getPluginInfo().getDuration();
 		pluginProxy = timeLimiter.newProxy(plugin, Plugin.class, timeout, TimeUnit.MILLISECONDS);
+		
+		LogRecord logRecord = configuration.createLogRecord();
 		try {
-			initPlugin();
+			initPlugin(logRecord);
 			execute();
 		} catch (RemoteException e) {
 			Log.e(LOG_TAG, "Unable to call proceed.", e);
+		} finally {
+			repository.store(configuration);
+			context.unbindService(this);
 		}
-		context.unbindService(this);
 	}
 	
-	private void initPlugin() throws RemoteException {
+	private void initPlugin(LogRecord logRecord) throws RemoteException {
 		Log.d(LOG_TAG, "Setting Persistence Manager...");
 		plugin.setPersistenceManager(persistenceManager);
 		
 		List<String> services = configuration.getPluginInfo().getServices();
 		if (services.contains(Context.LOCATION_SERVICE)) {
 			Log.d(LOG_TAG, "Setting Location Manager");
-			SecureLocationManager locationManager = SecureManagerFactory.createSecureLocationManager(context);
+			SecureLocationManager locationManager = SecureManagerFactory.createSecureLocationManager(context, logRecord);
 			plugin.setLocationManager(locationManager);
 		}
 		if (services.contains(Context.WIFI_SERVICE)) {
 			Log.d(LOG_TAG, "Setting Wifi Manager");
-			SecureWifiManager wifiManager = SecureManagerFactory.createSecureWifiManager(context);
+			SecureWifiManager wifiManager = SecureManagerFactory.createSecureWifiManager(context, logRecord);
 			plugin.setWifiManager(wifiManager);
 		}
 		if (services.contains(Context.AUDIO_SERVICE)) {
 			Log.d(LOG_TAG, "Setting Audio Manager");
-			SecureAudioManager audioManager = SecureManagerFactory.createSecureAudioManager(context);
+			SecureAudioManager audioManager = SecureManagerFactory.createSecureAudioManager(context, logRecord);
 			plugin.setAudioManager(audioManager);
 		}
 		if (services.contains(Context.CONNECTIVITY_SERVICE)) {
 			Log.d(LOG_TAG, "Setting Connectivity Manager");
-			SecureConnectivityManager connectivityManager = SecureManagerFactory.createSecureConnectivityManager(context);
+			SecureConnectivityManager connectivityManager = SecureManagerFactory.createSecureConnectivityManager(context, logRecord);
 			plugin.setConnectivityManager(connectivityManager);
 		}
 		if (services.contains(Context.TELEPHONY_SERVICE)) {
 			Log.d(LOG_TAG, "Setting Telephony Manager");
-			SecureTelephonyManager telephonyManager = SecureManagerFactory.createSecureTelephonyManager(context);
+			SecureTelephonyManager telephonyManager = SecureManagerFactory.createSecureTelephonyManager(context, logRecord);
 			plugin.setTelephonyManager(telephonyManager);
 		}
 	}
@@ -113,6 +121,7 @@ public class PluginTask implements Runnable, ServiceConnection {
 		try {
 			pluginProxy.run();
 		} catch (UncheckedTimeoutException e) {
+			Log.w(LOG_TAG, "Timeout was reached.");
 			killPlugin();
 		} finally {
 			configuration.setState(State.WAITING);

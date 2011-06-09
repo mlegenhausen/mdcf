@@ -37,7 +37,7 @@ public class PluginTaskManager implements PluginTaskListener {
 		configuration.setMode(Mode.ACTIVATED);
 		repository.store(configuration);
 		
-		PluginTask task = new PluginTask(context, configuration);
+		PluginTask task = new PluginTask(context, repository, configuration);
 		task.addListener(this);
 		tasks.put(configuration, task);
 		ScheduledFuture<?> future = scheduler.schedule(task, 0, TimeUnit.MILLISECONDS);

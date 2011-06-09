@@ -17,7 +17,13 @@
     <string name="plugin_stopping">%1$s is stopping</string>
     <string name="plugin_stop_collecting">%1$s has stopped collecting data...</string>
     <string name="data_viewer">Data Viewer</string>
+    <string name="log_viewer">Log Viewer</string>
+    <string name="workspace_viewer">Workspace Viewer</string>
+    <string name="workspace">Workspace</string>
+    <string name="log">Log</string>
     <string name="activate">Activate</string>
     <string name="deactivate">Deactivate</string>
     <string name="cancel">Cancel</string>
+    <string name="transfer">Transfer</string>
+    <string name="refresh">Refresh</string>
 </resources>
