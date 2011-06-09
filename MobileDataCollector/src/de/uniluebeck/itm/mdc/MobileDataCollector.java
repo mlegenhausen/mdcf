@@ -81,6 +81,11 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 	private String formatState(PluginConfiguration plugin) {
 		String result = "";
 		switch (plugin.getState()) {
+		case RESOLVED:
+			if (Mode.NEW.equals(plugin.getMode())) {
+				result = "Select to activate this plugin";
+			}
+			break;
 		case WAITING:
 			result = "Last Execution: " + DATE_FORMAT.format(new Date(plugin.getLastExecuted()));
 			break;
