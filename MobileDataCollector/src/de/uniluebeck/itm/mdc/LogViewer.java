@@ -2,6 +2,8 @@ package de.uniluebeck.itm.mdc;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -98,6 +100,22 @@ public class LogViewer extends ExpandableListActivity implements ServiceConnecti
 	private void refresh() {
 		pluginConfiguration = service.getPluginConfiguration(pluginInfo);
 		List<LogRecord> records = pluginConfiguration.getLogRecords();
+		// Sort all records in descending order.
+		Collections.sort(records, new Comparator<LogRecord>() {
+			@Override
+			public int compare(LogRecord record1, LogRecord record2) {
+				long timestamp1 = record1.getTimestamp();
+				long timestamp2 = record2.getTimestamp();
+				
+				int result = 0;
+				if(timestamp1 < timestamp2) {
+					result = 1;
+				} else if(timestamp1 > timestamp2) {
+		        	result = -1;
+		        }
+				return result;
+			}
+		});
 		mapGroups(records);
 	}
 	
