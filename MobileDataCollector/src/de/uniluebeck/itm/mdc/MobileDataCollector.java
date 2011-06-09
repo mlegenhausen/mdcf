@@ -32,7 +32,7 @@ import de.uniluebeck.itm.mdcf.PluginIntent;
 
 public class MobileDataCollector extends ListActivity implements ServiceConnection, PluginServiceListener {
 	
-	public static final String LOG_TAG = "MobileDataCollector";
+	private static final String TAG = MobileDataCollector.class.getName();
 	
 	private	static final String KEY_PLUGIN = "plugin";
 	
@@ -50,6 +50,8 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 	
 	private static final int UNINSTALL_ID = 5;
 	
+	private static final Map<Mode, String> MODE_MAPPING = new HashMap<Mode, String>();
+	
 	private SimpleAdapter listAdapter;
 	
 	private List<PluginConfiguration> pluginConfigurations = new ArrayList<PluginConfiguration>();
@@ -58,10 +60,16 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 	
 	private PluginService service;
 	
+	static {
+		MODE_MAPPING.put(Mode.NEW, "New");
+		MODE_MAPPING.put(Mode.ACTIVATED, "Active");
+		MODE_MAPPING.put(Mode.DEACTIVATED, "Deactivated");
+	}
+	
 	private Map<String, String> mapPlugin(PluginConfiguration plugin) {
 		final Map<String, String> map = new HashMap<String, String>();
 		map.put(KEY_PLUGIN, plugin.getPluginInfo().getName());
-		map.put(KEY_MODE, plugin.getMode().toString());
+		map.put(KEY_MODE, MODE_MAPPING.get(plugin.getMode()));
 		map.put(KEY_STATE, plugin.getState().toString());
 		return map;
 	}
@@ -116,7 +124,7 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     @Override
     protected void onStart() {
     	super.onStart();
-    	Log.i(LOG_TAG, "Bind Service");
+    	Log.i(TAG, "Bind Service");
     	bindService(new Intent(this, PluginService.class), this, Context.BIND_AUTO_CREATE);
     }
     
