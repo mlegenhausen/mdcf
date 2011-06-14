@@ -83,7 +83,7 @@ public class LogViewer extends ExpandableListActivity implements ServiceConnecti
 	
 	@Override
 	public boolean onCreateOptionsMenu(final Menu menu) {
-		menu.add(0, REFRESH, 0, getText(R.string.refresh));
+		menu.add(0, REFRESH, 0, R.string.refresh);
 		return true;
 	}
 	

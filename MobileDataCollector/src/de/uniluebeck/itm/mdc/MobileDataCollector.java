@@ -18,6 +18,7 @@ import android.os.IBinder;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView.AdapterContextMenuInfo;
@@ -44,6 +45,8 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 	
 	private static final String KEY_STATE = "state";
 	
+	private static final String MARKET_URI = "market://search?q=mdcf";
+	
 	private static final int ACTIVATE_ID = 1;
 	
 	private static final int DEACTIVATE_ID = 2;
@@ -53,6 +56,8 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 	private static final int DETAILS_ID = 4;
 	
 	private static final int UNINSTALL_ID = 5;
+	
+	private static final int MARKET_ID = 6;
 	
 	private static final Map<Mode, String> MODE_MAPPING = new HashMap<Mode, String>();
 	
@@ -68,53 +73,6 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 		MODE_MAPPING.put(Mode.NEW, "New");
 		MODE_MAPPING.put(Mode.ACTIVATED, "Active");
 		MODE_MAPPING.put(Mode.DEACTIVATED, "Deactivated");
-	}
-	
-	private Map<String, String> mapPlugin(PluginConfiguration plugin) {
-		final Map<String, String> map = new HashMap<String, String>();
-		map.put(KEY_PLUGIN, plugin.getPluginInfo().getName());
-		map.put(KEY_MODE, MODE_MAPPING.get(plugin.getMode()));
-		map.put(KEY_STATE, formatState(plugin));
-		return map;
-	}
-	
-	private String formatState(PluginConfiguration plugin) {
-		String result = "";
-		switch (plugin.getState()) {
-		case RESOLVED:
-			if (Mode.NEW.equals(plugin.getMode())) {
-				result = "Select to activate this plugin";
-			}
-			break;
-		case WAITING:
-			result = "Last Execution: " + DATE_FORMAT.format(new Date(plugin.getLastExecuted()));
-			break;
-		case RUNNING:
-			result = "Executing...";
-			break;
-		}
-		return result;
-	}
-	
-	private void addPlugin(PluginConfiguration plugin) {
-		pluginMappings.add(mapPlugin(plugin));
-	}
-	
-	private void loadPlugins() {
-		pluginMappings.clear();
-		pluginConfigurations = service.getPluginConfigurations();
-		for (final PluginConfiguration plugin : pluginConfigurations) {
-			addPlugin(plugin);
-		}
-		listAdapter.notifyDataSetChanged();
-	}
-	
-	private void updatePlugin(PluginConfiguration plugin) {
-		int index = pluginConfigurations.indexOf(plugin);
-		if (index > -1) {
-			pluginMappings.set(index, mapPlugin(plugin));
-			listAdapter.notifyDataSetChanged();
-		}
 	}
 	
     /**
@@ -182,8 +140,7 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     	PluginConfiguration plugin = pluginConfigurations.get(info.position);
     	switch (item.getItemId()) {
     	case ACTIVATE_ID:
-    		startActivite(plugin);
-    		//service.activate(plugin);
+    		startActivate(plugin);
     		break;
     	case DEACTIVATE_ID:
     		service.deactivate(plugin);
@@ -192,7 +149,7 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     		startDataViewer(plugin);
     		break;
     	case DETAILS_ID:
-    		startActivite(plugin);
+    		startActivate(plugin);
     		break;
     	case UNINSTALL_ID:
     		startUninstall(plugin);
@@ -201,7 +158,70 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     	return super.onContextItemSelected(item);
     }
     
-    private void startActivite(PluginConfiguration plugin) {
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+    	menu.add(0, MARKET_ID, 0, "Find more Plugins");
+    	return true;
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+    	switch(item.getItemId()) {
+    	case MARKET_ID:
+    		startMarket();
+    		break;
+    	}
+    	return true;
+    }
+    
+    private Map<String, String> mapPlugin(PluginConfiguration plugin) {
+		final Map<String, String> map = new HashMap<String, String>();
+		map.put(KEY_PLUGIN, plugin.getPluginInfo().getName());
+		map.put(KEY_MODE, MODE_MAPPING.get(plugin.getMode()));
+		map.put(KEY_STATE, formatState(plugin));
+		return map;
+	}
+	
+	private String formatState(PluginConfiguration plugin) {
+		String result = "";
+		switch (plugin.getState()) {
+		case RESOLVED:
+			if (Mode.NEW.equals(plugin.getMode())) {
+				result = "Select to activate this plugin";
+			}
+			break;
+		case WAITING:
+			result = "Last Execution: " + DATE_FORMAT.format(new Date(plugin.getLastExecuted()));
+			break;
+		case RUNNING:
+			result = "Executing...";
+			break;
+		}
+		return result;
+	}
+	
+	private void addPlugin(PluginConfiguration plugin) {
+		pluginMappings.add(mapPlugin(plugin));
+	}
+	
+	private void loadPlugins() {
+		pluginMappings.clear();
+		pluginConfigurations = service.getPluginConfigurations();
+		for (final PluginConfiguration plugin : pluginConfigurations) {
+			addPlugin(plugin);
+		}
+		listAdapter.notifyDataSetChanged();
+	}
+	
+	private void updatePlugin(PluginConfiguration plugin) {
+		int index = pluginConfigurations.indexOf(plugin);
+		if (index > -1) {
+			pluginMappings.set(index, mapPlugin(plugin));
+			listAdapter.notifyDataSetChanged();
+		}
+	}
+    
+    private void startActivate(PluginConfiguration plugin) {
     	PluginInfo pluginInfo = plugin.getPluginInfo();
     	Intent intent = new Intent(this, ActivationActivity.class);
     	intent.putExtra(PluginIntent.PLUGIN_INFO, pluginInfo);
@@ -219,6 +239,12 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     	String uri = "package:" + plugin.getPluginInfo().getPackage();
     	Intent intent = new Intent(Intent.ACTION_DELETE);
     	intent.setData(Uri.parse(uri));
+    	startActivity(intent);
+    }
+    
+    private void startMarket() {
+    	Intent intent = new Intent(Intent.ACTION_VIEW);
+    	intent.setData(Uri.parse(MARKET_URI));
     	startActivity(intent);
     }
 
