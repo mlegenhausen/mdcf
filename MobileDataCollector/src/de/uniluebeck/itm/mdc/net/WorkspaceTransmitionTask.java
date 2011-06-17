@@ -4,16 +4,15 @@ import java.io.IOException;
 
 import org.apache.http.client.ClientProtocolException;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 
-import de.uniluebeck.itm.mdcf.persistence.Node;
-
-public class WorkspaceTransmitionTask extends AsyncTask<Node, Integer, Void> {
+public class WorkspaceTransmitionTask extends AsyncTask<TransferRequest, Integer, Boolean> {
 
 	private final Gson gson = new Gson();
 	
@@ -38,20 +37,28 @@ public class WorkspaceTransmitionTask extends AsyncTask<Node, Integer, Void> {
 	}
 	
 	@Override
-	protected Void doInBackground(Node... nodes) {
-		for (Node node : nodes) {
-			String json = gson.toJson(node);
-			publishProgress(50);
+	protected Boolean doInBackground(TransferRequest... requests) {
+		int delta = 100 / (requests.length * 2);
+		int progress = 0;
+		for (TransferRequest request : requests) {
+			String json = gson.toJson(request);
+			
+			progress += delta;
+			publishProgress(progress);
+			
 			try {
 				SimpleJsonClient.to(url).send(json);
 			} catch (ClientProtocolException e) {
-				e.printStackTrace();
+				return false;
 			} catch (IOException e) {
-				e.printStackTrace();
+				return false;
 			}
-			publishProgress(100);
+			
+			progress += delta;
+			publishProgress(progress);
 		}
-		return null;
+		publishProgress(100);
+		return true;
 	}
 	
 	@Override
@@ -60,8 +67,23 @@ public class WorkspaceTransmitionTask extends AsyncTask<Node, Integer, Void> {
 	}
 
 	@Override
-	protected void onPostExecute(Void result) {
+	protected void onPostExecute(Boolean result) {
 		progressDialog.hide();
-		Toast.makeText(context, "Data was successfully transfered", Toast.LENGTH_LONG);
+		if (!result) {
+			showAlertDialog("Unable to transfer workspace. Please retry...");
+		}
+	}
+	
+	private void showAlertDialog(String message) {
+		new AlertDialog.Builder(context)
+			.setTitle("Error")
+			.setMessage(message)
+			.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.dismiss();
+				}
+			})
+			.show();
 	}
 }
