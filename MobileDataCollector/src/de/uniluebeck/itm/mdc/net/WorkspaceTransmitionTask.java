@@ -11,9 +11,7 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 
-import de.uniluebeck.itm.mdcf.persistence.Node;
-
-public class WorkspaceTransmitionTask extends AsyncTask<Node, Integer, Void> {
+public class WorkspaceTransmitionTask extends AsyncTask<TransferRequest, Integer, Void> {
 
 	private final Gson gson = new Gson();
 	
@@ -38,10 +36,15 @@ public class WorkspaceTransmitionTask extends AsyncTask<Node, Integer, Void> {
 	}
 	
 	@Override
-	protected Void doInBackground(Node... nodes) {
-		for (Node node : nodes) {
-			String json = gson.toJson(node);
-			publishProgress(50);
+	protected Void doInBackground(TransferRequest... requests) {
+		int delta = 100 / (requests.length * 2);
+		int progress = 0;
+		for (TransferRequest request : requests) {
+			String json = gson.toJson(request);
+			
+			progress += delta;
+			publishProgress(progress);
+			
 			try {
 				SimpleJsonClient.to(url).send(json);
 			} catch (ClientProtocolException e) {
@@ -49,8 +52,11 @@ public class WorkspaceTransmitionTask extends AsyncTask<Node, Integer, Void> {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			publishProgress(100);
+			
+			progress += delta;
+			publishProgress(progress);
 		}
+		publishProgress(100);
 		return null;
 	}
 	
