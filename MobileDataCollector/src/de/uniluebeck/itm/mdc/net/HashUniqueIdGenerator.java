@@ -10,29 +10,34 @@ public class HashUniqueIdGenerator implements UniqueIdGenerator {
 	
 	private static final String ALGORITHM = "SHA-1";
 	
+	private static final String SEPARATOR = "#";
+	
+	private static final String ENCODING = "iso-8859-1";
+	
 	private static String convertToHex(byte[] data) { 
         StringBuffer buf = new StringBuffer();
         for (int i = 0; i < data.length; i++) { 
-            int halfbyte = (data[i] >>> 4) & 0x0F;
-            int two_halfs = 0;
+            int halfByte = (data[i] >>> 4) & 0x0F;
+            int twoHalfs = 0;
             do { 
-                if ((0 <= halfbyte) && (halfbyte <= 9)) 
-                    buf.append((char) ('0' + halfbyte));
-                else 
-                    buf.append((char) ('a' + (halfbyte - 10)));
-                halfbyte = data[i] & 0x0F;
-            } while(two_halfs++ < 1);
+                if ((0 <= halfByte) && (halfByte <= 9)) {
+                    buf.append((char) ('0' + halfByte));
+                } else { 
+                    buf.append((char) ('a' + (halfByte - 10)));
+                }
+                halfByte = data[i] & 0x0F;
+            } while(twoHalfs++ < 1);
         } 
         return buf.toString();
     } 
 	
 	@Override
 	public String generate(String... strings) throws NoSuchAlgorithmException, UnsupportedEncodingException {
-		String text = Joiner.on("#").join(strings);
-		MessageDigest md = MessageDigest.getInstance(ALGORITHM);
+		String text = Joiner.on(SEPARATOR).join(strings);
+		MessageDigest messageDigest = MessageDigest.getInstance(ALGORITHM);
 	    byte[] sha1hash = new byte[40];
-	    md.update(text.getBytes("iso-8859-1"), 0, text.length());
-	    sha1hash = md.digest();
+	    messageDigest.update(text.getBytes(ENCODING), 0, text.length());
+	    sha1hash = messageDigest.digest();
 	    return convertToHex(sha1hash);
 	}
 

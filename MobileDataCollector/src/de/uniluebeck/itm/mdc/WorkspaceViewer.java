@@ -16,7 +16,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.telephony.TelephonyManager;
@@ -146,9 +145,9 @@ public class WorkspaceViewer extends ListActivity implements ServiceConnection {
 			id = uniqueIdGenerator.generate(subscriberId, action);
 			Log.i(TAG, "Unique id: " + id);
 		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
+			Log.e(TAG, "Algorithm was not found.", e);
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+			Log.e(TAG, "Unsupported Encoding", e);
 		}
 		Node workspace = pluginConfiguration.getWorkspace();
 		new WorkspaceTransmitionTask(this, url).execute(new TransferRequest(id, workspace));
