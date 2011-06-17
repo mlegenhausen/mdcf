@@ -13,7 +13,8 @@ public class PluginPermissionChecker {
 		Manifest.permission.INTERNET,
 		Manifest.permission.ACCESS_COARSE_LOCATION,
 		Manifest.permission.ACCESS_FINE_LOCATION,
-		Manifest.permission.ACCESS_NETWORK_STATE
+		Manifest.permission.ACCESS_NETWORK_STATE,
+		Manifest.permission.READ_PHONE_STATE
 	};
 
 	private final PackageManager packageManager;
