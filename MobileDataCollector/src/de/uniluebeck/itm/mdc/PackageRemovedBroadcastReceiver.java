@@ -1,21 +1,22 @@
 package de.uniluebeck.itm.mdc;
 
+import de.uniluebeck.itm.mdc.service.PluginService;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
-import de.uniluebeck.itm.mdc.service.PluginService;
 
-public class PackageAddedBroadcastReceiver extends BroadcastReceiver {
+public class PackageRemovedBroadcastReceiver extends BroadcastReceiver {
 
-	private static final String TAG = PackageAddedBroadcastReceiver.class.getName();
+	private static final String TAG = PackageRemovedBroadcastReceiver.class.getName();
 	
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		Log.i(TAG, "New package was installed. Reload plugins.");
+		Log.i(TAG, "Package removed update plugin service.");
 		Intent broadcast = new Intent(context, PluginService.class);
-		broadcast.setAction(PluginService.PLUGIN_ADDED);
+		broadcast.setAction(PluginService.PLUGIN_REMOVED);
 		broadcast.setData(intent.getData());
 		context.startService(broadcast);
 	}
+
 }

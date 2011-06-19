@@ -9,7 +9,7 @@
 
 		<receiver android:name=".PluginBroadcastReceiver">
 			<intent-filter>
-				<action android:name="de.uniluebeck.itm.mdc.PLUGIN"/>
+				<action android:name="de.uniluebeck.itm.mdcf.PLUGIN_FIND"/>
 			</intent-filter>
 		</receiver>
 		

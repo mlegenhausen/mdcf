@@ -9,7 +9,7 @@ import de.uniluebeck.itm.mdcf.PluginIntent;
 
 public class PluginBroadcastReceiver extends BroadcastReceiver {
 	
-	public static final String LOG_TAG = "HelloWorldPlugin";
+	public static final String TAG = HelloWorldPlugin.class.getName();
 	
 	@Override
 	public void onReceive(Context context, Intent intent) {
@@ -19,7 +19,7 @@ public class PluginBroadcastReceiver extends BroadcastReceiver {
 		configuration.setPackage(context.getPackageName());
 		configuration.setUrl("http://192.168.1.103/mdcf/receiver.php");
 		configuration.getServices().add(Context.LOCATION_SERVICE);
-		Log.i(LOG_TAG, "Sending service intent");
+		Log.i(TAG, "Sending service intent");
 		context.startService(new PluginIntent(configuration));
 	}
 }

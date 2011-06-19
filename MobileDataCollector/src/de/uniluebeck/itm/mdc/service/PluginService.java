@@ -1,5 +1,8 @@
 package de.uniluebeck.itm.mdc.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.Service;
@@ -19,9 +22,6 @@ import de.uniluebeck.itm.mdc.util.Notifications;
 import de.uniluebeck.itm.mdcf.PluginInfo;
 import de.uniluebeck.itm.mdcf.PluginIntent;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class PluginService extends Service implements PluginTaskListener {
 
     public class PluginServiceBinder extends Binder {
@@ -29,8 +29,14 @@ public class PluginService extends Service implements PluginTaskListener {
             return PluginService.this;
         }
     }
+    
+    public static final String MDC_FIRST_LAUNCH = "de.uniluebeck.itm.mdc.MDC_FIRST_LAUNCH";
 	
-	public static final String LOG_TAG = "MobileDataCollectorService";
+	public static final String PLUGIN_ADDED = "de.uniluebeck.itm.mdc.PLUGIN_ADDED";
+	
+	public static final String PLUGIN_REMOVED = "de.uniluebeck.itm.mdc.PLUGIN_REMOVED";
+	
+	private static final String TAG = PluginService.class.getName();
 	
 	private final List<PluginServiceListener> listeners = new ArrayList<PluginServiceListener>();
 	
@@ -58,8 +64,8 @@ public class PluginService extends Service implements PluginTaskListener {
 		Notification notification = Notifications.createNotification(this, R.string.notification_task_wait);
 		notification.tickerText = getString(R.string.notification_mdc_started);
 		startForeground(R.string.foreground_service, notification);
-		Log.i(LOG_TAG, "Sending broadcast");
-		sendBroadcast(new Intent(PluginIntent.PLUGIN_ACTION));
+		Log.i(TAG, "Sending broadcast");
+		sendBroadcast(new Intent(PluginIntent.PLUGIN_FIND));
 	}
 	
 	@Override
@@ -67,19 +73,30 @@ public class PluginService extends Service implements PluginTaskListener {
 		super.onStartCommand(intent, flags, startId);
 		handleCommand(intent);
 		
-		Log.i(LOG_TAG, "MobileDataCollectorServices start");
+		Log.i(TAG, "MobileDataCollectorServices start");
 		return START_STICKY;
 	}
 	
 	private void handleCommand(Intent intent) {
 		final String action = intent.getAction();
-		if (PluginIntent.PLUGIN_REGISTER.equals(action)) {
-			Log.i(LOG_TAG, "Plugin " + action + " wants to register");
+		Log.i(TAG, "Handle action: " + action);
+		if (MDC_FIRST_LAUNCH.equals(action)) {
+			firstLaunch();
+		} else if (PLUGIN_ADDED.equals(action)) {
+			String pkg = intent.getDataString();
+			Log.i(TAG, "Package " + pkg + " was added");
+			pluginAdded(pkg);
+		} else if (PLUGIN_REMOVED.equals(action)) {
+			String pkg = intent.getDataString();
+			Log.i(TAG, "Package " + pkg + " was removed");
+			pluginRemoved(pkg);
+		} else if (PluginIntent.PLUGIN_REGISTER.equals(action)) {
+			Log.i(TAG, "Plugin " + action + " wants to register");
 			if (intent.hasExtra(PluginIntent.PLUGIN_INFO)) {
 				final PluginInfo info = intent.getParcelableExtra(PluginIntent.PLUGIN_INFO);
-				register(info);
+				pluginRegister(info);
 			} else {
-				Log.e(LOG_TAG, "Plugin " + action + " has no configuration");
+				Log.e(TAG, "Plugin " + action + " has no configuration");
 			}
 		}
 	}
@@ -90,29 +107,46 @@ public class PluginService extends Service implements PluginTaskListener {
 		pluginTaskManager.destroy();
 		repository.close();
 		stopForeground(true);
-		Log.i(LOG_TAG, "MobileDataCollectorService destroyed");
+		Log.i(TAG, "MobileDataCollectorService destroyed");
 	}
 	
 	@Override
 	public IBinder onBind(Intent paramIntent) {
-		Log.i(LOG_TAG, "MobileDataCollectorService binded.");
+		Log.i(TAG, "MobileDataCollectorService binded.");
 		return binder;
 	}
 	
-	private void register(final PluginInfo info) {
+	private void firstLaunch() {
+		// Execute a whole system broadcast to find all already installed plugins.
+	}
+	
+	private void pluginRegister(final PluginInfo info) {
 		PluginConfiguration configuration = repository.findByPluginInfo(info);
 		if (configuration == null) {
 			configuration = new PluginConfiguration(info);
 			configuration = checker.updatePermissions(configuration);
 			repository.store(configuration);
 			fireRegistered(configuration);
-			Log.i(LOG_TAG, "Service registered: " + configuration.getPluginInfo().getAction());
+			Log.i(TAG, "Service registered: " + configuration.getPluginInfo().getAction());
 		} else {
 			// Update Plugin configuration.
 			if (Mode.ACTIVATED.equals(configuration.getMode())) {
 				activate(configuration);
 			}
 		}
+	}
+	
+	private void pluginAdded(final String pkg) {
+		Log.i(TAG, "Sending broadcast to find plugin with package: " + pkg);
+		Intent intent = new Intent(PluginIntent.PLUGIN_FIND);
+		//intent.setPackage(pkg);
+		sendBroadcast(intent);
+	}
+	
+	private void pluginRemoved(final String pkg) {
+		// Find plugin configuration by package name
+		// Remove from repository
+		// Send event
 	}
 	
 	private void fireRegistered(PluginConfiguration configuration) {

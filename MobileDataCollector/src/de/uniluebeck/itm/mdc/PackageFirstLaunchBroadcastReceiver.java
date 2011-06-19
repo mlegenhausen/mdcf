@@ -6,16 +6,16 @@ import android.content.Intent;
 import android.util.Log;
 import de.uniluebeck.itm.mdc.service.PluginService;
 
-public class PackageAddedBroadcastReceiver extends BroadcastReceiver {
+public class PackageFirstLaunchBroadcastReceiver extends BroadcastReceiver {
 
-	private static final String TAG = PackageAddedBroadcastReceiver.class.getName();
+	private static final String TAG = PackageFirstLaunchBroadcastReceiver.class.getName();
 	
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		Log.i(TAG, "New package was installed. Reload plugins.");
+		Log.i(TAG, "Package launch the first time");
 		Intent broadcast = new Intent(context, PluginService.class);
-		broadcast.setAction(PluginService.PLUGIN_ADDED);
-		broadcast.setData(intent.getData());
+		broadcast.setAction(PluginService.MDC_FIRST_LAUNCH);
 		context.startService(broadcast);
 	}
+
 }
