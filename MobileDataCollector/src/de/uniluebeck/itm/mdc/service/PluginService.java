@@ -8,9 +8,11 @@ import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.db4o.ObjectSet;
@@ -40,6 +42,8 @@ public class PluginService extends Service implements PluginTaskListener {
 	
 	private static final String TAG = PluginService.class.getName();
 	
+	private static final String FIRST_LAUNCH_PREFERECE = "first_launch";
+	
 	private final List<PluginServiceListener> listeners = new ArrayList<PluginServiceListener>();
 	
 	private final IBinder binder = new PluginServiceBinder();
@@ -50,7 +54,9 @@ public class PluginService extends Service implements PluginTaskListener {
 	
 	private NotificationManager notificationManager;
 	
-	private PluginPermissionChecker checker;
+	private PluginPermissionChecker pluginPermissionchecker;
+	
+	private SharedPreferences sharedPreferences;
 	
 	@Override
 	public void onCreate() {
@@ -58,16 +64,25 @@ public class PluginService extends Service implements PluginTaskListener {
 		notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		repository = new PluginConfigurationRepository(this);
 		pluginTaskManager = new PluginTaskManager(this, repository);
-		checker = new PluginPermissionChecker(this);
-		initService();
+		pluginPermissionchecker = new PluginPermissionChecker(this);
+		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+		initNotification();
+		checkFirstLaunch();
 	}
 	
-	private void initService() {		
+	private void initNotification() {		
 		Notification notification = Notifications.createNotification(this, R.string.notification_task_wait);
 		notification.tickerText = getString(R.string.notification_mdc_started);
 		startForeground(R.string.foreground_service, notification);
-		Log.i(TAG, "Sending broadcast");
-		sendBroadcast(new Intent(PluginIntent.PLUGIN_FIND));
+	}
+	
+	private void checkFirstLaunch() {
+		boolean isFirstLaunch = sharedPreferences.getBoolean(FIRST_LAUNCH_PREFERECE, true);
+		if (isFirstLaunch) {
+			Log.i(TAG, "Sending first launch broadcast to find previous installed plugins.");
+			sendBroadcast(new Intent(PluginIntent.PLUGIN_FIND));
+			sharedPreferences.edit().putBoolean(FIRST_LAUNCH_PREFERECE, false).commit();
+		}
 	}
 	
 	@Override
@@ -120,7 +135,7 @@ public class PluginService extends Service implements PluginTaskListener {
 		PluginConfiguration configuration = repository.findByPluginInfo(info);
 		if (configuration == null) {
 			configuration = new PluginConfiguration(info);
-			configuration = checker.updatePermissions(configuration);
+			configuration = pluginPermissionchecker.updatePermissions(configuration);
 			repository.store(configuration);
 			fireRegistered(configuration);
 			Log.i(TAG, "Service registered: " + configuration.getPluginInfo().getAction());

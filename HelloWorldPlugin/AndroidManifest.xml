@@ -4,7 +4,6 @@
       android:versionCode="1"
       android:versionName="1.0">
 
-
     <application android:icon="@drawable/icon" android:label="HelloWorldPlugin">
 
 		<receiver android:name=".PluginBroadcastReceiver">
