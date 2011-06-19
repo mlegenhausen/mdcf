@@ -27,6 +27,15 @@
 		        <data android:scheme="package" />
 			</intent-filter>
         </receiver>
+        
+        <receiver android:name="PackageRemovedBroadcastReceiver">
+        	<intent-filter>
+        		<action android:name="android.intent.action.PACKAGE_REMOVED" />
+        		
+        		<category android:name="android.intent.category.DEFAULT" />
+		        <data android:scheme="package" />
+        	</intent-filter>
+        </receiver>
 
 		<receiver android:name="ServiceStarterBroadcastReceiver"
 			android:enabled="true"
@@ -38,7 +47,10 @@
 
 		<service android:name=".service.PluginService">
 			<intent-filter>
-				<action android:name="de.uniluebeck.itm.mdc.PLUGIN_REGISTER" />
+				<action android:name="de.uniluebeck.itm.mdc.MDC_FIRST_LAUNCH" />
+				<action android:name="de.uniluebeck.itm.mdc.PLUGIN_ADDED" />
+				<action android:name="de.uniluebeck.itm.mdc.PLUGIN_REMOVED" />
+				<action android:name="de.uniluebeck.itm.mdcf.PLUGIN_REGISTER" />
 			</intent-filter>
 		</service>
 	</application>
