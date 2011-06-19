@@ -1,0 +1,9 @@
+<plugininfo action="de.uniluebeck.itm.plugin.HELLO_WORLD" version="1.0">
+	<name>Hello World Plugin</name>
+	<period>30000</period>
+	<duration>1000</duration>
+	<url>http://192.168.1.103/mdcf/receiver.php</url>
+	<services>
+		<service>location</service>
+	</services>
+</plugininfo>

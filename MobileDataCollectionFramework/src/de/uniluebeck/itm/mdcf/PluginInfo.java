@@ -3,9 +3,15 @@ package de.uniluebeck.itm.mdcf;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.ElementList;
+import org.simpleframework.xml.Root;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
+@Root
 public class PluginInfo implements Parcelable {
 
 	public static final Parcelable.Creator<PluginInfo> CREATOR = new Parcelable.Creator<PluginInfo>() {
@@ -18,23 +24,31 @@ public class PluginInfo implements Parcelable {
         }
     };
     
-    private String name;
-    
     private String pkg;
     
+    @Element
+    private String name;
+    
+    @Attribute
     private String action;
     
+    @Attribute
     private String version;
     
+    @Element
     private String url;
     
+    @Element
     private int period;
     
+    @Element
     private int duration;
     
-    private List<String> services = new ArrayList<String>();
-    
+    @Element(required=false)
     private String description;
+    
+    @ElementList(entry="service")
+    private List<String> services = new ArrayList<String>();
     
     public PluginInfo() {
 		
