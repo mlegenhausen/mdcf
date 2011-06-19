@@ -277,6 +277,16 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 	}
 	
 	@Override
+	public void onRemoved(PluginServiceEvent pluginServiceEvent) {
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				loadPlugins();
+			}
+		});
+	}
+	
+	@Override
 	public void onStateChanged(PluginServiceEvent event) {
 		final PluginConfiguration plugin = event.getConfiguration();
 		runOnUiThread(new Runnable() {

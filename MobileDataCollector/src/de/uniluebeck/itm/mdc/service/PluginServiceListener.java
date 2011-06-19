@@ -8,4 +8,6 @@ public interface PluginServiceListener {
 	void onStateChanged(PluginServiceEvent event);
 	
 	void onModeChanged(PluginServiceEvent event);
+
+	void onRemoved(PluginServiceEvent pluginServiceEvent);
 }

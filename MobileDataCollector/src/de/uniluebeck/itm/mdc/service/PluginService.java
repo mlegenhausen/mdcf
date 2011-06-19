@@ -8,9 +8,13 @@ import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
+
+import com.db4o.ObjectSet;
+
 import de.uniluebeck.itm.mdc.R;
 import de.uniluebeck.itm.mdc.persistence.PluginConfigurationRepository;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration.Mode;
@@ -83,13 +87,13 @@ public class PluginService extends Service implements PluginTaskListener {
 		if (MDC_FIRST_LAUNCH.equals(action)) {
 			firstLaunch();
 		} else if (PLUGIN_ADDED.equals(action)) {
-			String pkg = intent.getDataString();
-			Log.i(TAG, "Package " + pkg + " was added");
-			pluginAdded(pkg);
+			Uri data = intent.getData();
+			Log.i(TAG, data + " was added");
+			pluginAdded(data);
 		} else if (PLUGIN_REMOVED.equals(action)) {
-			String pkg = intent.getDataString();
-			Log.i(TAG, "Package " + pkg + " was removed");
-			pluginRemoved(pkg);
+			Uri data = intent.getData();
+			Log.i(TAG, data + " was removed");
+			pluginRemoved(data);
 		} else if (PluginIntent.PLUGIN_REGISTER.equals(action)) {
 			Log.i(TAG, "Plugin " + action + " wants to register");
 			if (intent.hasExtra(PluginIntent.PLUGIN_INFO)) {
@@ -136,22 +140,38 @@ public class PluginService extends Service implements PluginTaskListener {
 		}
 	}
 	
-	private void pluginAdded(final String pkg) {
+	private void pluginAdded(Uri data) {
+		String pkg = data.getSchemeSpecificPart();
 		Log.i(TAG, "Sending broadcast to find plugin with package: " + pkg);
 		Intent intent = new Intent(PluginIntent.PLUGIN_FIND);
-		//intent.setPackage(pkg);
+		intent.setPackage(pkg);
 		sendBroadcast(intent);
 	}
 	
-	private void pluginRemoved(final String pkg) {
-		// Find plugin configuration by package name
-		// Remove from repository
-		// Send event
+	private void pluginRemoved(Uri data) {
+		String pkg = data.getSchemeSpecificPart();
+		PluginInfo info = new PluginInfo();
+		info.setPackage(pkg);
+		ObjectSet<PluginInfo> result = repository.db().queryByExample(info);
+		if (result.size() > 0) {
+			PluginInfo deleted = result.get(0);
+			PluginConfiguration configuration = repository.findByPluginInfo(deleted);
+			pluginTaskManager.deactivate(configuration);
+			repository.delete(configuration);
+			Log.i(TAG, deleted.getName() + " was successfully removed.");
+			fireRemoved(configuration);
+		}
 	}
 	
 	private void fireRegistered(PluginConfiguration configuration) {
 		for (final PluginServiceListener listener : listeners.toArray(new PluginServiceListener[0])) {
 			listener.onRegistered(new PluginServiceEvent(this, configuration));
+		}
+	}
+	
+	private void fireRemoved(PluginConfiguration configuration) {
+		for (final PluginServiceListener listener : listeners.toArray(new PluginServiceListener[0])) {
+			listener.onRemoved(new PluginServiceEvent(this, configuration));
 		}
 	}
 	
