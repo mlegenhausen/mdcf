@@ -52,6 +52,7 @@ public class Db4oHelper {
     	
     	configuration.common().objectClass(PluginConfiguration.class).objectField("pluginInfo").indexed(true);
     	configuration.common().objectClass(PluginConfiguration.class).cascadeOnUpdate(true);
+    	configuration.common().objectClass(PluginConfiguration.class).cascadeOnDelete(true);
     	
     	configuration.common().objectClass(PluginInfo.class).objectField("action").indexed(true);
     	

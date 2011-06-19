@@ -141,6 +141,8 @@ public class PluginService extends Service implements PluginTaskListener {
 			Log.i(TAG, "Service registered: " + configuration.getPluginInfo().getAction());
 		} else {
 			// Update Plugin configuration.
+			configuration.setPluginInfo(info);
+			repository.store(configuration);
 			if (Mode.ACTIVATED.equals(configuration.getMode())) {
 				activate(configuration);
 			}
