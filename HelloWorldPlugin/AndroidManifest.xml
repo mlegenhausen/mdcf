@@ -6,7 +6,7 @@
 
     <application android:icon="@drawable/icon" android:label="HelloWorldPlugin">
 
-		<receiver android:name=".PluginBroadcastReceiver">
+		<receiver android:name=".HelloWorldPluginRegister">
 			<intent-filter>
 				<action android:name="de.uniluebeck.itm.mdcf.PLUGIN_FIND"/>
 			</intent-filter>
