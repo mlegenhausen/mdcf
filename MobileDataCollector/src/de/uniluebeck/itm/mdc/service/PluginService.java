@@ -33,8 +33,6 @@ public class PluginService extends Service implements PluginTaskListener {
             return PluginService.this;
         }
     }
-    
-    public static final String MDC_FIRST_LAUNCH = "de.uniluebeck.itm.mdc.MDC_FIRST_LAUNCH";
 	
 	public static final String PLUGIN_ADDED = "de.uniluebeck.itm.mdc.PLUGIN_ADDED";
 	
@@ -84,9 +82,7 @@ public class PluginService extends Service implements PluginTaskListener {
 	private void handleCommand(Intent intent) {
 		final String action = intent.getAction();
 		Log.i(TAG, "Handle action: " + action);
-		if (MDC_FIRST_LAUNCH.equals(action)) {
-			firstLaunch();
-		} else if (PLUGIN_ADDED.equals(action)) {
+		if (PLUGIN_ADDED.equals(action)) {
 			Uri data = intent.getData();
 			Log.i(TAG, data + " was added");
 			pluginAdded(data);
@@ -120,10 +116,6 @@ public class PluginService extends Service implements PluginTaskListener {
 		return binder;
 	}
 	
-	private void firstLaunch() {
-		// Execute a whole system broadcast to find all already installed plugins.
-	}
-	
 	private void pluginRegister(final PluginInfo info) {
 		PluginConfiguration configuration = repository.findByPluginInfo(info);
 		if (configuration == null) {
@@ -153,7 +145,7 @@ public class PluginService extends Service implements PluginTaskListener {
 		PluginInfo info = new PluginInfo();
 		info.setPackage(pkg);
 		ObjectSet<PluginInfo> result = repository.db().queryByExample(info);
-		if (result.size() > 0) {
+		if (!result.isEmpty()) {
 			PluginInfo deleted = result.get(0);
 			PluginConfiguration configuration = repository.findByPluginInfo(deleted);
 			pluginTaskManager.deactivate(configuration);
