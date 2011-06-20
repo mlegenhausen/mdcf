@@ -13,8 +13,8 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.view.View;
-import android.widget.Button;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -22,15 +22,20 @@ import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 
 import de.uniluebeck.itm.mdc.service.PluginConfiguration;
+import de.uniluebeck.itm.mdc.service.PluginConfiguration.Mode;
 import de.uniluebeck.itm.mdc.service.PluginService;
 import de.uniluebeck.itm.mdcf.PluginInfo;
 import de.uniluebeck.itm.mdcf.PluginIntent;
 
-public class ActivationActivity extends Activity implements ServiceConnection {
-	
+public class InfoActivity extends Activity implements ServiceConnection {
+
 	private static final Map<String, String> SERVICE_MAPPING = new HashMap<String, String>();
 	
 	private static final int DANGEROUS_PERMISSIONS_DIALOG = 0;
+	
+	private static final int DEACTIVATE_ID = 0;
+	
+	private static final int ACTIVATE_ID = 1;
 	
 	private PluginService service;
 	
@@ -52,7 +57,7 @@ public class ActivationActivity extends Activity implements ServiceConnection {
 	
 	private LinearLayout permissionLayout;
 	
-	private Button activateButton;
+	private PluginInfo info;
 	
 	static {
 		SERVICE_MAPPING.put(Context.LOCATION_SERVICE, "Location Service");
@@ -65,7 +70,8 @@ public class ActivationActivity extends Activity implements ServiceConnection {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activation);
+		info = getIntent().getParcelableExtra(PluginIntent.PLUGIN_INFO);
+		setContentView(R.layout.info);
 		
 		name = (TextView) findViewById(R.id.activation_name);
 		version = (TextView) findViewById(R.id.activation_version);
@@ -75,43 +81,44 @@ public class ActivationActivity extends Activity implements ServiceConnection {
 		serviceLayout = (LinearLayout) findViewById(R.id.activation_services);
 		description = (TextView) findViewById(R.id.activation_description);
 		permissionLayout = (LinearLayout) findViewById(R.id.activation_permissions);
-		
-		activateButton = (Button) findViewById(R.id.activate);
-		activateButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if (!configuration.getPermissions().isEmpty()) {
-					showDialog(DANGEROUS_PERMISSIONS_DIALOG);
-				} else {
-					activateAndFinish();
-				}
-			}
-		});
-		
-		Button cancelButton = (Button) findViewById(R.id.cancel_activitation);
-		cancelButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				finish();
-			}
-		});
-	}
-	
-	private void activateAndFinish() {
-		service.activate(configuration);
-		finish();
 	}
 	
 	@Override
     protected void onStart() {
     	super.onStart();
-    	bindService(new Intent(this, PluginService.class), this, Context.BIND_AUTO_CREATE);
+    	getApplicationContext().bindService(new Intent(this, PluginService.class), this, Context.BIND_AUTO_CREATE);
     }
 	
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		unbindService(this);
+		getApplicationContext().unbindService(this);
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		Mode mode = configuration.getMode();
+		if (Mode.NEW.equals(mode) || Mode.DEACTIVATED.equals(mode)) {
+    		menu.add(0, ACTIVATE_ID, 0, R.string.activate);
+    	} else {
+    		menu.add(0, DEACTIVATE_ID, 0, R.string.deactivate);
+    	}
+		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case DEACTIVATE_ID:
+			service.deactivate(configuration);
+			break;
+		case ACTIVATE_ID:
+			if (!configuration.getPermissions().isEmpty()) {
+				showDialog(DANGEROUS_PERMISSIONS_DIALOG);
+			}
+			break;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 	
 	@Override
@@ -126,7 +133,8 @@ public class ActivationActivity extends Activity implements ServiceConnection {
 				.setPositiveButton(R.string.activate, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						activateAndFinish();
+						service.activate(configuration);
+						dialog.dismiss();
 					}
 				})
 				.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -143,7 +151,6 @@ public class ActivationActivity extends Activity implements ServiceConnection {
 
 	@Override
 	public void onServiceConnected(ComponentName name, IBinder binder) {
-		PluginInfo info = getIntent().getParcelableExtra(PluginIntent.PLUGIN_INFO);
 		service = ((PluginService.PluginServiceBinder) binder).getService();
 		configuration = service.getPluginConfiguration(info);		
 		showConfiguration();

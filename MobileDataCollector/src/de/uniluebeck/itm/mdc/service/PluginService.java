@@ -82,7 +82,7 @@ public class PluginService extends Service implements PluginTaskListener {
 	}
 	
 	private void checkFirstLaunch() {
-		boolean isFirstLaunch = sharedPreferences.getBoolean(FIRST_LAUNCH_PREFERECE, true);
+		boolean isFirstLaunch = true; //sharedPreferences.getBoolean(FIRST_LAUNCH_PREFERECE, true);
 		if (isFirstLaunch) {
 			Log.i(TAG, "Sending first launch broadcast to find previous installed plugins.");
 			sendBroadcast(new Intent(PluginIntent.PLUGIN_FIND));

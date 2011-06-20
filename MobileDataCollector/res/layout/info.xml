@@ -7,10 +7,8 @@
 	<ScrollView
 	    android:layout_width="fill_parent"
 	    android:layout_height="fill_parent"
-	    android:layout_marginTop="5px"
 	    android:fadingEdge="none"
-	    android:scrollbarStyle="outsideInset"
-	    android:layout_marginBottom="65px">
+	    android:scrollbarStyle="outsideInset">
 	    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     		android:orientation="vertical"
 		    android:layout_width="fill_parent"
@@ -163,29 +161,4 @@
 		  	/>
     	</LinearLayout>
     </ScrollView>
-    <RelativeLayout
-        android:layout_marginTop="-45dip" 
-        android:padding="0dip"
-        android:layout_alignParentBottom="true"
-        android:gravity="bottom|right" 
-        android:background="@android:drawable/bottom_bar"
-        android:layout_height="fill_parent"
-        android:layout_width="fill_parent">
-        <Button
-            android:id="@+id/activate"
-            android:text="@string/activate"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="-4dip" 
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="false"
-            android:layout_width="wrap_content"/>
-        <Button
-            android:id="@+id/cancel_activitation"
-            android:text="@string/cancel"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="-4dip" 
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="false" 
-           	android:layout_width="wrap_content"/>
-    </RelativeLayout>
 </LinearLayout>

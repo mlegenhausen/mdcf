@@ -51,8 +51,6 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 	
 	private static final int DEACTIVATE_ID = 2;
 	
-	private static final int DATAVIEWER_ID = 3;
-	
 	private static final int DETAILS_ID = 4;
 	
 	private static final int UNINSTALL_ID = 5;
@@ -129,7 +127,6 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     	} else {
     		menu.add(0, DEACTIVATE_ID, 0, R.string.menu_deactivate);
     	}
-    	menu.add(0, DATAVIEWER_ID, 1, R.string.menu_dataviewer);
     	menu.add(0, DETAILS_ID, 2, R.string.menu_details);
     	menu.add(0, UNINSTALL_ID, 3, R.string.menu_uninstall);
     }
@@ -145,11 +142,8 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     	case DEACTIVATE_ID:
     		service.deactivate(plugin);
     		break;
-    	case DATAVIEWER_ID:
-    		startDataViewer(plugin);
-    		break;
     	case DETAILS_ID:
-    		startActivate(plugin);
+    		startDetails(plugin);
     		break;
     	case UNINSTALL_ID:
     		startUninstall(plugin);
@@ -228,9 +222,9 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     	startActivity(intent);
     }
     
-    private void startDataViewer(PluginConfiguration plugin) {
+    private void startDetails(PluginConfiguration plugin) {
     	PluginInfo pluginInfo = plugin.getPluginInfo();
-		Intent intent = new Intent(this, DataViewer.class);
+		Intent intent = new Intent(this, DetailsActivity.class);
 		intent.putExtra(PluginIntent.PLUGIN_INFO, pluginInfo);
 		startActivity(intent);
     }
