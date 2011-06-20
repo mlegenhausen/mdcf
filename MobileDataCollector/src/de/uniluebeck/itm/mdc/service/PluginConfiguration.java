@@ -28,6 +28,10 @@ public class PluginConfiguration implements Serializable {
 	
 	private long lastExecuted = -1;
 	
+	private long lastActivated = -1;
+	
+	private long totalActivationTime = 0;
+	
 	private Mode mode = Mode.NEW;
 	
 	private State state = State.RESOLVED;
@@ -50,6 +54,22 @@ public class PluginConfiguration implements Serializable {
 		this.lastExecuted = lastExecuted;
 	}
 	
+	public long getLastActivated() {
+		return lastActivated;
+	}
+
+	public void setLastActivated(long lastActivated) {
+		this.lastActivated = lastActivated;
+	}
+
+	public long getTotalActivationTime() {
+		return totalActivationTime;
+	}
+
+	public void setTotalActivationTime(long totalActivationTime) {
+		this.totalActivationTime = totalActivationTime;
+	}
+
 	public LogRecord createLogRecord() {
 		LogRecord logRecord = new LogRecord();
 		logRecords.add(logRecord);

@@ -40,6 +40,8 @@ public class PluginService extends Service implements PluginTaskListener {
 	
 	public static final String PLUGIN_REMOVED = "de.uniluebeck.itm.mdc.PLUGIN_REMOVED";
 	
+	public static final String TRANSFER_REQUEST = "de.uniluebeck.itm.mdc.TRANSFER_REQUEST";
+	
 	private static final String TAG = PluginService.class.getName();
 	
 	private static final String FIRST_LAUNCH_PREFERECE = "first_launch";
@@ -58,11 +60,14 @@ public class PluginService extends Service implements PluginTaskListener {
 	
 	private SharedPreferences sharedPreferences;
 	
+	private TansferManager transferManager;
+	
 	@Override
 	public void onCreate() {
 		super.onCreate();
 		notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		repository = new PluginConfigurationRepository(this);
+		transferManager = new TansferManager(this, repository);
 		pluginTaskManager = new PluginTaskManager(this, repository);
 		pluginPermissionchecker = new PluginPermissionChecker(this);
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -111,8 +116,10 @@ public class PluginService extends Service implements PluginTaskListener {
 				final PluginInfo info = intent.getParcelableExtra(PluginIntent.PLUGIN_INFO);
 				pluginRegister(info);
 			} else {
-				Log.e(TAG, "Plugin " + action + " has no configuration");
+				Log.e(TAG, "Plugin " + action + " has no info.");
 			}
+		} else if (TRANSFER_REQUEST.equals(action)) {
+			Log.i(TAG, "Transfer was requested.");
 		}
 	}
 	
@@ -198,10 +205,12 @@ public class PluginService extends Service implements PluginTaskListener {
 	
 	public void activate(PluginConfiguration configuration) {
 		pluginTaskManager.activate(configuration).addListener(this);
+		transferManager.schedule(configuration);
 	}
 	
 	public void deactivate(PluginConfiguration configuration) {
 		pluginTaskManager.deactivate(configuration).removeListener(this);
+		transferManager.schedule(configuration);
 	}
 	
 	public void addListener(PluginServiceListener listener) {
