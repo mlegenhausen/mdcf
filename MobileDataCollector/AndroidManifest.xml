@@ -17,6 +17,7 @@
 		<activity android:name="DetailsActivity" android:label="@string/details"/>
 		<activity android:name="WorkspaceViewer" android:label="@string/workspace_viewer"/>
 		<activity android:name="LogViewer" android:label="@string/log_viewer"/>
+		<activity android:name="TransferActivity" android:label="@string/transfer"/>
 		
 		<receiver android:name=".PackageAddedBroadcastReceiver">
 			<intent-filter>
@@ -48,7 +49,6 @@
 
 		<service android:name=".service.PluginService">
 			<intent-filter>
-				<action android:name="de.uniluebeck.itm.mdc.MDC_FIRST_LAUNCH" />
 				<action android:name="de.uniluebeck.itm.mdc.PLUGIN_ADDED" />
 				<action android:name="de.uniluebeck.itm.mdc.PLUGIN_REMOVED" />
 				<action android:name="de.uniluebeck.itm.mdcf.PLUGIN_REGISTER" />

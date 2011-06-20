@@ -60,14 +60,14 @@ public class PluginService extends Service implements PluginTaskListener {
 	
 	private SharedPreferences sharedPreferences;
 	
-	private TansferManager transferManager;
+	private TransferManager transferManager;
 	
 	@Override
 	public void onCreate() {
 		super.onCreate();
 		notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		repository = new PluginConfigurationRepository(this);
-		transferManager = new TansferManager(this, repository);
+		transferManager = new TransferManager(this, repository);
 		pluginTaskManager = new PluginTaskManager(this, repository);
 		pluginPermissionchecker = new PluginPermissionChecker(this);
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);

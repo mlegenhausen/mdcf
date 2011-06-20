@@ -4,11 +4,12 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import de.uniluebeck.itm.mdc.TransferActivity;
 import de.uniluebeck.itm.mdc.persistence.PluginConfigurationRepository;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration.Mode;
 import de.uniluebeck.itm.mdcf.PluginIntent;
 
-public class TansferManager {
+public class TransferManager {
 
 	private final Context context;
 	
@@ -16,7 +17,7 @@ public class TansferManager {
 	
 	private final AlarmManager alarmManager;
 	
-	public TansferManager(Context context, PluginConfigurationRepository repository) {
+	public TransferManager(Context context, PluginConfigurationRepository repository) {
 		this.context = context;
 		this.repository = repository;
 		this.alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
@@ -56,9 +57,12 @@ public class TansferManager {
 	}
 	
 	private PendingIntent createIntent(PluginConfiguration configuration) {
-		Intent intent = new Intent(context, PluginService.class);
-		intent.setAction(PluginService.TRANSFER_REQUEST);
+//		Intent intent = new Intent(context, PluginService.class);
+//		intent.setAction(PluginService.TRANSFER_REQUEST);
+//		intent.putExtra(PluginIntent.PLUGIN_INFO, configuration.getPluginInfo());
+//		return PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_ONE_SHOT);
+		Intent intent = new Intent(context, TransferActivity.class);
 		intent.putExtra(PluginIntent.PLUGIN_INFO, configuration.getPluginInfo());
-		return PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_ONE_SHOT);
+		return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_ONE_SHOT);
 	}
 }
