@@ -57,6 +57,8 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 	
 	private static final int MARKET_ID = 6;
 	
+	private static final int TRANSFER_ID = 7;
+	
 	private static final Map<Mode, String> MODE_MAPPING = new HashMap<Mode, String>();
 	
 	private SimpleAdapter listAdapter;
@@ -71,6 +73,7 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 		MODE_MAPPING.put(Mode.NEW, "New");
 		MODE_MAPPING.put(Mode.ACTIVATED, "Active");
 		MODE_MAPPING.put(Mode.DEACTIVATED, "Deactivated");
+		MODE_MAPPING.put(Mode.TRANSFER, "Transfer");
 	}
 	
     /**
@@ -119,8 +122,10 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     	Mode mode = configuration.getMode();
     	if (Mode.NEW.equals(mode) || Mode.DEACTIVATED.equals(mode)) {
     		startActivate(configuration);
-    	} else {
+    	} else if (Mode.DEACTIVATED.equals(mode)) {
     		service.deactivate(configuration);
+    	} else {
+    		startTransfer(configuration);
     	}
     }
     
@@ -131,8 +136,10 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     	Mode mode = pluginConfigurations.get(info.position).getMode();
     	if (Mode.NEW.equals(mode) || Mode.DEACTIVATED.equals(mode)) {
     		menu.add(0, ACTIVATE_ID, 0, R.string.menu_activate);
-    	} else {
+    	} else if (Mode.DEACTIVATED.equals(mode)) {
     		menu.add(0, DEACTIVATE_ID, 0, R.string.menu_deactivate);
+    	} else {
+    		menu.add(0, TRANSFER_ID, 0, R.string.menu_transfer);
     	}
     	menu.add(0, DETAILS_ID, 2, R.string.menu_details);
     	menu.add(0, UNINSTALL_ID, 3, R.string.menu_uninstall);
@@ -148,6 +155,9 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     		break;
     	case DEACTIVATE_ID:
     		service.deactivate(configuration);
+    		break;
+    	case TRANSFER_ID:
+    		startTransfer(configuration);
     		break;
     	case DETAILS_ID:
     		startDetails(configuration);
@@ -187,8 +197,11 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 		String result = "";
 		switch (plugin.getState()) {
 		case RESOLVED:
-			if (Mode.NEW.equals(plugin.getMode())) {
+			Mode mode = plugin.getMode();
+			if (Mode.NEW.equals(mode)) {
 				result = "Select to activate this plugin";
+			} else if (Mode.TRANSFER.equals(mode)) {
+				result = "Select to start transfer";
 			}
 			break;
 		case WAITING:
@@ -241,6 +254,12 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     	Intent intent = new Intent(Intent.ACTION_DELETE);
     	intent.setData(Uri.parse(uri));
     	startActivity(intent);
+    }
+    
+    private void startTransfer(PluginConfiguration plugin) {
+    	Intent intent = new Intent(this, TransferActivity.class);
+		intent.putExtra(PluginIntent.PLUGIN_INFO, plugin.getPluginInfo());
+		startActivity(intent);
     }
     
     private void startMarket() {

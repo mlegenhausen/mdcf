@@ -186,11 +186,20 @@ public class PluginService extends Service implements PluginTaskListener {
 	private void pluginTransfer(PluginInfo info) {
 		PluginConfiguration configuration = repository.findByPluginInfo(info);
 		if (configuration != null) {
+			transfer(configuration);
+			
 			Intent intent = new Intent(this, TransferActivity.class);
 			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			intent.putExtra(PluginIntent.PLUGIN_INFO, configuration.getPluginInfo());
 			startActivity(intent);
 		}
+	}
+	
+	private void transfer(PluginConfiguration configuration) {
+		deactivate(configuration);
+		configuration.setMode(Mode.TRANSFER);
+		repository.store(configuration);
+		fireModeChanged(configuration);
 	}
 	
 	private void fireRegistered(PluginConfiguration configuration) {

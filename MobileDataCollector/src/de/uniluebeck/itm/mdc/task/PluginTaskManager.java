@@ -35,6 +35,7 @@ public class PluginTaskManager implements PluginTaskListener {
 			return tasks.get(configuration);
 		}
 		configuration.setMode(Mode.ACTIVATED);
+		configuration.setState(State.RESOLVED);
 		repository.store(configuration);
 		
 		PluginTask task = new PluginTask(context, repository, configuration);
@@ -47,6 +48,7 @@ public class PluginTaskManager implements PluginTaskListener {
 	
 	public PluginTask deactivate(PluginConfiguration configuration) {
 		configuration.setMode(Mode.DEACTIVATED);
+		configuration.setState(State.RESOLVED);
 		repository.store(configuration);
 		
 		PluginTask task = tasks.remove(configuration);
