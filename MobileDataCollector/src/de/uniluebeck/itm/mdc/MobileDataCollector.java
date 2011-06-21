@@ -122,7 +122,7 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     	Mode mode = configuration.getMode();
     	if (Mode.NEW.equals(mode) || Mode.DEACTIVATED.equals(mode)) {
     		startActivate(configuration);
-    	} else if (Mode.DEACTIVATED.equals(mode)) {
+    	} else if (Mode.ACTIVATED.equals(mode)) {
     		service.deactivate(configuration);
     	} else {
     		startTransfer(configuration);
@@ -136,7 +136,7 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     	Mode mode = pluginConfigurations.get(info.position).getMode();
     	if (Mode.NEW.equals(mode) || Mode.DEACTIVATED.equals(mode)) {
     		menu.add(0, ACTIVATE_ID, 0, R.string.menu_activate);
-    	} else if (Mode.DEACTIVATED.equals(mode)) {
+    	} else if (Mode.ACTIVATED.equals(mode)) {
     		menu.add(0, DEACTIVATE_ID, 0, R.string.menu_deactivate);
     	} else {
     		menu.add(0, TRANSFER_ID, 0, R.string.menu_transfer);

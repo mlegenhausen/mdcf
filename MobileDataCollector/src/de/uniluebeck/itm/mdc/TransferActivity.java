@@ -157,7 +157,7 @@ public class TransferActivity extends ActivityGroup implements ServiceConnection
 	}
 	
 	private void dismissAndFinish() {
-		// Call service for clearing data.
+		service.reset(pluginConfiguration);
 		finish();
 	}
 }

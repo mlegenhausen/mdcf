@@ -1,6 +1,7 @@
 package de.uniluebeck.itm.mdc.service;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import android.app.Notification;
@@ -19,6 +20,7 @@ import com.db4o.ObjectSet;
 
 import de.uniluebeck.itm.mdc.R;
 import de.uniluebeck.itm.mdc.TransferActivity;
+import de.uniluebeck.itm.mdc.log.LogRecord;
 import de.uniluebeck.itm.mdc.persistence.PluginConfigurationRepository;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration.Mode;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration.State;
@@ -28,6 +30,7 @@ import de.uniluebeck.itm.mdc.task.PluginTaskManager;
 import de.uniluebeck.itm.mdc.util.Notifications;
 import de.uniluebeck.itm.mdcf.PluginInfo;
 import de.uniluebeck.itm.mdcf.PluginIntent;
+import de.uniluebeck.itm.mdcf.persistence.Node;
 
 public class PluginService extends Service implements PluginTaskListener {
 
@@ -69,7 +72,7 @@ public class PluginService extends Service implements PluginTaskListener {
 		notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		repository = new PluginConfigurationRepository(this);
 		transferManager = new TransferManager(this, repository);
-		pluginTaskManager = new PluginTaskManager(this, repository);
+		pluginTaskManager = new PluginTaskManager(this);
 		pluginPermissionchecker = new PluginPermissionChecker(this);
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 		initNotification();
@@ -227,13 +230,34 @@ public class PluginService extends Service implements PluginTaskListener {
 	}
 	
 	public void activate(PluginConfiguration configuration) {
+		configuration.setMode(Mode.ACTIVATED);
+		repository.store(configuration);
+		fireModeChanged(configuration);
 		pluginTaskManager.activate(configuration).addListener(this);
 		transferManager.schedule(configuration);
 	}
 	
 	public void deactivate(PluginConfiguration configuration) {
+		configuration.setMode(Mode.DEACTIVATED);
+		configuration.setState(State.RESOLVED);
+		repository.store(configuration);
+		fireModeChanged(configuration);
+		fireStateChanged(configuration);
 		pluginTaskManager.deactivate(configuration).removeListener(this);
 		transferManager.schedule(configuration);
+	}
+	
+	public void reset(PluginConfiguration configuration) {
+		configuration.setLastActivated(-1);
+		configuration.setLastExecuted(-1);
+		configuration.setTotalActivationTime(0);
+		configuration.setState(State.RESOLVED);
+		configuration.setMode(Mode.DEACTIVATED);
+		configuration.setWorkspace(new Node());
+		configuration.setLogRecords(new LinkedList<LogRecord>());
+		repository.store(configuration);
+		fireStateChanged(configuration);
+		fireModeChanged(configuration);
 	}
 	
 	public void addListener(PluginServiceListener listener) {
@@ -262,6 +286,7 @@ public class PluginService extends Service implements PluginTaskListener {
 	@Override
 	public void onStateChange(PluginTaskEvent event) {
 		PluginConfiguration configuration = event.getConfiguration();
+		repository.store(configuration);
 		PluginInfo info = configuration.getPluginInfo();
 		State state = configuration.getState();
 		String name = info.getName();

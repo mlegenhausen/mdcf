@@ -8,9 +8,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import android.content.Context;
-import de.uniluebeck.itm.mdc.persistence.PluginConfigurationRepository;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration;
-import de.uniluebeck.itm.mdc.service.PluginConfiguration.Mode;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration.State;
 
 public class PluginTaskManager implements PluginTaskListener {
@@ -23,22 +21,16 @@ public class PluginTaskManager implements PluginTaskListener {
 	
 	private final Context context;
 	
-	private final PluginConfigurationRepository repository;
-	
-	public PluginTaskManager(Context context, PluginConfigurationRepository repository) {		
+	public PluginTaskManager(Context context) {		
 		this.context = context;
-		this.repository = repository;
 	}
 	
 	public PluginTask activate(PluginConfiguration configuration) {
 		if (tasks.containsKey(configuration)) {
 			return tasks.get(configuration);
 		}
-		configuration.setMode(Mode.ACTIVATED);
-		configuration.setState(State.RESOLVED);
-		repository.store(configuration);
 		
-		PluginTask task = new PluginTask(context, repository, configuration);
+		PluginTask task = new PluginTask(context, configuration);
 		task.addListener(this);
 		tasks.put(configuration, task);
 		ScheduledFuture<?> future = scheduler.schedule(task, 0, TimeUnit.MILLISECONDS);
@@ -46,11 +38,7 @@ public class PluginTaskManager implements PluginTaskListener {
 		return task;
 	}
 	
-	public PluginTask deactivate(PluginConfiguration configuration) {
-		configuration.setMode(Mode.DEACTIVATED);
-		configuration.setState(State.RESOLVED);
-		repository.store(configuration);
-		
+	public PluginTask deactivate(PluginConfiguration configuration) {		
 		PluginTask task = tasks.remove(configuration);
 		if (task != null) {
 			task.destroy();
