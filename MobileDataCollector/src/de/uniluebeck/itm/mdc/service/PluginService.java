@@ -173,6 +173,7 @@ public class PluginService extends Service implements PluginTaskListener {
 			PluginInfo deleted = result.get(0);
 			PluginConfiguration configuration = repository.findByPluginInfo(deleted);
 			pluginTaskManager.deactivate(configuration);
+			transferManager.remove(configuration);
 			repository.delete(configuration);
 			Log.i(TAG, deleted.getName() + " was successfully removed.");
 			fireRemoved(configuration);

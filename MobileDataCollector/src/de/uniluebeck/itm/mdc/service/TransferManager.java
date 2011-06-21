@@ -52,6 +52,10 @@ public class TransferManager {
 		configuration.setTotalActivationTime(total + (now - lastActivated));
 		repository.store(configuration);
 		
+		remove(configuration);
+	}
+	
+	public void remove(PluginConfiguration configuration) {
 		PendingIntent intent = createIntent(configuration);
 		alarmManager.cancel(intent);
 	}
