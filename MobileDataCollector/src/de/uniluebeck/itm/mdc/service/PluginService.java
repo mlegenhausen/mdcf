@@ -120,6 +120,7 @@ public class PluginService extends Service implements PluginTaskListener {
 			}
 		} else if (TRANSFER_REQUEST.equals(action)) {
 			Log.i(TAG, "Transfer was requested.");
+			
 		}
 	}
 	

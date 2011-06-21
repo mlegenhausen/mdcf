@@ -114,7 +114,14 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
-    	openContextMenu(v);
+    	super.onListItemClick(l, v, position, id);
+    	PluginConfiguration configuration = pluginConfigurations.get(position);
+    	Mode mode = configuration.getMode();
+    	if (Mode.NEW.equals(mode) || Mode.DEACTIVATED.equals(mode)) {
+    		startActivate(configuration);
+    	} else {
+    		service.deactivate(configuration);
+    	}
     }
     
     @Override
@@ -134,19 +141,19 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     @Override
     public boolean onContextItemSelected(MenuItem item) {
     	AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-    	PluginConfiguration plugin = pluginConfigurations.get(info.position);
+    	PluginConfiguration configuration = pluginConfigurations.get(info.position);
     	switch (item.getItemId()) {
     	case ACTIVATE_ID:
-    		startActivate(plugin);
+    		startActivate(configuration);
     		break;
     	case DEACTIVATE_ID:
-    		service.deactivate(plugin);
+    		service.deactivate(configuration);
     		break;
     	case DETAILS_ID:
-    		startDetails(plugin);
+    		startDetails(configuration);
     		break;
     	case UNINSTALL_ID:
-    		startUninstall(plugin);
+    		startUninstall(configuration);
     		break;
     	}
     	return super.onContextItemSelected(item);
