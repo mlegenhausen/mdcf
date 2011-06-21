@@ -18,6 +18,7 @@ import android.util.Log;
 import com.db4o.ObjectSet;
 
 import de.uniluebeck.itm.mdc.R;
+import de.uniluebeck.itm.mdc.TransferActivity;
 import de.uniluebeck.itm.mdc.persistence.PluginConfigurationRepository;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration.Mode;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration.State;
@@ -113,14 +114,15 @@ public class PluginService extends Service implements PluginTaskListener {
 		} else if (PluginIntent.PLUGIN_REGISTER.equals(action)) {
 			Log.i(TAG, "Plugin " + action + " wants to register");
 			if (intent.hasExtra(PluginIntent.PLUGIN_INFO)) {
-				final PluginInfo info = intent.getParcelableExtra(PluginIntent.PLUGIN_INFO);
+				PluginInfo info = intent.getParcelableExtra(PluginIntent.PLUGIN_INFO);
 				pluginRegister(info);
 			} else {
 				Log.e(TAG, "Plugin " + action + " has no info.");
 			}
 		} else if (TRANSFER_REQUEST.equals(action)) {
 			Log.i(TAG, "Transfer was requested.");
-			
+			PluginInfo info = intent.getParcelableExtra(PluginIntent.PLUGIN_INFO);
+			pluginTransfer(info);
 		}
 	}
 	
@@ -178,6 +180,16 @@ public class PluginService extends Service implements PluginTaskListener {
 			repository.delete(configuration);
 			Log.i(TAG, deleted.getName() + " was successfully removed.");
 			fireRemoved(configuration);
+		}
+	}
+	
+	private void pluginTransfer(PluginInfo info) {
+		PluginConfiguration configuration = repository.findByPluginInfo(info);
+		if (configuration != null) {
+			Intent intent = new Intent(this, TransferActivity.class);
+			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			intent.putExtra(PluginIntent.PLUGIN_INFO, configuration.getPluginInfo());
+			startActivity(intent);
 		}
 	}
 	
