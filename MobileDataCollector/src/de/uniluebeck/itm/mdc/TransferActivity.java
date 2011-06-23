@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 import de.uniluebeck.itm.mdc.net.HashUniqueIdGenerator;
 import de.uniluebeck.itm.mdc.net.TransferRequest;
 import de.uniluebeck.itm.mdc.net.UniqueIdGenerator;
@@ -44,10 +45,6 @@ public class TransferActivity extends ActivityGroup implements ServiceConnection
 	
 	private PluginConfiguration pluginConfiguration;
 	
-	private Button transferButton;
-	
-	private Button dismissButton;
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -67,7 +64,7 @@ public class TransferActivity extends ActivityGroup implements ServiceConnection
 		LinearLayout layout = (LinearLayout) findViewById(R.id.transfer_layout);
 		layout.addView(view, 0);
 		
-		transferButton = (Button) findViewById(R.id.transfer_transfer);
+		Button transferButton = (Button) findViewById(R.id.transfer_transfer);
 		transferButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -75,11 +72,18 @@ public class TransferActivity extends ActivityGroup implements ServiceConnection
 			}
 		});
 		
-		dismissButton = (Button) findViewById(R.id.transfer_dismiss);
+		Button dismissButton = (Button) findViewById(R.id.transfer_dismiss);
 		dismissButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				dismiss();
+			}
+		});
+		Button cancelButton = (Button) findViewById(R.id.transfer_cancel);
+		cancelButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View paramView) {
+				finish();
 			}
 		});
 	}
@@ -129,7 +133,7 @@ public class TransferActivity extends ActivityGroup implements ServiceConnection
 					}
 				});
 			dialog = builder.create();
-			break;
+			break;			
 		}
 		return dialog;
 	}

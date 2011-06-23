@@ -24,6 +24,14 @@
         <Button
             android:id="@+id/transfer_dismiss"
             android:text="@string/dismiss"
+            android:layout_toRightOf="@id/transfer_transfer"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="-4dip" 
+            android:layout_centerVertical="false" 
+           	android:layout_width="wrap_content"/>
+        <Button
+            android:id="@+id/transfer_cancel"
+            android:text="@string/cancel"
             android:layout_height="wrap_content"
             android:layout_marginBottom="-4dip" 
             android:layout_alignParentRight="true"

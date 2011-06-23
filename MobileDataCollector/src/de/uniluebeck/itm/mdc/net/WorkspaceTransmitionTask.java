@@ -33,7 +33,7 @@ public class WorkspaceTransmitionTask extends AsyncTask<TransferRequest, Integer
 	protected void onPreExecute() {
 		progressDialog = new ProgressDialog(context);
 		progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-		progressDialog.setMessage("Sending Data...");
+		progressDialog.setMessage("Sending Workspace...");
 		progressDialog.setCancelable(false);
 		progressDialog.show();
 	}
