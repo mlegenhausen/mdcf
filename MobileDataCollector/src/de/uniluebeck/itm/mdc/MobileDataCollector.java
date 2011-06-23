@@ -51,13 +51,13 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 	
 	private static final int DEACTIVATE_ID = 2;
 	
-	private static final int DATAVIEWER_ID = 3;
-	
 	private static final int DETAILS_ID = 4;
 	
 	private static final int UNINSTALL_ID = 5;
 	
 	private static final int MARKET_ID = 6;
+	
+	private static final int TRANSFER_ID = 7;
 	
 	private static final Map<Mode, String> MODE_MAPPING = new HashMap<Mode, String>();
 	
@@ -73,6 +73,7 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 		MODE_MAPPING.put(Mode.NEW, "New");
 		MODE_MAPPING.put(Mode.ACTIVATED, "Active");
 		MODE_MAPPING.put(Mode.DEACTIVATED, "Deactivated");
+		MODE_MAPPING.put(Mode.TRANSFER, "Transfer");
 	}
 	
     /**
@@ -116,7 +117,16 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
-    	openContextMenu(v);
+    	super.onListItemClick(l, v, position, id);
+    	PluginConfiguration configuration = pluginConfigurations.get(position);
+    	Mode mode = configuration.getMode();
+    	if (Mode.NEW.equals(mode) || Mode.DEACTIVATED.equals(mode)) {
+    		startActivate(configuration);
+    	} else if (Mode.ACTIVATED.equals(mode)) {
+    		service.deactivate(configuration);
+    	} else {
+    		startTransfer(configuration);
+    	}
     }
     
     @Override
@@ -126,10 +136,11 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     	Mode mode = pluginConfigurations.get(info.position).getMode();
     	if (Mode.NEW.equals(mode) || Mode.DEACTIVATED.equals(mode)) {
     		menu.add(0, ACTIVATE_ID, 0, R.string.menu_activate);
-    	} else {
+    	} else if (Mode.ACTIVATED.equals(mode)) {
     		menu.add(0, DEACTIVATE_ID, 0, R.string.menu_deactivate);
+    	} else {
+    		menu.add(0, TRANSFER_ID, 0, R.string.menu_transfer);
     	}
-    	menu.add(0, DATAVIEWER_ID, 1, R.string.menu_dataviewer);
     	menu.add(0, DETAILS_ID, 2, R.string.menu_details);
     	menu.add(0, UNINSTALL_ID, 3, R.string.menu_uninstall);
     }
@@ -137,22 +148,22 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     @Override
     public boolean onContextItemSelected(MenuItem item) {
     	AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-    	PluginConfiguration plugin = pluginConfigurations.get(info.position);
+    	PluginConfiguration configuration = pluginConfigurations.get(info.position);
     	switch (item.getItemId()) {
     	case ACTIVATE_ID:
-    		startActivate(plugin);
+    		startActivate(configuration);
     		break;
     	case DEACTIVATE_ID:
-    		service.deactivate(plugin);
+    		service.deactivate(configuration);
     		break;
-    	case DATAVIEWER_ID:
-    		startDataViewer(plugin);
+    	case TRANSFER_ID:
+    		startTransfer(configuration);
     		break;
     	case DETAILS_ID:
-    		startActivate(plugin);
+    		startDetails(configuration);
     		break;
     	case UNINSTALL_ID:
-    		startUninstall(plugin);
+    		startUninstall(configuration);
     		break;
     	}
     	return super.onContextItemSelected(item);
@@ -186,8 +197,11 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 		String result = "";
 		switch (plugin.getState()) {
 		case RESOLVED:
-			if (Mode.NEW.equals(plugin.getMode())) {
+			Mode mode = plugin.getMode();
+			if (Mode.NEW.equals(mode)) {
 				result = "Select to activate this plugin";
+			} else if (Mode.TRANSFER.equals(mode)) {
+				result = "Select to start transfer";
 			}
 			break;
 		case WAITING:
@@ -228,9 +242,9 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     	startActivity(intent);
     }
     
-    private void startDataViewer(PluginConfiguration plugin) {
+    private void startDetails(PluginConfiguration plugin) {
     	PluginInfo pluginInfo = plugin.getPluginInfo();
-		Intent intent = new Intent(this, DataViewer.class);
+		Intent intent = new Intent(this, DetailsActivity.class);
 		intent.putExtra(PluginIntent.PLUGIN_INFO, pluginInfo);
 		startActivity(intent);
     }
@@ -240,6 +254,12 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     	Intent intent = new Intent(Intent.ACTION_DELETE);
     	intent.setData(Uri.parse(uri));
     	startActivity(intent);
+    }
+    
+    private void startTransfer(PluginConfiguration plugin) {
+    	Intent intent = new Intent(this, TransferActivity.class);
+		intent.putExtra(PluginIntent.PLUGIN_INFO, plugin.getPluginInfo());
+		startActivity(intent);
     }
     
     private void startMarket() {
@@ -300,6 +320,7 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 	@Override
 	public void onModeChanged(PluginServiceEvent event) {
 		final PluginConfiguration plugin = event.getConfiguration();
+		Log.d(TAG, "onModeChanged " + plugin.getPluginInfo().getName() + " " + plugin.getMode());
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {

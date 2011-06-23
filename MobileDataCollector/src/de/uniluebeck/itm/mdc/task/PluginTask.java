@@ -41,17 +41,14 @@ public class PluginTask implements Runnable, ServiceConnection {
 	
 	private final PersistenceManager persistenceManager;
 	
-	private final PluginConfigurationRepository repository;
-	
 	private final TimeLimiter timeLimiter = new SimpleTimeLimiter();
 	
 	private Plugin plugin;
 	
 	private Plugin pluginProxy;
 	
-	public PluginTask(final Context context, PluginConfigurationRepository repository, final PluginConfiguration configuration) {
+	public PluginTask(final Context context, final PluginConfiguration configuration) {
 		this.context = context;
-		this.repository = repository;
 		this.configuration = configuration;
 		persistenceManager = new PersistenceManagerImpl(new PluginConfigurationRepository(context), configuration);
 	}
@@ -78,7 +75,6 @@ public class PluginTask implements Runnable, ServiceConnection {
 		} catch (RemoteException e) {
 			Log.e(LOG_TAG, "Unable to call proceed.", e);
 		} finally {
-			repository.store(configuration);
 			context.unbindService(this);
 		}
 	}

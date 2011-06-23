@@ -1,6 +1,7 @@
 package de.uniluebeck.itm.mdc.service;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import android.app.Notification;
@@ -18,6 +19,8 @@ import android.util.Log;
 import com.db4o.ObjectSet;
 
 import de.uniluebeck.itm.mdc.R;
+import de.uniluebeck.itm.mdc.TransferActivity;
+import de.uniluebeck.itm.mdc.log.LogRecord;
 import de.uniluebeck.itm.mdc.persistence.PluginConfigurationRepository;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration.Mode;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration.State;
@@ -27,6 +30,7 @@ import de.uniluebeck.itm.mdc.task.PluginTaskManager;
 import de.uniluebeck.itm.mdc.util.Notifications;
 import de.uniluebeck.itm.mdcf.PluginInfo;
 import de.uniluebeck.itm.mdcf.PluginIntent;
+import de.uniluebeck.itm.mdcf.persistence.Node;
 
 public class PluginService extends Service implements PluginTaskListener {
 
@@ -39,6 +43,8 @@ public class PluginService extends Service implements PluginTaskListener {
 	public static final String PLUGIN_ADDED = "de.uniluebeck.itm.mdc.PLUGIN_ADDED";
 	
 	public static final String PLUGIN_REMOVED = "de.uniluebeck.itm.mdc.PLUGIN_REMOVED";
+	
+	public static final String TRANSFER_REQUEST = "de.uniluebeck.itm.mdc.TRANSFER_REQUEST";
 	
 	private static final String TAG = PluginService.class.getName();
 	
@@ -58,12 +64,15 @@ public class PluginService extends Service implements PluginTaskListener {
 	
 	private SharedPreferences sharedPreferences;
 	
+	private TransferManager transferManager;
+	
 	@Override
 	public void onCreate() {
 		super.onCreate();
 		notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		repository = new PluginConfigurationRepository(this);
-		pluginTaskManager = new PluginTaskManager(this, repository);
+		transferManager = new TransferManager(this, repository);
+		pluginTaskManager = new PluginTaskManager(this);
 		pluginPermissionchecker = new PluginPermissionChecker(this);
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 		initNotification();
@@ -77,7 +86,7 @@ public class PluginService extends Service implements PluginTaskListener {
 	}
 	
 	private void checkFirstLaunch() {
-		boolean isFirstLaunch = sharedPreferences.getBoolean(FIRST_LAUNCH_PREFERECE, true);
+		boolean isFirstLaunch = true; //sharedPreferences.getBoolean(FIRST_LAUNCH_PREFERECE, true);
 		if (isFirstLaunch) {
 			Log.i(TAG, "Sending first launch broadcast to find previous installed plugins.");
 			sendBroadcast(new Intent(PluginIntent.PLUGIN_FIND));
@@ -108,11 +117,15 @@ public class PluginService extends Service implements PluginTaskListener {
 		} else if (PluginIntent.PLUGIN_REGISTER.equals(action)) {
 			Log.i(TAG, "Plugin " + action + " wants to register");
 			if (intent.hasExtra(PluginIntent.PLUGIN_INFO)) {
-				final PluginInfo info = intent.getParcelableExtra(PluginIntent.PLUGIN_INFO);
+				PluginInfo info = intent.getParcelableExtra(PluginIntent.PLUGIN_INFO);
 				pluginRegister(info);
 			} else {
-				Log.e(TAG, "Plugin " + action + " has no configuration");
+				Log.e(TAG, "Plugin " + action + " has no info.");
 			}
+		} else if (TRANSFER_REQUEST.equals(action)) {
+			Log.i(TAG, "Transfer was requested.");
+			PluginInfo info = intent.getParcelableExtra(PluginIntent.PLUGIN_INFO);
+			pluginTransfer(info);
 		}
 	}
 	
@@ -166,10 +179,30 @@ public class PluginService extends Service implements PluginTaskListener {
 			PluginInfo deleted = result.get(0);
 			PluginConfiguration configuration = repository.findByPluginInfo(deleted);
 			pluginTaskManager.deactivate(configuration);
+			transferManager.remove(configuration);
 			repository.delete(configuration);
 			Log.i(TAG, deleted.getName() + " was successfully removed.");
 			fireRemoved(configuration);
 		}
+	}
+	
+	private void pluginTransfer(PluginInfo info) {
+		PluginConfiguration configuration = repository.findByPluginInfo(info);
+		if (configuration != null) {
+			transfer(configuration);
+			
+			Intent intent = new Intent(this, TransferActivity.class);
+			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			intent.putExtra(PluginIntent.PLUGIN_INFO, configuration.getPluginInfo());
+			startActivity(intent);
+		}
+	}
+	
+	private void transfer(PluginConfiguration configuration) {
+		deactivate(configuration);
+		configuration.setMode(Mode.TRANSFER);
+		repository.store(configuration);
+		fireModeChanged(configuration);
 	}
 	
 	private void fireRegistered(PluginConfiguration configuration) {
@@ -197,11 +230,47 @@ public class PluginService extends Service implements PluginTaskListener {
 	}
 	
 	public void activate(PluginConfiguration configuration) {
+		Log.d(TAG, "Activate: " + configuration.getPluginInfo().getName());
+		configuration.setMode(Mode.ACTIVATED);
+		repository.store(configuration);
+		fireModeChanged(configuration);
 		pluginTaskManager.activate(configuration).addListener(this);
+		transferManager.schedule(configuration);
 	}
 	
 	public void deactivate(PluginConfiguration configuration) {
+		Log.d(TAG, "Deactivate: " + configuration.getPluginInfo().getName());
+		configuration.setMode(Mode.DEACTIVATED);
+		configuration.setState(State.RESOLVED);
+		repository.store(configuration);
+		fireModeChanged(configuration);
+		fireStateChanged(configuration);
 		pluginTaskManager.deactivate(configuration).removeListener(this);
+		transferManager.schedule(configuration);
+	}
+	
+	public void reset(PluginConfiguration configuration) {
+		configuration.setLastActivated(-1);
+		configuration.setLastExecuted(-1);
+		configuration.setTotalActivationTime(0);
+		configuration.setState(State.RESOLVED);
+		configuration.setMode(Mode.DEACTIVATED);
+		configuration.setWorkspace(new Node());
+		configuration.setLogRecords(new LinkedList<LogRecord>());
+		repository.store(configuration);
+		fireStateChanged(configuration);
+		fireModeChanged(configuration);
+	}
+	
+	/**
+	 * Call this method after a plugin was successfully transfered.
+	 * 
+	 * @param configuration
+	 */
+	public void transfered(PluginConfiguration configuration) {
+		configuration.setTotalActivationTime(0);
+		repository.store(configuration);
+		activate(configuration);
 	}
 	
 	public void addListener(PluginServiceListener listener) {
@@ -230,6 +299,7 @@ public class PluginService extends Service implements PluginTaskListener {
 	@Override
 	public void onStateChange(PluginTaskEvent event) {
 		PluginConfiguration configuration = event.getConfiguration();
+		repository.store(configuration);
 		PluginInfo info = configuration.getPluginInfo();
 		State state = configuration.getState();
 		String name = info.getName();

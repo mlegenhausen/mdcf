@@ -1,7 +1,5 @@
 package de.uniluebeck.itm.mdc;
 
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -18,17 +16,11 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
-import de.uniluebeck.itm.mdc.net.HashUniqueIdGenerator;
-import de.uniluebeck.itm.mdc.net.TransferRequest;
-import de.uniluebeck.itm.mdc.net.UniqueIdGenerator;
-import de.uniluebeck.itm.mdc.net.WorkspaceTransmitionTask;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration;
 import de.uniluebeck.itm.mdc.service.PluginService;
 import de.uniluebeck.itm.mdcf.PluginInfo;
@@ -39,19 +31,11 @@ import de.uniluebeck.itm.mdcf.persistence.Property;
 
 public class WorkspaceViewer extends ListActivity implements ServiceConnection {
 	
-	private final static String TAG = WorkspaceViewer.class.getName();
-	
 	private final static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
 	
 	private final static String NODE_FIELD = "name";
 	
 	private final static int REFRESH = 0;
-	
-	private final static int TRANSFER = 1;
-	
-	private UniqueIdGenerator uniqueIdGenerator;
-	
-	private TelephonyManager telephonyManager;
 	
 	private SimpleAdapter adapter;
 	
@@ -72,8 +56,6 @@ public class WorkspaceViewer extends ListActivity implements ServiceConnection {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-		uniqueIdGenerator = new HashUniqueIdGenerator();
 		
 		pluginInfo = getIntent().getParcelableExtra(PluginIntent.PLUGIN_INFO);
 		adapter = new SimpleAdapter(
@@ -134,24 +116,6 @@ public class WorkspaceViewer extends ListActivity implements ServiceConnection {
 			items.add(node);
 		}
 	}
-	
-	private void transfer() {
-		PluginInfo info = pluginConfiguration.getPluginInfo();
-		String url = info.getUrl();
-		String subscriberId = telephonyManager.getSubscriberId();
-		String action = info.getAction();
-		String id = null;
-		try {
-			id = uniqueIdGenerator.generate(subscriberId, action);
-			Log.i(TAG, "Unique id: " + id);
-		} catch (NoSuchAlgorithmException e) {
-			Log.e(TAG, "Algorithm was not found.", e);
-		} catch (UnsupportedEncodingException e) {
-			Log.e(TAG, "Unsupported Encoding", e);
-		}
-		Node workspace = pluginConfiguration.getWorkspace();
-		new WorkspaceTransmitionTask(this, url).execute(new TransferRequest(id, workspace));
-	}
 
 	@Override
 	public void onServiceConnected(final ComponentName name, final IBinder binder) {
@@ -167,7 +131,6 @@ public class WorkspaceViewer extends ListActivity implements ServiceConnection {
 	@Override
 	public boolean onCreateOptionsMenu(final Menu menu) {
 		menu.add(0, REFRESH, 0, getText(R.string.refresh));
-		menu.add(0, TRANSFER, 0, getText(R.string.transfer));
 		return true;
 	}
 	
@@ -176,9 +139,6 @@ public class WorkspaceViewer extends ListActivity implements ServiceConnection {
 		switch (item.getItemId()) {
 		case REFRESH:
 			refresh();
-			break;
-		case TRANSFER:
-			transfer();
 			break;
 		}
 		return true;

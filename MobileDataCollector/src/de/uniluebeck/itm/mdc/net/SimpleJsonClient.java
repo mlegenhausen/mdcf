@@ -12,6 +12,7 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 
 import android.util.Log;
+import de.uniluebeck.itm.mdc.net.ProgressStringEntity.ProgressListener;
 
 public class SimpleJsonClient {
 
@@ -30,9 +31,9 @@ public class SimpleJsonClient {
     	httpPost = new HttpPost(url);
     }
     
-    public HttpResponse send(String json) throws ClientProtocolException, IOException {
+    public HttpResponse send(String json, ProgressListener listener) throws ClientProtocolException, IOException {
     	Log.i(TAG, "JSON: " + json);
-    	final StringEntity entry = new StringEntity(json);  
+    	final StringEntity entry = new ProgressStringEntity(json, listener);  
         entry.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
         httpPost.setEntity(entry);
         return httpClient.execute(httpPost);

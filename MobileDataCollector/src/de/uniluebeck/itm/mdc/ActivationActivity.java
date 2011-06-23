@@ -3,7 +3,7 @@ package de.uniluebeck.itm.mdc;
 import java.util.HashMap;
 import java.util.Map;
 
-import android.app.Activity;
+import android.app.ActivityGroup;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ComponentName;
@@ -16,18 +16,12 @@ import android.os.IBinder;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.TextView;
-
-import com.google.common.base.Objects;
-import com.google.common.base.Strings;
-
 import de.uniluebeck.itm.mdc.service.PluginConfiguration;
-import de.uniluebeck.itm.mdc.service.PluginConfiguration.Mode;
 import de.uniluebeck.itm.mdc.service.PluginService;
 import de.uniluebeck.itm.mdcf.PluginInfo;
 import de.uniluebeck.itm.mdcf.PluginIntent;
 
-public class ActivationActivity extends Activity implements ServiceConnection {
+public class ActivationActivity extends ActivityGroup implements ServiceConnection {
 	
 	private static final Map<String, String> SERVICE_MAPPING = new HashMap<String, String>();
 	
@@ -37,25 +31,7 @@ public class ActivationActivity extends Activity implements ServiceConnection {
 	
 	private PluginConfiguration configuration;
 	
-	private TextView name;
-	
-	private TextView version;
-	
-	private TextView url;
-	
-	private TextView period;
-	
-	private TextView duration;
-	
-	private LinearLayout serviceLayout;
-	
-	private TextView description;
-	
-	private LinearLayout permissionLayout;
-	
 	private Button activateButton;
-	
-	private Button deactivateButton;
 	
 	static {
 		SERVICE_MAPPING.put(Context.LOCATION_SERVICE, "Location Service");
@@ -70,14 +46,14 @@ public class ActivationActivity extends Activity implements ServiceConnection {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activation);
 		
-		name = (TextView) findViewById(R.id.activation_name);
-		version = (TextView) findViewById(R.id.activation_version);
-		url = (TextView) findViewById(R.id.activation_url);
-		period = (TextView) findViewById(R.id.activation_period);
-		duration = (TextView) findViewById(R.id.activation_duration);
-		serviceLayout = (LinearLayout) findViewById(R.id.activation_services);
-		description = (TextView) findViewById(R.id.activation_description);
-		permissionLayout = (LinearLayout) findViewById(R.id.activation_permissions);
+		// Add InfoActivity for this activity.
+		Intent intent = (Intent) getIntent().clone();
+		intent.setClass(this, InfoActivity.class);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		View view = getLocalActivityManager().startActivity("InfoActivity", intent).getDecorView();
+		view.setPadding(0, 0, 0, 70);
+		LinearLayout layout = (LinearLayout) findViewById(R.id.activation_layout);
+		layout.addView(view, 0);
 		
 		activateButton = (Button) findViewById(R.id.activate);
 		activateButton.setOnClickListener(new View.OnClickListener() {
@@ -91,18 +67,8 @@ public class ActivationActivity extends Activity implements ServiceConnection {
 			}
 		});
 		
-		deactivateButton = (Button) findViewById(R.id.deactivate);
-		deactivateButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				service.deactivate(configuration);
-				finish();
-			}
-		});
-		
 		Button cancelButton = (Button) findViewById(R.id.cancel_activitation);
 		cancelButton.setOnClickListener(new View.OnClickListener() {
-			
 			@Override
 			public void onClick(View v) {
 				finish();
@@ -159,44 +125,10 @@ public class ActivationActivity extends Activity implements ServiceConnection {
 		PluginInfo info = getIntent().getParcelableExtra(PluginIntent.PLUGIN_INFO);
 		service = ((PluginService.PluginServiceBinder) binder).getService();
 		configuration = service.getPluginConfiguration(info);
-		
-		if (configuration.getMode().equals(Mode.ACTIVATED)) {
-			activateButton.setVisibility(View.INVISIBLE);
-			deactivateButton.setVisibility(View.VISIBLE);
-		} else {
-			activateButton.setVisibility(View.VISIBLE);
-			deactivateButton.setVisibility(View.INVISIBLE);
-		}
-		
-		showConfiguration();
 	}
 
 	@Override
 	public void onServiceDisconnected(ComponentName name) {
 		
-	}
-	
-	private void showConfiguration() {
-		PluginInfo info = configuration.getPluginInfo();
-		name.setText(info.getName());
-		version.setText(Objects.firstNonNull(Strings.emptyToNull(info.getVersion()), "Unknown"));
-		url.setText(Objects.firstNonNull(Strings.emptyToNull(info.getUrl()), "Unknown"));
-		period.setText(info.getPeriod() + "ms");
-		duration.setText(info.getDuration() + "ms");
-		for (String service : info.getServices()) {
-			TextView textView = new TextView(this);
-			textView.setTextAppearance(this, android.R.attr.textAppearanceMedium);
-			textView.setPadding(5, 3, 3, 3);
-			textView.setText(SERVICE_MAPPING.get(service));
-			serviceLayout.addView(textView);
-		}
-		description.setText(Objects.firstNonNull(Strings.emptyToNull(info.getDescription()), "Unknown"));
-		for (String permission : configuration.getPermissions()) {
-			TextView textView = new TextView(this);
-			textView.setTextAppearance(this, android.R.attr.textAppearanceMedium);
-			textView.setPadding(5, 3, 3, 3);
-			textView.setText(permission);
-			permissionLayout.addView(textView);
-		}
 	}
 }

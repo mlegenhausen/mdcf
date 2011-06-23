@@ -17,7 +17,7 @@ public class PluginConfiguration implements Serializable {
 	private static final long serialVersionUID = -3205252713479131098L;
 
 	public enum Mode {
-		NEW, ACTIVATED, DEACTIVATED
+		NEW, ACTIVATED, DEACTIVATED, TRANSFER
 	}
 	
 	public enum State {
@@ -27,6 +27,10 @@ public class PluginConfiguration implements Serializable {
 	private PluginInfo pluginInfo;
 	
 	private long lastExecuted = -1;
+	
+	private long lastActivated = -1;
+	
+	private long totalActivationTime = 0;
 	
 	private Mode mode = Mode.NEW;
 	
@@ -50,6 +54,22 @@ public class PluginConfiguration implements Serializable {
 		this.lastExecuted = lastExecuted;
 	}
 	
+	public long getLastActivated() {
+		return lastActivated;
+	}
+
+	public void setLastActivated(long lastActivated) {
+		this.lastActivated = lastActivated;
+	}
+
+	public long getTotalActivationTime() {
+		return totalActivationTime;
+	}
+
+	public void setTotalActivationTime(long totalActivationTime) {
+		this.totalActivationTime = totalActivationTime;
+	}
+
 	public LogRecord createLogRecord() {
 		LogRecord logRecord = new LogRecord();
 		logRecords.add(logRecord);

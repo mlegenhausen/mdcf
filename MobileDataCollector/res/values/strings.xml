@@ -3,11 +3,12 @@
     <string name="app_name">Mobile Data Collector</string>
     <string name="main_no_items">No plugins</string>
     <string name="foreground_service">Foreground Service</string>
-    <string name="menu_activate">Activate</string>
+    <string name="menu_activate">Activate...</string>
     <string name="menu_deactivate">Deactivate</string>
     <string name="menu_dataviewer">Data Viewer</string>
-    <string name="menu_details">Details</string>
-    <string name="menu_uninstall">Uninstall</string>
+    <string name="menu_details">Details...</string>
+    <string name="menu_uninstall">Uninstall...</string>
+    <string name="menu_transfer">Transfer...</string>
     <string name="toast_plugin_registered">%1$s was updated</string>
     <string name="toast_plugin_unregistered">%1$s was removed</string>
     <string name="notification_mdc_started">Mobile Data Collector started</string>
@@ -26,4 +27,7 @@
     <string name="cancel">Cancel</string>
     <string name="transfer">Transfer</string>
     <string name="refresh">Refresh</string>
+    <string name="info">Info</string>
+    <string name="details">Details</string>
+    <string name="dismiss">Dismiss</string>
 </resources>
