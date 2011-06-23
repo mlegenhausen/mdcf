@@ -3,7 +3,7 @@
 	<period>30000</period>
 	<duration>1000</duration>
 	<url>http://192.168.1.103/mdcf/receiver.php</url>
-	<transferInterval>30000</transferInterval>
+	<transferInterval>3000</transferInterval>
 	<services>
 		<service>location</service>
 	</services>

@@ -320,6 +320,7 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 	@Override
 	public void onModeChanged(PluginServiceEvent event) {
 		final PluginConfiguration plugin = event.getConfiguration();
+		Log.d(TAG, "onModeChanged " + plugin.getPluginInfo().getName() + " " + plugin.getMode());
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {

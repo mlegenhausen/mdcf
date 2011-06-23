@@ -230,6 +230,7 @@ public class PluginService extends Service implements PluginTaskListener {
 	}
 	
 	public void activate(PluginConfiguration configuration) {
+		Log.d(TAG, "Activate: " + configuration.getPluginInfo().getName());
 		configuration.setMode(Mode.ACTIVATED);
 		repository.store(configuration);
 		fireModeChanged(configuration);
@@ -238,6 +239,7 @@ public class PluginService extends Service implements PluginTaskListener {
 	}
 	
 	public void deactivate(PluginConfiguration configuration) {
+		Log.d(TAG, "Deactivate: " + configuration.getPluginInfo().getName());
 		configuration.setMode(Mode.DEACTIVATED);
 		configuration.setState(State.RESOLVED);
 		repository.store(configuration);
@@ -258,6 +260,17 @@ public class PluginService extends Service implements PluginTaskListener {
 		repository.store(configuration);
 		fireStateChanged(configuration);
 		fireModeChanged(configuration);
+	}
+	
+	/**
+	 * Call this method after a plugin was successfully transfered.
+	 * 
+	 * @param configuration
+	 */
+	public void transfered(PluginConfiguration configuration) {
+		configuration.setTotalActivationTime(0);
+		repository.store(configuration);
+		activate(configuration);
 	}
 	
 	public void addListener(PluginServiceListener listener) {

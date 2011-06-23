@@ -12,8 +12,10 @@ import android.os.AsyncTask;
 
 import com.google.gson.Gson;
 
-public class WorkspaceTransmitionTask extends AsyncTask<TransferRequest, Integer, Boolean> {
+import de.uniluebeck.itm.mdc.net.ProgressStringEntity.ProgressListener;
 
+public class WorkspaceTransmitionTask extends AsyncTask<TransferRequest, Integer, Throwable> implements ProgressListener {
+	
 	private final Gson gson = new Gson();
 	
 	private final Context context;
@@ -37,40 +39,32 @@ public class WorkspaceTransmitionTask extends AsyncTask<TransferRequest, Integer
 	}
 	
 	@Override
-	protected Boolean doInBackground(TransferRequest... requests) {
-		int delta = 100 / (requests.length * 2);
-		int progress = 0;
+	protected Throwable doInBackground(TransferRequest... requests) {
 		for (TransferRequest request : requests) {
 			String json = gson.toJson(request);
 			
-			progress += delta;
-			publishProgress(progress);
-			
 			try {
-				SimpleJsonClient.to(url).send(json);
+				SimpleJsonClient.to(url).send(json, this);
 			} catch (ClientProtocolException e) {
-				return false;
+				return e;
 			} catch (IOException e) {
-				return false;
+				return e;
 			}
-			
-			progress += delta;
-			publishProgress(progress);
 		}
-		publishProgress(100);
-		return true;
+		return null;
 	}
 	
 	@Override
 	protected void onProgressUpdate(Integer... values) {
-		progressDialog.setProgress(values[0]);
+		progressDialog.setMax(values[0]);
+		progressDialog.setProgress(values[1]);
 	}
 
 	@Override
-	protected void onPostExecute(Boolean result) {
-		progressDialog.hide();
-		if (!result) {
-			showAlertDialog("Unable to transfer workspace. Please retry...");
+	protected void onPostExecute(Throwable e) {
+		progressDialog.dismiss();
+		if (e != null) {
+			showAlertDialog(e.getMessage() + ". Please retry...");
 		}
 	}
 	
@@ -85,5 +79,10 @@ public class WorkspaceTransmitionTask extends AsyncTask<TransferRequest, Integer
 				}
 			})
 			.show();
+	}
+	
+	@Override
+	public void onProgress(int progress, int size) {
+		publishProgress(size, progress);
 	}
 }

@@ -119,7 +119,7 @@ public class TransferActivity extends ActivityGroup implements ServiceConnection
 				.setPositiveButton(R.string.dismiss, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						dismissAndFinish();
+						resetAndFinish();
 					}
 				})
 				.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -149,15 +149,29 @@ public class TransferActivity extends ActivityGroup implements ServiceConnection
 			Log.e(TAG, "Unsupported Encoding", e);
 		}
 		Node workspace = pluginConfiguration.getWorkspace();
-		new WorkspaceTransmitionTask(this, url).execute(new TransferRequest(id, workspace));
+		WorkspaceTransmitionTask task = new WorkspaceTransmitionTask(this, url) {
+			@Override
+			protected void onPostExecute(Throwable e) {
+				super.onPostExecute(e);
+				if (e == null) {
+					maskAsTransferedAndFinish();
+				}	
+			}
+		};
+		task.execute(new TransferRequest(id, workspace));
 	}
 	
 	private void dismiss() {
 		showDialog(DISMISS_DIALOG);
 	}
 	
-	private void dismissAndFinish() {
+	private void resetAndFinish() {
 		service.reset(pluginConfiguration);
+		finish();
+	}
+	
+	private void maskAsTransferedAndFinish() {
+		service.transfered(pluginConfiguration);
 		finish();
 	}
 }
