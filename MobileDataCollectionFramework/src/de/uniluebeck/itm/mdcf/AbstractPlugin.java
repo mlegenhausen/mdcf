@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.util.Log;
 import de.uniluebeck.itm.mdcf.persistence.PersistenceManager;
 import de.uniluebeck.itm.mdcf.service.SecureAudioManager;
 import de.uniluebeck.itm.mdcf.service.SecureConnectivityManager;
@@ -50,6 +51,8 @@ public abstract class AbstractPlugin extends Service implements Plugin {
 			AbstractPlugin.this.run();
 		}
 	}
+	
+	private static final String TAG = AbstractPlugin.class.getName();
 
 	private SecureLocationManager locationManager;
 	
@@ -100,10 +103,12 @@ public abstract class AbstractPlugin extends Service implements Plugin {
 
 	@Override
 	public void run() throws RemoteException {
+		Log.d(TAG, "Running Plugin...");
 		try {
 			onRun();
+			Log.d(TAG, "Plugin run finished.");
 		} catch(Exception e) {
-			
+			Log.e(TAG, "Exception during Plugin execution.", e);
 		}
 	}
 	
