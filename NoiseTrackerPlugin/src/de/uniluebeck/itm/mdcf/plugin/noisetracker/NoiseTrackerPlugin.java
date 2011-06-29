@@ -11,11 +11,7 @@ public class NoiseTrackerPlugin extends AbstractPlugin {
 
 	private static final int POLL_INTERVAL = 100;
 	
-	private static final double EMA_FILTER = 0.6;
-	
 	private MediaRecorder recorder;
-	
-	private double ema = 0.0;
 
 	@Override
 	protected void onRun() throws Exception {
@@ -28,44 +24,29 @@ public class NoiseTrackerPlugin extends AbstractPlugin {
 		recorder.setOutputFile("/dev/null");
 		recorder.prepare();
 		recorder.start();
-		ema = 0.0;
 		
-		double ema = 0.0;
 		double amplitude = 0.0;
 		for (int i = 0; i < 10; i++) {
 			amplitude = getAmplitude();
-			ema = getAmplitudeEMA();
 			Thread.sleep(POLL_INTERVAL);
 		}
 		
+		storeLocationAndNoiseLevel(location, amplitude);
+		
 		recorder.stop();
 		recorder.release();
-
-		storeLocationAndNoiseLevel(location, amplitude, ema);
 	}
 
 	private double getAmplitude() {
-		if (recorder != null)
-			return (recorder.getMaxAmplitude() / 2700.0);
-		else
-			return 0;
-
+		return recorder.getMaxAmplitude() / 2700.0;
 	}
-	
-    private double getAmplitudeEMA() {
-        double amp = getAmplitude();
-        ema = EMA_FILTER * amp + (1.0 - EMA_FILTER) * ema;
-        return ema;
-    }
 
-	private void storeLocationAndNoiseLevel(Location location, double amplitude, double ema)
-			throws RemoteException {
+	private void storeLocationAndNoiseLevel(Location location, double amplitude) throws RemoteException {
 		Node workspace = getPersistenceManager().getWorkspace();
 		Node node = new Node();
 		node.setProperty("Latitude", location.getLatitude());
 		node.setProperty("Longitude", location.getLongitude());
 		node.setProperty("Amplitude", amplitude);
-		node.setProperty("EMA", ema);
 		workspace.addNode(node);
 		getPersistenceManager().save(workspace);
 	}
