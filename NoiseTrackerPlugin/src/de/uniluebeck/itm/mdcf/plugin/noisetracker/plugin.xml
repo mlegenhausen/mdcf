@@ -1,0 +1,12 @@
+<plugininfo action="de.uniluebeck.itm.mdcf.plugin.noisetracker.NOISE_TRACKER_PLUGIN" version="1.0">
+	<name>Noise Tracker</name>
+	<period>3000</period>
+	<duration>1500</duration>
+	<url>http://192.168.1.103/mdcf/receiver.php</url>
+	<transferInterval>30000</transferInterval>
+	<services>
+		<service>location</service>
+		<service>audio</service>
+	</services>
+	<description>Plugin that tracks every 30 seconds the current location and the noise level.</description>
+</plugininfo>

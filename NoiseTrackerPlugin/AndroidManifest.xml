@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+      package="de.uniluebeck.itm.mdcf.plugin.noisetracker"
+      android:versionCode="1"
+      android:versionName="1.0">
+    <uses-sdk android:minSdkVersion="10" />
+
+    <application android:icon="@drawable/icon" android:label="@string/app_name">
+        		<receiver android:name="de.uniluebeck.itm.mdcf.plugin.noisetracker.NoiseTrackerPluginRegister">
+			<intent-filter>
+				<action android:name="de.uniluebeck.itm.mdcf.PLUGIN_FIND"/>
+			</intent-filter>
+		</receiver>
+		
+		<service android:name="de.uniluebeck.itm.mdcf.plugin.noisetracker.NoiseTrackerPlugin">
+			<intent-filter>
+				<action android:name="de.uniluebeck.itm.mdcf.plugin.noisetracker.NOISE_TRACKER_PLUGIN"/>
+			</intent-filter>
+		</service>
+    </application>
+    
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+</manifest>
