@@ -20,7 +20,7 @@
     <string name="data_viewer">Data Viewer</string>
     <string name="log_viewer">Log Viewer</string>
     <string name="workspace_viewer">Workspace Viewer</string>
-    <string name="workspace">Workspace</string>
+    <string name="workspace">Collected Data</string>
     <string name="log">Log</string>
     <string name="activate">Activate</string>
     <string name="deactivate">Deactivate</string>
