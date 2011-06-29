@@ -50,7 +50,7 @@ public class WorkspaceTransmitionTask extends AsyncTask<TransferRequest, Integer
         notification.contentView = new RemoteViews(context.getPackageName(), R.layout.transfer_notification_progress);
         notification.contentIntent = pendingIntent;
         notification.contentView.setImageViewResource(R.id.transfer_notification_status_icon, R.drawable.ic_menu_save);
-        notification.contentView.setTextViewText(R.id.transfer_notification_status_text, "simulation in progress");
+        notification.contentView.setTextViewText(R.id.transfer_notification_status_text, "Uploading Workspace...");
         notification.contentView.setProgressBar(R.id.transfer_notification_status_progress, 100, 0, false);
         notificationManager.notify(R.id.transfer_notification_status_progress, notification);
 	}
