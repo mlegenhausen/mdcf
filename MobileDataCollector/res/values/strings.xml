@@ -30,4 +30,7 @@
     <string name="info">Info</string>
     <string name="details">Details</string>
     <string name="dismiss">Dismiss</string>
+    <string name="transfer_list_no_items">No outstanding transfers</string>
+    <string name="plugins">Plugins</string>
+    <string name="transfers">Outstanding Transfers</string>
 </resources>

@@ -33,9 +33,9 @@ import de.uniluebeck.itm.mdc.service.PluginServiceListener;
 import de.uniluebeck.itm.mdcf.PluginInfo;
 import de.uniluebeck.itm.mdcf.PluginIntent;
 
-public class MobileDataCollector extends ListActivity implements ServiceConnection, PluginServiceListener {
+public class PluginListActivity extends ListActivity implements ServiceConnection, PluginServiceListener {
 	
-	private static final String TAG = MobileDataCollector.class.getName();
+	private static final String TAG = PluginListActivity.class.getName();
 	
 	private final static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
 	
@@ -82,7 +82,7 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+        setContentView(R.layout.plugin_list);
         listAdapter = new SimpleAdapter(
     		this, 
     		pluginMappings, 
@@ -106,13 +106,13 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     protected void onStart() {
     	super.onStart();
     	Log.i(TAG, "Bind Service");
-    	bindService(new Intent(this, PluginService.class), this, Context.BIND_AUTO_CREATE);
+    	getApplicationContext().bindService(new Intent(this, PluginService.class), this, Context.BIND_AUTO_CREATE);
     }
     
     @Override
     protected void onDestroy() {
     	super.onDestroy();
-    	unbindService(this);
+    	getApplicationContext().unbindService(this);
     }
     
     @Override
@@ -290,7 +290,7 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				Toast.makeText(MobileDataCollector.this, text, Toast.LENGTH_LONG);
+				Toast.makeText(PluginListActivity.this, text, Toast.LENGTH_LONG);
 				loadPlugins();
 			}
 		});
