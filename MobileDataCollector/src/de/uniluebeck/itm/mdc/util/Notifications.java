@@ -22,7 +22,7 @@ public class Notifications {
 		notification.setLatestEventInfo(context, context.getText(R.string.app_name), content, contentIntent);
 		notification.flags |= Notification.FLAG_FOREGROUND_SERVICE;
 		notification.when = when;
-		notification.icon = R.drawable.stat_sample;
+		notification.icon = R.drawable.ic_plugins;
 		return notification;
 	}
 	
