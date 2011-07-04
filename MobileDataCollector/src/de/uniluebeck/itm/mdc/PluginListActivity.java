@@ -15,6 +15,7 @@ import android.content.ServiceConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -28,14 +29,13 @@ import android.widget.Toast;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration.Mode;
 import de.uniluebeck.itm.mdc.service.PluginService;
-import de.uniluebeck.itm.mdc.service.PluginServiceEvent;
-import de.uniluebeck.itm.mdc.service.PluginServiceListener;
-import de.uniluebeck.itm.mdcf.PluginInfo;
+import de.uniluebeck.itm.mdc.service.PluginEvent;
+import de.uniluebeck.itm.mdc.service.PluginListener;
 import de.uniluebeck.itm.mdcf.PluginIntent;
 
-public class MobileDataCollector extends ListActivity implements ServiceConnection, PluginServiceListener {
+public class PluginListActivity extends ListActivity implements ServiceConnection, PluginListener {
 	
-	private static final String TAG = MobileDataCollector.class.getName();
+	private static final String TAG = PluginListActivity.class.getName();
 	
 	private final static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
 	
@@ -56,8 +56,6 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 	private static final int UNINSTALL_ID = 5;
 	
 	private static final int MARKET_ID = 6;
-	
-	private static final int TRANSFER_ID = 7;
 	
 	private static final Map<Mode, String> MODE_MAPPING = new HashMap<Mode, String>();
 	
@@ -82,7 +80,7 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+        setContentView(R.layout.plugin_list);
         listAdapter = new SimpleAdapter(
     		this, 
     		pluginMappings, 
@@ -106,13 +104,13 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     protected void onStart() {
     	super.onStart();
     	Log.i(TAG, "Bind Service");
-    	bindService(new Intent(this, PluginService.class), this, Context.BIND_AUTO_CREATE);
+    	getApplicationContext().bindService(new Intent(this, PluginService.class), this, Context.BIND_AUTO_CREATE);
     }
     
     @Override
     protected void onDestroy() {
     	super.onDestroy();
-    	unbindService(this);
+    	getApplicationContext().unbindService(this);
     }
     
     @Override
@@ -124,8 +122,6 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     		startActivate(configuration);
     	} else if (Mode.ACTIVATED.equals(mode)) {
     		service.deactivate(configuration);
-    	} else {
-    		startTransfer(configuration);
     	}
     }
     
@@ -138,8 +134,6 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     		menu.add(0, ACTIVATE_ID, 0, R.string.menu_activate);
     	} else if (Mode.ACTIVATED.equals(mode)) {
     		menu.add(0, DEACTIVATE_ID, 0, R.string.menu_deactivate);
-    	} else {
-    		menu.add(0, TRANSFER_ID, 0, R.string.menu_transfer);
     	}
     	menu.add(0, DETAILS_ID, 2, R.string.menu_details);
     	menu.add(0, UNINSTALL_ID, 3, R.string.menu_uninstall);
@@ -155,9 +149,6 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     		break;
     	case DEACTIVATE_ID:
     		service.deactivate(configuration);
-    		break;
-    	case TRANSFER_ID:
-    		startTransfer(configuration);
     		break;
     	case DETAILS_ID:
     		startDetails(configuration);
@@ -221,6 +212,7 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 	private void loadPlugins() {
 		pluginMappings.clear();
 		pluginConfigurations = service.getPluginConfigurations();
+		Log.i(TAG, "Plugins found: " + pluginConfigurations.size());
 		for (final PluginConfiguration plugin : pluginConfigurations) {
 			addPlugin(plugin);
 		}
@@ -236,14 +228,14 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 	}
     
     private void startActivate(PluginConfiguration plugin) {
-    	PluginInfo pluginInfo = plugin.getPluginInfo();
+    	Parcelable pluginInfo = plugin.getPluginInfo();
     	Intent intent = new Intent(this, ActivationActivity.class);
     	intent.putExtra(PluginIntent.PLUGIN_INFO, pluginInfo);
     	startActivity(intent);
     }
     
     private void startDetails(PluginConfiguration plugin) {
-    	PluginInfo pluginInfo = plugin.getPluginInfo();
+    	Parcelable pluginInfo = plugin.getPluginInfo();
 		Intent intent = new Intent(this, DetailsActivity.class);
 		intent.putExtra(PluginIntent.PLUGIN_INFO, pluginInfo);
 		startActivity(intent);
@@ -254,12 +246,6 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
     	Intent intent = new Intent(Intent.ACTION_DELETE);
     	intent.setData(Uri.parse(uri));
     	startActivity(intent);
-    }
-    
-    private void startTransfer(PluginConfiguration plugin) {
-    	Intent intent = new Intent(this, TransferActivity.class);
-		intent.putExtra(PluginIntent.PLUGIN_INFO, plugin.getPluginInfo());
-		startActivity(intent);
     }
     
     private void startMarket() {
@@ -284,20 +270,20 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 	}
 
 	@Override
-	public void onRegistered(PluginServiceEvent event) {
+	public void onRegistered(PluginEvent event) {
 		final String name = event.getConfiguration().getPluginInfo().getName();
 		final String text = String.format(getString(R.string.toast_plugin_unregistered), name);
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				Toast.makeText(MobileDataCollector.this, text, Toast.LENGTH_LONG);
+				Toast.makeText(PluginListActivity.this, text, Toast.LENGTH_LONG);
 				loadPlugins();
 			}
 		});
 	}
 	
 	@Override
-	public void onRemoved(PluginServiceEvent pluginServiceEvent) {
+	public void onRemoved(PluginEvent pluginServiceEvent) {
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
@@ -307,7 +293,7 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 	}
 	
 	@Override
-	public void onStateChanged(PluginServiceEvent event) {
+	public void onStateChanged(PluginEvent event) {
 		final PluginConfiguration plugin = event.getConfiguration();
 		runOnUiThread(new Runnable() {
 			@Override
@@ -318,7 +304,7 @@ public class MobileDataCollector extends ListActivity implements ServiceConnecti
 	}
 	
 	@Override
-	public void onModeChanged(PluginServiceEvent event) {
+	public void onModeChanged(PluginEvent event) {
 		final PluginConfiguration plugin = event.getConfiguration();
 		Log.d(TAG, "onModeChanged " + plugin.getPluginInfo().getName() + " " + plugin.getMode());
 		runOnUiThread(new Runnable() {

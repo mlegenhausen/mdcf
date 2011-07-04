@@ -1,12 +1,18 @@
 package de.uniluebeck.itm.mdc.log;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
 import de.uniluebeck.itm.mdc.log.LogEntry.Confidentiality;
 
-public class LogRecord {
+public class LogRecord implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3247459231080418436L;
+
 	private long id;
 	
 	private long timestamp;

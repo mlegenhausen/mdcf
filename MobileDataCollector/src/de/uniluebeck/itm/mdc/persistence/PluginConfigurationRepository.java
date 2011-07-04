@@ -12,7 +12,7 @@ import de.uniluebeck.itm.mdcf.PluginInfo;
 public class PluginConfigurationRepository extends Repository<PluginConfiguration> {
 
 	public PluginConfigurationRepository(Context ctx) {
-		super(PluginConfiguration.class, ctx);
+		super(PluginConfiguration.class, ctx, "plugin.db4o");
 	}
 
 	public PluginConfiguration findByPluginInfo(final PluginInfo info) {

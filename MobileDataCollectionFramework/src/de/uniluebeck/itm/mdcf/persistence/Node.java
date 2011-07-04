@@ -12,11 +12,6 @@ import android.os.Parcelable;
 
 public class Node extends Item implements Parcelable {
 
-	/**
-	 * Serial UID.
-	 */
-	private static final long serialVersionUID = 3780531054736799768L;
-
 	public static final Parcelable.Creator<Node> CREATOR = new Parcelable.Creator<Node>() {
         public Node createFromParcel(Parcel in) {
             return new Node(in);
@@ -26,6 +21,11 @@ public class Node extends Item implements Parcelable {
             return new Node[size];
         }
     };
+    
+	/**
+	 * Serial UID.
+	 */
+	private static final long serialVersionUID = 3780531054736799768L;
     
     private final List<Node> nodes = new ArrayList<Node>();
     

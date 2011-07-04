@@ -9,8 +9,8 @@ public class Repository<T extends Serializable> extends Db4oHelper {
 	
     public Class<T> persistentClass;
 
-    public Repository( Class<T> persistentClass, Context ctx ) {
-        super(ctx);
+    public Repository(Class<T> persistentClass, Context ctx, String path) {
+        super(ctx, path);
         this.persistentClass = persistentClass;
     }
 

@@ -1,5 +1,6 @@
 package de.uniluebeck.itm.mdcf;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +13,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 @Root
-public class PluginInfo implements Parcelable {
+public class PluginInfo implements Parcelable, Serializable {
 
 	public static final Parcelable.Creator<PluginInfo> CREATOR = new Parcelable.Creator<PluginInfo>() {
         public PluginInfo createFromParcel(Parcel in) {
@@ -23,7 +24,12 @@ public class PluginInfo implements Parcelable {
             return new PluginInfo[size];
         }
     };
-    
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6097475469038464727L;
+
     private String pkg;
     
     @Element

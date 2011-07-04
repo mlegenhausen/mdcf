@@ -70,7 +70,6 @@ public class InfoActivity extends Activity implements ServiceConnection {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		info = getIntent().getParcelableExtra(PluginIntent.PLUGIN_INFO);
 		setContentView(R.layout.info);
 		
 		name = (TextView) findViewById(R.id.activation_name);
@@ -86,13 +85,22 @@ public class InfoActivity extends Activity implements ServiceConnection {
 	@Override
     protected void onStart() {
     	super.onStart();
-    	getApplicationContext().bindService(new Intent(this, PluginService.class), this, Context.BIND_AUTO_CREATE);
+    	Intent intent = getIntent();
+    	if (intent.hasExtra(PluginIntent.PLUGIN_INFO)) {
+    		info = intent.getParcelableExtra(PluginIntent.PLUGIN_INFO);
+        	getApplicationContext().bindService(new Intent(this, PluginService.class), this, Context.BIND_AUTO_CREATE);
+    	} else if (intent.hasExtra(PluginService.PLUGIN_CONFIGURATION)) {
+    		configuration = (PluginConfiguration) intent.getSerializableExtra(PluginService.PLUGIN_CONFIGURATION);
+    		showConfiguration();
+    	}
     }
 	
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		getApplicationContext().unbindService(this);
+		if (service != null) {
+			getApplicationContext().unbindService(this);
+		}
 	}
 	
 	@Override
@@ -158,7 +166,7 @@ public class InfoActivity extends Activity implements ServiceConnection {
 
 	@Override
 	public void onServiceDisconnected(ComponentName name) {
-		
+		service = null;
 	}
 	
 	private void showConfiguration() {
