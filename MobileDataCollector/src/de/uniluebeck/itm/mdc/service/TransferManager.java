@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Parcelable;
 import de.uniluebeck.itm.mdc.persistence.PluginConfigurationRepository;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration.Mode;
 import de.uniluebeck.itm.mdcf.PluginIntent;
@@ -60,9 +61,10 @@ public class TransferManager {
 	}
 	
 	private PendingIntent createIntent(PluginConfiguration configuration) {
+		Parcelable pluginInfo = configuration.getPluginInfo(); 
 		Intent intent = new Intent(context, PluginService.class);
 		intent.setAction(PluginService.TRANSFER_REQUEST);
-		intent.putExtra(PluginIntent.PLUGIN_INFO, configuration.getPluginInfo());
+		intent.putExtra(PluginIntent.PLUGIN_INFO, pluginInfo);
 		return PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_ONE_SHOT);
 	}
 }

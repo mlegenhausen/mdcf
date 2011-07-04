@@ -1,8 +1,9 @@
 package de.uniluebeck.itm.mdc.service;
 
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Lists.newLinkedList;
+
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import de.uniluebeck.itm.mdc.log.LogRecord;
@@ -36,9 +37,11 @@ public class PluginConfiguration implements Serializable {
 	
 	private State state = State.RESOLVED;
 	
-	private List<String> permissions = new ArrayList<String>();
+	private List<String> permissions = newArrayList();
 	
-	private List<LogRecord> logRecords = new LinkedList<LogRecord>();
+	private List<LogRecord> logRecords = newLinkedList();
+	
+	private List<Transfer> transfers = newLinkedList();
 	
 	private Node workspace = new Node();
 	
@@ -122,6 +125,14 @@ public class PluginConfiguration implements Serializable {
 	
 	public void setWorkspace(Node workspace) {
 		this.workspace = workspace;
+	}
+	
+	public List<Transfer> getTransfers() {
+		return transfers;
+	}
+	
+	public void setTransfers(List<Transfer> transfers) {
+		this.transfers = transfers;
 	}
 	
 	@Override

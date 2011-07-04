@@ -1,7 +1,14 @@
 package de.uniluebeck.itm.mdc.log;
 
-public class LogEntry {
+import java.io.Serializable;
+
+public class LogEntry implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 9215371678633807737L;
+
 	public enum Confidentiality {
 		HIGH, MEDIUM, LOW
 	}

@@ -17,7 +17,7 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.LinearLayout; 
+import android.widget.LinearLayout;
 import de.uniluebeck.itm.mdc.net.HashUniqueIdGenerator;
 import de.uniluebeck.itm.mdc.net.TransferRequest;
 import de.uniluebeck.itm.mdc.net.UniqueIdGenerator;
@@ -161,7 +161,7 @@ public class TransferActivity extends ActivityGroup implements ServiceConnection
 				}	
 			}
 		};
-		task.execute(new TransferRequest(id, workspace));
+		task.execute(new TransferRequest(id, info, workspace));
 	}
 	
 	private void dismiss() {

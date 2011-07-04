@@ -15,6 +15,7 @@ import android.content.ServiceConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -28,12 +29,11 @@ import android.widget.Toast;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration.Mode;
 import de.uniluebeck.itm.mdc.service.PluginService;
-import de.uniluebeck.itm.mdc.service.PluginServiceEvent;
-import de.uniluebeck.itm.mdc.service.PluginServiceListener;
-import de.uniluebeck.itm.mdcf.PluginInfo;
+import de.uniluebeck.itm.mdc.service.PluginEvent;
+import de.uniluebeck.itm.mdc.service.PluginListener;
 import de.uniluebeck.itm.mdcf.PluginIntent;
 
-public class PluginListActivity extends ListActivity implements ServiceConnection, PluginServiceListener {
+public class PluginListActivity extends ListActivity implements ServiceConnection, PluginListener {
 	
 	private static final String TAG = PluginListActivity.class.getName();
 	
@@ -236,14 +236,14 @@ public class PluginListActivity extends ListActivity implements ServiceConnectio
 	}
     
     private void startActivate(PluginConfiguration plugin) {
-    	PluginInfo pluginInfo = plugin.getPluginInfo();
+    	Parcelable pluginInfo = plugin.getPluginInfo();
     	Intent intent = new Intent(this, ActivationActivity.class);
     	intent.putExtra(PluginIntent.PLUGIN_INFO, pluginInfo);
     	startActivity(intent);
     }
     
     private void startDetails(PluginConfiguration plugin) {
-    	PluginInfo pluginInfo = plugin.getPluginInfo();
+    	Parcelable pluginInfo = plugin.getPluginInfo();
 		Intent intent = new Intent(this, DetailsActivity.class);
 		intent.putExtra(PluginIntent.PLUGIN_INFO, pluginInfo);
 		startActivity(intent);
@@ -257,8 +257,9 @@ public class PluginListActivity extends ListActivity implements ServiceConnectio
     }
     
     private void startTransfer(PluginConfiguration plugin) {
+    	Parcelable pluginInfo = plugin.getPluginInfo();
     	Intent intent = new Intent(this, TransferActivity.class);
-		intent.putExtra(PluginIntent.PLUGIN_INFO, plugin.getPluginInfo());
+		intent.putExtra(PluginIntent.PLUGIN_INFO, pluginInfo);
 		startActivity(intent);
     }
     
@@ -284,7 +285,7 @@ public class PluginListActivity extends ListActivity implements ServiceConnectio
 	}
 
 	@Override
-	public void onRegistered(PluginServiceEvent event) {
+	public void onRegistered(PluginEvent event) {
 		final String name = event.getConfiguration().getPluginInfo().getName();
 		final String text = String.format(getString(R.string.toast_plugin_unregistered), name);
 		runOnUiThread(new Runnable() {
@@ -297,7 +298,7 @@ public class PluginListActivity extends ListActivity implements ServiceConnectio
 	}
 	
 	@Override
-	public void onRemoved(PluginServiceEvent pluginServiceEvent) {
+	public void onRemoved(PluginEvent pluginServiceEvent) {
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
@@ -307,7 +308,7 @@ public class PluginListActivity extends ListActivity implements ServiceConnectio
 	}
 	
 	@Override
-	public void onStateChanged(PluginServiceEvent event) {
+	public void onStateChanged(PluginEvent event) {
 		final PluginConfiguration plugin = event.getConfiguration();
 		runOnUiThread(new Runnable() {
 			@Override
@@ -318,7 +319,7 @@ public class PluginListActivity extends ListActivity implements ServiceConnectio
 	}
 	
 	@Override
-	public void onModeChanged(PluginServiceEvent event) {
+	public void onModeChanged(PluginEvent event) {
 		final PluginConfiguration plugin = event.getConfiguration();
 		Log.d(TAG, "onModeChanged " + plugin.getPluginInfo().getName() + " " + plugin.getMode());
 		runOnUiThread(new Runnable() {

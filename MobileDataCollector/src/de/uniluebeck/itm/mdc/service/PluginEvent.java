@@ -2,7 +2,7 @@ package de.uniluebeck.itm.mdc.service;
 
 import java.util.EventObject;
 
-public class PluginServiceEvent extends EventObject {
+public class PluginEvent extends EventObject {
 
 	/**
 	 * 
@@ -11,7 +11,7 @@ public class PluginServiceEvent extends EventObject {
 	
 	private final PluginConfiguration configuration;
 
-	public PluginServiceEvent(Object source, PluginConfiguration configuration) {
+	public PluginEvent(Object source, PluginConfiguration configuration) {
 		super(source);
 		this.configuration = configuration;
 	}

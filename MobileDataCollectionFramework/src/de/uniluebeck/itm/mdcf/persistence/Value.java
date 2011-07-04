@@ -7,7 +7,7 @@ import java.util.Calendar;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class Value implements Parcelable {
+public class Value implements Parcelable, Serializable {
 
 	public static final Parcelable.Creator<Value> CREATOR = new Parcelable.Creator<Value>() {
         public Value createFromParcel(Parcel in) {
@@ -18,6 +18,11 @@ public class Value implements Parcelable {
             return new Value[size];
         }
     };
+    
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -5378304228650146756L;
 	
 	private int type;
 	
