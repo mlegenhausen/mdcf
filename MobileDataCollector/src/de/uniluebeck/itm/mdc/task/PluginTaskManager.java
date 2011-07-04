@@ -37,8 +37,8 @@ public class PluginTaskManager implements PluginTaskListener {
 		}
 		
 		PluginTask task = new PluginTask(context, configuration);
-		addAllListenersToTask(task);
 		task.addListener(this);
+		addAllListenersToTask(task);
 		tasks.put(configuration, task);
 		ScheduledFuture<?> future = scheduler.schedule(task, 0, TimeUnit.MILLISECONDS);
 		futures.put(configuration, future);
@@ -48,8 +48,8 @@ public class PluginTaskManager implements PluginTaskListener {
 	public PluginTask deactivate(PluginConfiguration configuration) {		
 		PluginTask task = tasks.remove(configuration);
 		if (task != null) {
-			removeAllListenersFromTask(task);
 			task.removeListener(this);
+			removeAllListenersFromTask(task);
 			task.destroy();
 			futures.get(configuration).cancel(true);
 			futures.remove(configuration);

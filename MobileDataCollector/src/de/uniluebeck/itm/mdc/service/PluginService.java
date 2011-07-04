@@ -291,8 +291,8 @@ public class PluginService extends Service implements PluginTaskListener {
 	public void deactivate(PluginConfiguration configuration) {
 		Log.d(TAG, "Deactivate: " + configuration.getPluginInfo().getName());
 		pluginTaskManager.deactivate(configuration);
-		transferManager.schedule(configuration);
 		configuration.setMode(Mode.DEACTIVATED);
+		transferManager.schedule(configuration);
 		configuration.setState(State.RESOLVED);
 		pluginConfigurationRepository.store(configuration);
 		fireModeChanged(configuration);
