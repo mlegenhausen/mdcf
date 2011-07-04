@@ -59,6 +59,9 @@ public class PluginInfo implements Parcelable, Serializable {
     @ElementList(entry="service")
     private List<String> services = new ArrayList<String>();
     
+    @Element(required=false)
+    private boolean resetWorkspaceAfterTransfer = true;
+    
     public PluginInfo() {
 		
 	}
@@ -89,6 +92,7 @@ public class PluginInfo implements Parcelable, Serializable {
 		parcel.writeStringList(services);
 		parcel.writeString(description);
 		parcel.writeLong(transferInterval);
+		parcel.writeInt(resetWorkspaceAfterTransfer ? 1 : 0);
 	}
 	
 	public void readFromParcel(Parcel parcel) {
@@ -102,6 +106,7 @@ public class PluginInfo implements Parcelable, Serializable {
 		parcel.readStringList(services);
 		description = parcel.readString();
 		transferInterval = parcel.readLong();
+		resetWorkspaceAfterTransfer = parcel.readInt() == 1;
 	}
 
 	public String getName() {
@@ -182,6 +187,14 @@ public class PluginInfo implements Parcelable, Serializable {
 	
 	public void setDescription(String description) {
 		this.description = description;
+	}
+	
+	public boolean isResetWorkspaceAfterTransfer() {
+		return resetWorkspaceAfterTransfer;
+	}
+	
+	public void setResetWorkspaceAfterTransfer(boolean resetWorkspaceAfterTransfer) {
+		this.resetWorkspaceAfterTransfer = resetWorkspaceAfterTransfer;
 	}
 
 	@Override

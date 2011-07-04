@@ -2,6 +2,7 @@ package de.uniluebeck.itm.mdc.service;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import android.app.Notification;
@@ -21,6 +22,7 @@ import com.db4o.ObjectSet;
 
 import de.uniluebeck.itm.mdc.MobileDataCollectorActivity;
 import de.uniluebeck.itm.mdc.R;
+import de.uniluebeck.itm.mdc.log.LogRecord;
 import de.uniluebeck.itm.mdc.persistence.PluginConfigurationRepository;
 import de.uniluebeck.itm.mdc.persistence.TransferRepository;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration.Mode;
@@ -32,6 +34,7 @@ import de.uniluebeck.itm.mdc.util.Notifications;
 import de.uniluebeck.itm.mdc.util.ObjectCloner;
 import de.uniluebeck.itm.mdcf.PluginInfo;
 import de.uniluebeck.itm.mdcf.PluginIntent;
+import de.uniluebeck.itm.mdcf.persistence.Node;
 
 public class PluginService extends Service implements PluginTaskListener {
 
@@ -239,6 +242,11 @@ public class PluginService extends Service implements PluginTaskListener {
 	 */
 	public void reactivateAfterTransferPreparation(PluginConfiguration configuration) {
 		configuration.setTotalActivationTime(0);
+		PluginInfo info = configuration.getPluginInfo();
+		if (info.isResetWorkspaceAfterTransfer()) {
+			configuration.setWorkspace(new Node());
+			configuration.setLogRecords(new LinkedList<LogRecord>());
+		}
 		pluginConfigurationRepository.store(configuration);
 		activate(configuration);
 	}
