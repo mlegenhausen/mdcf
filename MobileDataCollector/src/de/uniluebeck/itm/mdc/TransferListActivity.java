@@ -111,7 +111,7 @@ public class TransferListActivity extends ListActivity implements ServiceConnect
 				long timestamp2 = transfer2.getTimestamp();
 				
 				int result = 0;
-				if(timestamp1 > timestamp2) {
+				if(timestamp1 < timestamp2) {
 					result = 1;
 				} else if(timestamp1 > timestamp2) {
 		        	result = -1;
