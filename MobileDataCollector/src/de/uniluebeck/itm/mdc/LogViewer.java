@@ -52,8 +52,6 @@ public class LogViewer extends ExpandableListActivity implements ServiceConnecti
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		pluginInfo = getIntent().getParcelableExtra(PluginIntent.PLUGIN_INFO);
-		
 		adapter = new SimpleExpandableListAdapter(
 			this, 
 			groupData, 
@@ -67,7 +65,22 @@ public class LogViewer extends ExpandableListActivity implements ServiceConnecti
 		);
 		setListAdapter(adapter);
 		
-		getApplicationContext().bindService(new Intent(this, PluginService.class), this, Context.BIND_AUTO_CREATE);
+		Intent intent = getIntent();
+    	if (intent.hasExtra(PluginIntent.PLUGIN_INFO)) {
+    		pluginInfo = intent.getParcelableExtra(PluginIntent.PLUGIN_INFO);
+        	getApplicationContext().bindService(new Intent(this, PluginService.class), this, Context.BIND_AUTO_CREATE);
+    	} else if (intent.hasExtra(PluginService.PLUGIN_CONFIGURATION)) {
+    		pluginConfiguration = (PluginConfiguration) intent.getSerializableExtra(PluginService.PLUGIN_CONFIGURATION);
+    		showRecords();
+    	}
+	}
+	
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		if (service != null) {
+			getApplicationContext().unbindService(this);
+		}
 	}
 
 	@Override
@@ -78,12 +91,14 @@ public class LogViewer extends ExpandableListActivity implements ServiceConnecti
 
 	@Override
 	public void onServiceDisconnected(ComponentName componentName) {
-		
+		service = null;
 	}
 	
 	@Override
 	public boolean onCreateOptionsMenu(final Menu menu) {
-		menu.add(0, REFRESH, 0, R.string.refresh);
+		if (pluginInfo != null) {
+			menu.add(0, REFRESH, 0, R.string.refresh);
+		}
 		return true;
 	}
 	
@@ -99,6 +114,10 @@ public class LogViewer extends ExpandableListActivity implements ServiceConnecti
 	
 	private void refresh() {
 		pluginConfiguration = service.getPluginConfiguration(pluginInfo);
+		showRecords();
+	}
+	
+	private void showRecords() {
 		List<LogRecord> records = pluginConfiguration.getLogRecords();
 		// Sort all records in descending order.
 		Collections.sort(records, new Comparator<LogRecord>() {

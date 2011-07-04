@@ -24,8 +24,8 @@ import de.uniluebeck.itm.mdc.net.UniqueIdGenerator;
 import de.uniluebeck.itm.mdc.net.WorkspaceTransmitionTask;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration;
 import de.uniluebeck.itm.mdc.service.PluginService;
+import de.uniluebeck.itm.mdc.service.Transfer;
 import de.uniluebeck.itm.mdcf.PluginInfo;
-import de.uniluebeck.itm.mdcf.PluginIntent;
 import de.uniluebeck.itm.mdcf.persistence.Node;
 
 public class TransferActivity extends ActivityGroup implements ServiceConnection {
@@ -40,7 +40,9 @@ public class TransferActivity extends ActivityGroup implements ServiceConnection
 	
 	private TelephonyManager telephonyManager;
 	
-	private PluginInfo pluginInfo;
+	private long transferId;
+	
+	private Transfer transfer;
 	
 	private PluginConfiguration pluginConfiguration;
 	
@@ -50,18 +52,9 @@ public class TransferActivity extends ActivityGroup implements ServiceConnection
 		
 		telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
 		uniqueIdGenerator = new HashUniqueIdGenerator();
-		pluginInfo = getIntent().getParcelableExtra(PluginIntent.PLUGIN_INFO);
+		transferId = getIntent().getLongExtra(PluginService.TRANSFER, -1);
 		
 		setContentView(R.layout.transfer);
-		
-		// Add DetailsActivity for this activity.
-		Intent intent = (Intent) getIntent().clone();
-		intent.setClass(this, DetailsActivity.class);
-		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		View view = getLocalActivityManager().startActivity("DetailsActivity", intent).getDecorView();
-		view.setPadding(0, 0, 0, 70);
-		LinearLayout layout = (LinearLayout) findViewById(R.id.transfer_layout);
-		layout.addView(view, 0);
 		
 		Button transferButton = (Button) findViewById(R.id.transfer_transfer);
 		transferButton.setOnClickListener(new View.OnClickListener() {
@@ -85,29 +78,16 @@ public class TransferActivity extends ActivityGroup implements ServiceConnection
 				finish();
 			}
 		});
-	}
-	
-	@Override
-	protected void onStart() {
-		super.onStart();
-		bindService(new Intent(this, PluginService.class), this, Context.BIND_AUTO_CREATE);
+		
+		getApplicationContext().bindService(new Intent(this, PluginService.class), this, Context.BIND_AUTO_CREATE);
 	}
 	
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		unbindService(this);
-	}
-	
-	@Override
-	public void onServiceConnected(ComponentName name, IBinder binder) {
-		service = ((PluginService.PluginServiceBinder) binder).getService();
-		pluginConfiguration = service.getPluginConfiguration(pluginInfo);
-	}
-
-	@Override
-	public void onServiceDisconnected(ComponentName name) {
-		
+		if (service != null) {
+			getApplicationContext().unbindService(this);
+		}
 	}
 	
 	@Override
@@ -122,7 +102,7 @@ public class TransferActivity extends ActivityGroup implements ServiceConnection
 				.setPositiveButton(R.string.dismiss, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						resetAndFinish();
+						removeTransferAndFinish();
 					}
 				})
 				.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -135,6 +115,28 @@ public class TransferActivity extends ActivityGroup implements ServiceConnection
 			break;			
 		}
 		return dialog;
+	}
+	
+	@Override
+	public void onServiceConnected(ComponentName name, IBinder binder) {
+		service = ((PluginService.PluginServiceBinder) binder).getService();
+		transfer = service.getTransferById(transferId);
+		pluginConfiguration = transfer.getPluginConfiguration();
+		
+		// Add DetailsActivity for this activity.
+		Intent intent = new Intent(this, DetailsActivity.class);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		intent.putExtra(PluginService.PLUGIN_CONFIGURATION, pluginConfiguration);
+		
+		View view = getLocalActivityManager().startActivity("DetailsActivity", intent).getDecorView();
+		view.setPadding(0, 0, 0, 70);
+		LinearLayout layout = (LinearLayout) findViewById(R.id.transfer_layout);
+		layout.addView(view, 0);
+	}
+	
+	@Override
+	public void onServiceDisconnected(ComponentName name) {
+		service = null;
 	}
 
 	private void transfer() {
@@ -157,7 +159,7 @@ public class TransferActivity extends ActivityGroup implements ServiceConnection
 			protected void onPostExecute(Throwable e) {
 				super.onPostExecute(e);
 				if (e == null) {
-					maskAsTransferedAndFinish();
+					removeTransferAndFinish();
 				}	
 			}
 		};
@@ -168,13 +170,9 @@ public class TransferActivity extends ActivityGroup implements ServiceConnection
 		showDialog(DISMISS_DIALOG);
 	}
 	
-	private void resetAndFinish() {
-		service.reset(pluginConfiguration);
-		finish();
-	}
-	
-	private void maskAsTransferedAndFinish() {
-		service.transfered(pluginConfiguration);
+	private void removeTransferAndFinish() {
+		Log.i(TAG, "Transfer: " + transfer);
+		service.removeTransfer(transfer);
 		finish();
 	}
 }

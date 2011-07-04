@@ -6,7 +6,7 @@ import de.uniluebeck.itm.mdc.service.Transfer;
 public class TransferRepository extends Repository<Transfer> {
 
 	public TransferRepository(Context ctx) {
-		super(Transfer.class, ctx);
+		super(Transfer.class, ctx, "transfer.db4o");
 	}
 
 }

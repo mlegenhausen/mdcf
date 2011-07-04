@@ -57,7 +57,6 @@ public class WorkspaceViewer extends ListActivity implements ServiceConnection {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		pluginInfo = getIntent().getParcelableExtra(PluginIntent.PLUGIN_INFO);
 		adapter = new SimpleAdapter(
 			this, 
 			itemMapping, 
@@ -66,23 +65,31 @@ public class WorkspaceViewer extends ListActivity implements ServiceConnection {
 			new int[] { R.id.name }
 		);
 		setListAdapter(adapter);
-	}
-	
-	@Override
-	protected void onStart() {
-		super.onStart();
-		// Referee to issue 2483
-		getApplicationContext().bindService(new Intent(this, PluginService.class), this, Context.BIND_AUTO_CREATE);
+		
+		Intent intent = getIntent();
+		if (intent.hasExtra(PluginIntent.PLUGIN_INFO)) {
+    		pluginInfo = intent.getParcelableExtra(PluginIntent.PLUGIN_INFO);
+        	getApplicationContext().bindService(new Intent(this, PluginService.class), this, Context.BIND_AUTO_CREATE);
+    	} else if (intent.hasExtra(PluginService.PLUGIN_CONFIGURATION)) {
+    		pluginConfiguration = (PluginConfiguration) intent.getSerializableExtra(PluginService.PLUGIN_CONFIGURATION);
+    		showRoot();
+    	}
 	}
 	
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		getApplicationContext().unbindService(this);
+		if (service != null) {
+			getApplicationContext().unbindService(this);
+		}
 	}
 	
 	private void refresh() {
 		pluginConfiguration = service.getPluginConfiguration(pluginInfo);
+		showRoot();
+	}
+	
+	private void showRoot() {
 		showItems(pluginConfiguration.getWorkspace());
 	}
 	
@@ -130,7 +137,9 @@ public class WorkspaceViewer extends ListActivity implements ServiceConnection {
 	
 	@Override
 	public boolean onCreateOptionsMenu(final Menu menu) {
-		menu.add(0, REFRESH, 0, getText(R.string.refresh));
+		if (pluginInfo != null) {
+			menu.add(0, REFRESH, 0, getText(R.string.refresh));
+		}
 		return true;
 	}
 	

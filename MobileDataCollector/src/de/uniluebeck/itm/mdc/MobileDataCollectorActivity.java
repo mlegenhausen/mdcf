@@ -1,5 +1,6 @@
 package de.uniluebeck.itm.mdc;
 
+import static com.google.common.base.Preconditions.checkPositionIndex;
 import android.app.TabActivity;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -8,6 +9,12 @@ import android.widget.TabHost;
 
 public class MobileDataCollectorActivity extends TabActivity {
 
+	public static final String SHOW_VIEW = "de.unilubeck.itm.mdc.MobileDataCollectorActivity.SHOW_VIEW";
+	
+	public static final int PLUGIN_LIST = 0;
+	
+	public static final int TRANSFER_LIST = 1;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -40,6 +47,9 @@ public class MobileDataCollectorActivity extends TabActivity {
 	    	.setContent(intent);
 	    tabHost.addTab(spec);
 
-	    tabHost.setCurrentTab(0);
+	    intent = getIntent();
+	    int currentTab = intent.getIntExtra(SHOW_VIEW, 0);
+	    checkPositionIndex(currentTab, 2);
+	    tabHost.setCurrentTab(currentTab);
 	}
 }

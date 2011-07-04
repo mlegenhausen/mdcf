@@ -57,8 +57,6 @@ public class PluginListActivity extends ListActivity implements ServiceConnectio
 	
 	private static final int MARKET_ID = 6;
 	
-	private static final int TRANSFER_ID = 7;
-	
 	private static final Map<Mode, String> MODE_MAPPING = new HashMap<Mode, String>();
 	
 	private SimpleAdapter listAdapter;
@@ -124,8 +122,6 @@ public class PluginListActivity extends ListActivity implements ServiceConnectio
     		startActivate(configuration);
     	} else if (Mode.ACTIVATED.equals(mode)) {
     		service.deactivate(configuration);
-    	} else {
-    		startTransfer(configuration);
     	}
     }
     
@@ -138,8 +134,6 @@ public class PluginListActivity extends ListActivity implements ServiceConnectio
     		menu.add(0, ACTIVATE_ID, 0, R.string.menu_activate);
     	} else if (Mode.ACTIVATED.equals(mode)) {
     		menu.add(0, DEACTIVATE_ID, 0, R.string.menu_deactivate);
-    	} else {
-    		menu.add(0, TRANSFER_ID, 0, R.string.menu_transfer);
     	}
     	menu.add(0, DETAILS_ID, 2, R.string.menu_details);
     	menu.add(0, UNINSTALL_ID, 3, R.string.menu_uninstall);
@@ -155,9 +149,6 @@ public class PluginListActivity extends ListActivity implements ServiceConnectio
     		break;
     	case DEACTIVATE_ID:
     		service.deactivate(configuration);
-    		break;
-    	case TRANSFER_ID:
-    		startTransfer(configuration);
     		break;
     	case DETAILS_ID:
     		startDetails(configuration);
@@ -221,6 +212,7 @@ public class PluginListActivity extends ListActivity implements ServiceConnectio
 	private void loadPlugins() {
 		pluginMappings.clear();
 		pluginConfigurations = service.getPluginConfigurations();
+		Log.i(TAG, "Plugins found: " + pluginConfigurations.size());
 		for (final PluginConfiguration plugin : pluginConfigurations) {
 			addPlugin(plugin);
 		}
@@ -254,13 +246,6 @@ public class PluginListActivity extends ListActivity implements ServiceConnectio
     	Intent intent = new Intent(Intent.ACTION_DELETE);
     	intent.setData(Uri.parse(uri));
     	startActivity(intent);
-    }
-    
-    private void startTransfer(PluginConfiguration plugin) {
-    	Parcelable pluginInfo = plugin.getPluginInfo();
-    	Intent intent = new Intent(this, TransferActivity.class);
-		intent.putExtra(PluginIntent.PLUGIN_INFO, pluginInfo);
-		startActivity(intent);
     }
     
     private void startMarket() {

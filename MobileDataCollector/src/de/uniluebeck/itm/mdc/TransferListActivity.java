@@ -74,12 +74,19 @@ public class TransferListActivity extends ListActivity implements ServiceConnect
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		getApplicationContext().unbindService(this);
+		if (service != null) {
+			getApplicationContext().unbindService(this);
+		}
 	}
 	
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
-		
+		Transfer transfer = transfers.get(position);
+		long transferId = service.getTransferId(transfer);
+		Log.i(TAG, "Transfer (" + transferId + "): " + transfer);
+		Intent intent = new Intent(this, TransferActivity.class);
+		intent.putExtra(PluginService.TRANSFER, transferId);
+		startActivity(intent);
 	}
 
 	@Override
@@ -91,13 +98,13 @@ public class TransferListActivity extends ListActivity implements ServiceConnect
 
 	@Override
 	public void onServiceDisconnected(ComponentName name) {
-		
+		service = null;
 	}
 	
 	private void loadTransfers() {
 		transferMappings.clear();
-		transfers = service.getTransfers();
-		Collections.sort(newArrayList(transfers), new Comparator<Transfer>() {
+		transfers = newArrayList(service.getTransfers());
+		Collections.sort(transfers, new Comparator<Transfer>() {
 			@Override
 			public int compare(Transfer transfer1, Transfer transfer2) {
 				long timestamp1 = transfer1.getTimestamp();
@@ -132,7 +139,17 @@ public class TransferListActivity extends ListActivity implements ServiceConnect
 	}
 	
 	@Override
-	public void onTransfer(TransferEvent event) {
+	public void onCreated(TransferEvent event) {
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				loadTransfers();
+			}
+		});
+	}
+	
+	@Override
+	public void onRemoved(TransferEvent event) {
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {

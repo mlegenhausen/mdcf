@@ -1,6 +1,10 @@
 package de.uniluebeck.itm.mdc.task;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -19,6 +23,8 @@ public class PluginTaskManager implements PluginTaskListener {
 	
 	private final Map<PluginConfiguration, ScheduledFuture<?>> futures = new HashMap<PluginConfiguration, ScheduledFuture<?>>();
 	
+	private final List<PluginTaskListener> listeners = newArrayList();
+	
 	private final Context context;
 	
 	public PluginTaskManager(Context context) {		
@@ -31,6 +37,7 @@ public class PluginTaskManager implements PluginTaskListener {
 		}
 		
 		PluginTask task = new PluginTask(context, configuration);
+		addAllListenersToTask(task);
 		task.addListener(this);
 		tasks.put(configuration, task);
 		ScheduledFuture<?> future = scheduler.schedule(task, 0, TimeUnit.MILLISECONDS);
@@ -41,6 +48,8 @@ public class PluginTaskManager implements PluginTaskListener {
 	public PluginTask deactivate(PluginConfiguration configuration) {		
 		PluginTask task = tasks.remove(configuration);
 		if (task != null) {
+			removeAllListenersFromTask(task);
+			task.removeListener(this);
 			task.destroy();
 			futures.get(configuration).cancel(true);
 			futures.remove(configuration);
@@ -61,6 +70,7 @@ public class PluginTaskManager implements PluginTaskListener {
 		if (State.WAITING.equals(state)) {
 			long period = configuration.getPluginInfo().getPeriod();
 			PluginTask task = tasks.get(configuration);
+			checkNotNull(task);
 			ScheduledFuture<?> future = scheduler.schedule(task, period, TimeUnit.MILLISECONDS);
 			futures.put(configuration, future);
 		}
@@ -69,5 +79,25 @@ public class PluginTaskManager implements PluginTaskListener {
 	@Override
 	public void onNotFound(PluginTaskEvent event) {
 		deactivate(event.getConfiguration());
+	}
+	
+	private void addAllListenersToTask(PluginTask task) {
+		for (PluginTaskListener listener : listeners) {
+			task.addListener(listener);
+		}
+	}
+	
+	private void removeAllListenersFromTask(PluginTask task) {
+		for (PluginTaskListener listener : listeners) {
+			task.removeListener(listener);
+		}
+	}
+	
+	public void addListener(PluginTaskListener listener) {
+		listeners.add(listener);
+	}
+	
+	public void removeListener(PluginTaskListener listener) {
+		listeners.remove(listener);
 	}
 }

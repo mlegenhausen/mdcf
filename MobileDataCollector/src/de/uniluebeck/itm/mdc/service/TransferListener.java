@@ -2,5 +2,7 @@ package de.uniluebeck.itm.mdc.service;
 
 public interface TransferListener {
 
-	void onTransfer(TransferEvent event);
+	void onCreated(TransferEvent event);
+	
+	void onRemoved(TransferEvent event);
 }
