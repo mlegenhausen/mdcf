@@ -1,0 +1,2 @@
+serviceClass: de.uniluebeck.itm.mdcf.remote.locationtracker.client.GreetingService
+path: 2B353A89ADB13068733D0C457E5A4DF8.gwt.rpc
