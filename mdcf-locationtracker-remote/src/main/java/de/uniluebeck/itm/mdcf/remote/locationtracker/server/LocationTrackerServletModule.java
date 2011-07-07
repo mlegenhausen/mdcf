@@ -7,6 +7,8 @@ import com.google.inject.Singleton;
 import com.google.inject.persist.PersistFilter;
 import com.google.inject.persist.jpa.JpaPersistModule;
 import com.google.inject.servlet.ServletModule;
+import com.trycatchsoft.gwt.requestfactory.InjectedRequestFactoryModule;
+import com.trycatchsoft.gwt.requestfactory.InjectedRequestFactoryServlet;
 
 import de.uniluebeck.itm.mdcf.remote.locationtracker.server.model.Item;
 import de.uniluebeck.itm.mdcf.remote.locationtracker.server.model.ItemDeserializer;
@@ -18,9 +20,14 @@ public class LocationTrackerServletModule extends ServletModule {
 	@Override
 	protected void configureServlets() {
 		install(new JpaPersistModule("locationTrackerPersistenceUnit"));
-		filter("/*").through(PersistFilter.class);
-		serve("/receiver").with(DataReceiver.class);
+		install(new InjectedRequestFactoryModule());
+		
 		bind(TransferRequestProcessor.class).to(TransferRequestProcessorImpl.class);
+		
+		filter("/*").through(PersistFilter.class);
+		
+		serve("/receiver").with(DataReceiver.class);
+		serve("/gwtRequest").with(InjectedRequestFactoryServlet.class);
 	}
 	
 	@Provides
