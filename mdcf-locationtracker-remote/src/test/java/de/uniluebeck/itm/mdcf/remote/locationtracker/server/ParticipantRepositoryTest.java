@@ -1,7 +1,6 @@
 package de.uniluebeck.itm.mdcf.remote.locationtracker.server;
 
 import static junit.framework.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -47,11 +46,6 @@ public class ParticipantRepositoryTest {
 	public void setUp() {
 		repository = INJECTOR.getInstance(ParticipantRepository.class);
 	}
-	
-	@Test
-	public void testAbstractRepository() {
-		fail("Not yet implemented");
-	}
 
 	@Test
 	public void testPersist() {
@@ -72,24 +66,9 @@ public class ParticipantRepositoryTest {
 	}
 
 	@Test
-	public void testUpdate() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testRemove() {
-		fail("Not yet implemented");
-	}
-
-	@Test
 	public void testFindById() {
 		Participant participant = repository.findById("123");
 		assertNotNull(participant);
-	}
-
-	@Test
-	public void testFindAll() {
-		fail("Not yet implemented");
 	}
 
 }
