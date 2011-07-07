@@ -4,12 +4,36 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
 
-public class Entry {
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
+@Entity
+public class Participant {
+
+	@Id
+	@GeneratedValue
+	private Long id;
+	
 	private String participantId;
 	
+	@OneToMany(cascade=CascadeType.ALL)
 	private List<GeoLocation> locations = newArrayList();
+	
+	public Participant() {
+		
+	}
 
+	public Long getId() {
+		return id;
+	}
+	
+	public void setId(Long id) {
+		this.id = id;
+	}
+	
 	public String getParticipantId() {
 		return participantId;
 	}

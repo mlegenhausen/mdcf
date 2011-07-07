@@ -1,8 +1,17 @@
 package de.uniluebeck.itm.mdcf.remote.locationtracker.server.domain;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
 import com.google.common.base.Objects;
 
+@Entity
 public class GeoLocation {
+	
+	@Id
+	@GeneratedValue
+	private Long id;
 
 	private Double latitude;
 	
@@ -10,6 +19,18 @@ public class GeoLocation {
 	
 	private Long timestamp;
 
+	public GeoLocation() {
+		
+	}
+	
+	public Long getId() {
+		return id;
+	}
+	
+	public void setId(Long id) {
+		this.id = id;
+	}
+	
 	public Double getLatitude() {
 		return latitude;
 	}
