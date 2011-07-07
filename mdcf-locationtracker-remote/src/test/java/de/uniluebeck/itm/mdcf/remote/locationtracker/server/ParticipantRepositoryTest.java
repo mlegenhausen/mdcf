@@ -56,7 +56,7 @@ public class ParticipantRepositoryTest {
 	@Test
 	public void testPersist() {
 		Participant participant = new Participant();
-		participant.setParticipantId("123");
+		participant.setId("123");
 		
 		GeoLocation location = new GeoLocation();
 		location.setTimestamp(System.currentTimeMillis());
@@ -83,7 +83,8 @@ public class ParticipantRepositoryTest {
 
 	@Test
 	public void testFindById() {
-		fail("Not yet implemented");
+		Participant participant = repository.findById("123");
+		assertNotNull(participant);
 	}
 
 	@Test

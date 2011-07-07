@@ -6,7 +6,6 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
@@ -14,10 +13,7 @@ import javax.persistence.OneToMany;
 public class Participant {
 
 	@Id
-	@GeneratedValue
-	private Long id;
-	
-	private String participantId;
+	private String id;
 	
 	@OneToMany(cascade=CascadeType.ALL)
 	private List<GeoLocation> locations = newArrayList();
@@ -26,20 +22,12 @@ public class Participant {
 		
 	}
 
-	public Long getId() {
+	public String getId() {
 		return id;
 	}
 	
-	public void setId(Long id) {
+	public void setId(String id) {
 		this.id = id;
-	}
-	
-	public String getParticipantId() {
-		return participantId;
-	}
-
-	public void setParticipantId(String participantId) {
-		this.participantId = participantId;
 	}
 
 	public List<GeoLocation> getLocations() {
