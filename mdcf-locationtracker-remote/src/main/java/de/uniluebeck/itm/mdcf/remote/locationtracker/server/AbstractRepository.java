@@ -45,4 +45,8 @@ public abstract class AbstractRepository<T> implements Repository<T> {
     	return entitiyManager.get().createQuery(
                 String.format("SELECT x FROM %s x", persistentClass.getName()), persistentClass).getResultList();
     }
+    
+    public EntityManager getEntitiyManager() {
+		return entitiyManager.get();
+	}
 }

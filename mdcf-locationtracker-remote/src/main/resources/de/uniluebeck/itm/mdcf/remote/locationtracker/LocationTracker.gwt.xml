@@ -11,6 +11,7 @@
 	<!-- <inherits name='com.google.gwt.user.theme.dark.Dark'/> -->
 	<inherits name='com.google.web.bindery.requestfactory.RequestFactory' />
 	<inherits name="com.google.common.collect.Collect"/>
+	<inherits name="com.google.gwt.maps.GoogleMaps"/>
 
 	<!-- Other module inherits -->
 

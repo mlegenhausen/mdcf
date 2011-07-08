@@ -1,12 +1,13 @@
 package de.uniluebeck.itm.mdcf.remote.locationtracker.shared;
 
+import com.google.web.bindery.requestfactory.shared.EntityProxy;
 import com.google.web.bindery.requestfactory.shared.ProxyFor;
-import com.google.web.bindery.requestfactory.shared.ValueProxy;
 
+import de.uniluebeck.itm.mdcf.remote.locationtracker.server.GeoLocationLocator;
 import de.uniluebeck.itm.mdcf.remote.locationtracker.server.domain.GeoLocation;
 
-@ProxyFor(GeoLocation.class)
-public interface GeoLocationProxy extends ValueProxy {
+@ProxyFor(value=GeoLocation.class, locator=GeoLocationLocator.class)
+public interface GeoLocationProxy extends EntityProxy {
 	
 	Long getTimestamp();
 	
