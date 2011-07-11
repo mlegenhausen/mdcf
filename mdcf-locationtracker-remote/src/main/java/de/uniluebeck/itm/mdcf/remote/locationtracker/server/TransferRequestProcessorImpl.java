@@ -3,7 +3,7 @@ package de.uniluebeck.itm.mdcf.remote.locationtracker.server;
 import java.util.Iterator;
 import java.util.List;
 
-import com.google.gwt.thirdparty.guava.common.base.Objects;
+import com.google.common.base.Objects;
 import com.google.inject.Inject;
 
 import de.uniluebeck.itm.mdcf.remote.TransferRequestProcessor;
