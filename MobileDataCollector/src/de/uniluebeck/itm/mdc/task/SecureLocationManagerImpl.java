@@ -1,5 +1,6 @@
 package de.uniluebeck.itm.mdc.task;
 
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.RemoteException;
@@ -19,6 +20,13 @@ public class SecureLocationManagerImpl extends SecureLocationManager.Stub {
 	public SecureLocationManagerImpl(LocationManager locationManager, LogRecord logRecord) {
 		this.locationManager = locationManager;
 		this.logRecord = logRecord;
+	}
+	
+	@Override
+	public String getBestProvider(Criteria criteria, boolean enabledOnly) throws RemoteException {
+		String provider = locationManager.getBestProvider(criteria, enabledOnly);
+		logRecord.add(Confidentiality.LOW, "%s was fetched as best provider", provider);
+		return provider;
 	}
 	
 	@Override
