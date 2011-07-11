@@ -7,7 +7,7 @@
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
         <!-- Classes to persist -->
         <class>de.uniluebeck.itm.mdcf.remote.locationtracker.server.domain.Participant</class>
-        <class>de.uniluebeck.itm.mdcf.remote.locationtracker.server.domain.GeoLocation</class>
+        <class>de.uniluebeck.itm.mdcf.remote.locationtracker.server.domain.Location</class>
         <!-- The variables jdbc.connection.userName, etc. are configured in the file ~/.m2/settings.xml -->
         <properties>
             <property name="hibernate.cache.provider_class" value="org.hibernate.cache.NoCacheProvider"/>

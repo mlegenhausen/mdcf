@@ -6,10 +6,10 @@ import com.google.web.bindery.requestfactory.shared.ServiceLocator;
 
 public class GeoLocationServiceLocator implements ServiceLocator {
 
-	private final GeoLocationRepository repository;
+	private final LocationRepository repository;
 	
 	@Inject
-	public GeoLocationServiceLocator(GeoLocationRepository repository) {
+	public GeoLocationServiceLocator(LocationRepository repository) {
 		this.repository = repository;
 	}
 	

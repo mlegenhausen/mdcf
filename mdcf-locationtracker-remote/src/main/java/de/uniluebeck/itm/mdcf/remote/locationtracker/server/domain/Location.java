@@ -7,7 +7,7 @@ import javax.persistence.Id;
 import com.google.common.base.Objects;
 
 @Entity
-public class GeoLocation {
+public class Location {
 	
 	@Id
 	@GeneratedValue
@@ -29,7 +29,7 @@ public class GeoLocation {
 	
 	private Long timestamp;
 
-	public GeoLocation() {
+	public Location() {
 		
 	}
 	

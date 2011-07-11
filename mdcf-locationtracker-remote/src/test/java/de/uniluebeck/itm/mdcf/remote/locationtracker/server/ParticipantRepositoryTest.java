@@ -14,7 +14,7 @@ import com.google.inject.Module;
 import com.google.inject.persist.PersistService;
 import com.google.inject.persist.jpa.JpaPersistModule;
 
-import de.uniluebeck.itm.mdcf.remote.locationtracker.server.domain.GeoLocation;
+import de.uniluebeck.itm.mdcf.remote.locationtracker.server.domain.Location;
 import de.uniluebeck.itm.mdcf.remote.locationtracker.server.domain.Participant;
 
 public class ParticipantRepositoryTest {
@@ -52,7 +52,7 @@ public class ParticipantRepositoryTest {
 		Participant participant = new Participant();
 		participant.setId("123");
 		
-		GeoLocation location = new GeoLocation();
+		Location location = new Location();
 		location.setTimestamp(System.currentTimeMillis());
 		location.setLatitude(123.4);
 		location.setLongitude(432.1);

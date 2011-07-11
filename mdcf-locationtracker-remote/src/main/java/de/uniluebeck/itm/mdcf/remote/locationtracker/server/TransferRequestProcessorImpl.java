@@ -3,9 +3,10 @@ package de.uniluebeck.itm.mdcf.remote.locationtracker.server;
 import java.util.Iterator;
 import java.util.List;
 
+import com.google.gwt.thirdparty.guava.common.base.Objects;
 import com.google.inject.Inject;
 
-import de.uniluebeck.itm.mdcf.remote.locationtracker.server.domain.GeoLocation;
+import de.uniluebeck.itm.mdcf.remote.locationtracker.server.domain.Location;
 import de.uniluebeck.itm.mdcf.remote.locationtracker.server.domain.Participant;
 import de.uniluebeck.itm.mdcf.remote.locationtracker.server.model.Node;
 import de.uniluebeck.itm.mdcf.remote.locationtracker.server.model.TransferRequest;
@@ -21,18 +22,14 @@ public class TransferRequestProcessorImpl implements TransferRequestProcessor {
 	
 	public void process(TransferRequest request) {
 		String id = request.getId();
-		Participant participant = repository.findById(id);
-		if (participant == null) {
-			participant = new Participant();
-			participant.setId(id);
-		}
+		Participant participant = Objects.firstNonNull(repository.findById(id), new Participant(id));
 		
 		Node workspace = request.getWorkspace();
 		Iterator<Node> nodes = workspace.getNodes();
-		List<GeoLocation> locations = participant.getLocations();
+		List<Location> locations = participant.getLocations();
 		while (nodes.hasNext()) {
 			Node node = nodes.next();
-			GeoLocation location = new GeoLocation();
+			Location location = new Location();
 			location.setTimestamp(node.getTimestamp());
 			location.setLatitude(node.getProperty("Latitude").getValue().getDouble());
 			location.setLongitude(node.getProperty("Longitude").getValue().getDouble());

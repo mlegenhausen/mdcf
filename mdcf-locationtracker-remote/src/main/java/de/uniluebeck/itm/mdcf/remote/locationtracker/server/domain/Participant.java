@@ -17,10 +17,14 @@ public class Participant {
 	private String id;
 	
 	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER)
-	private List<GeoLocation> locations = newArrayList();
+	private List<Location> locations = newArrayList();
 	
 	public Participant() {
 		
+	}
+	
+	public Participant(String id) {
+		this.id = id;
 	}
 
 	public String getId() {
@@ -31,11 +35,11 @@ public class Participant {
 		this.id = id;
 	}
 
-	public List<GeoLocation> getLocations() {
+	public List<Location> getLocations() {
 		return locations;
 	}
 
-	public void setLocations(List<GeoLocation> locations) {
+	public void setLocations(List<Location> locations) {
 		this.locations = locations;
 	}
 }
