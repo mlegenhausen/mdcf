@@ -5,10 +5,10 @@
 	<!-- POM file generated with GWT webAppCreator -->
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.uniluebeck.itm</groupId>
-	<artifactId>mdcf-locationtracker-remote</artifactId>
+	<artifactId>mdcf-noisetracker-remote</artifactId>
 	<packaging>war</packaging>
 	<version>0.1-SNAPSHOT</version>
-	<name>GWT Maven Archetype</name>
+	<name>NoiseTracker Remote</name>
 
 	<properties>
 		<!-- Convenience property to set the GWT version -->
@@ -139,6 +139,7 @@
 		<outputDirectory>${webappDirectory}/WEB-INF/classes</outputDirectory>
 
 		<plugins>
+
 			<!-- GWT Maven Plugin -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -148,14 +149,13 @@
 					<execution>
 						<goals>
 							<goal>compile</goal>
-							<goal>generateAsync</goal>
 						</goals>
 					</execution>
 				</executions>
 				<!-- Plugin configuration. There are many available options, see gwt-maven-plugin 
 					documentation at codehaus.org -->
 				<configuration>
-					<runTarget>LocationTracker.html</runTarget>
+					<runTarget>NoiseTracker.html</runTarget>
 					<hostedWebapp>${webappDirectory}</hostedWebapp>
 				</configuration>
 			</plugin>
