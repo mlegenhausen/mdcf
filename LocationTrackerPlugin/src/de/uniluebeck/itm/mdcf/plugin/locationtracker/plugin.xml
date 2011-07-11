@@ -2,7 +2,7 @@
 	<name>Location Tracker</name>
 	<period>10000</period>
 	<duration>1000</duration>
-	<url>http://192.168.1.103/mdcf/receiver.php</url>
+	<url>http://192.168.1.103:8888/receiver</url>
 	<transferInterval>10000</transferInterval>
 	<services>
 		<service>location</service>

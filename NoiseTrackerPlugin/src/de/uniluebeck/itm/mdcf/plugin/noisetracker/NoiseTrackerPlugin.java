@@ -1,7 +1,7 @@
 package de.uniluebeck.itm.mdcf.plugin.noisetracker;
 
+import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationManager;
 import android.media.MediaRecorder;
 import android.os.RemoteException;
 import de.uniluebeck.itm.mdcf.AbstractPlugin;
@@ -15,7 +15,8 @@ public class NoiseTrackerPlugin extends AbstractPlugin {
 
 	@Override
 	protected void onRun() throws Exception {
-		Location location = getLocationManager().getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+		String provider = getLocationManager().getBestProvider(new Criteria(), false);
+		Location location = getLocationManager().getLastKnownLocation(provider);
 
 		recorder = new MediaRecorder();
 		recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
@@ -46,6 +47,11 @@ public class NoiseTrackerPlugin extends AbstractPlugin {
 		Node node = new Node();
 		node.setProperty("Latitude", location.getLatitude());
 		node.setProperty("Longitude", location.getLongitude());
+		node.setProperty("Altitude", location.getAltitude());
+		node.setProperty("Bearing", location.getBearing());
+		node.setProperty("Accuracy", location.getAccuracy());
+		node.setProperty("Speed", location.getSpeed());
+		node.setProperty("Provider", location.getProvider());
 		node.setProperty("Amplitude", amplitude);
 		workspace.addNode(node);
 		getPersistenceManager().save(workspace);
