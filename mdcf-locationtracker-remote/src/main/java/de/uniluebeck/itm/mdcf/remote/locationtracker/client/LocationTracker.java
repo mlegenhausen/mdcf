@@ -46,16 +46,13 @@ import de.uniluebeck.itm.mdcf.remote.locationtracker.shared.ParticipantProxy;
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
-public class LocationTracker implements EntryPoint, ResizeHandler,
-		ChangeHandler, ClickHandler {
+public class LocationTracker implements EntryPoint, ResizeHandler, ChangeHandler, ClickHandler {
 
-	private static final DateTimeFormat DATE_TIME_FORMAT = DateTimeFormat
-			.getFormat("dd.MM.yyyy HH:mm:ss");
+	private static final DateTimeFormat DATE_TIME_FORMAT = DateTimeFormat.getFormat("dd.MM.yyyy HH:mm:ss");
 
 	private final EventBus eventBus = new SimpleEventBus();
 
-	private final LocationTrackerRequestFactory requestFactory = GWT
-			.create(LocationTrackerRequestFactory.class);
+	private final LocationTrackerRequestFactory requestFactory = GWT.create(LocationTrackerRequestFactory.class);
 
 	private final Button refreshButton = new Button("Refresh");
 
@@ -121,18 +118,17 @@ public class LocationTracker implements EntryPoint, ResizeHandler,
 	}
 
 	private void loadParticipants() {
-		requestFactory.participantRequest().findAll()
-				.fire(new Receiver<List<ParticipantProxy>>() {
-					@Override
-					public void onSuccess(List<ParticipantProxy> result) {
-						participants.clear();
-						participants.addAll(result);
-						showParticipants(result);
-						if (!participants.isEmpty()) {
-							loadLocations(participants.get(0));
-						}
-					}
-				});
+		requestFactory.participantRequest().findAll().fire(new Receiver<List<ParticipantProxy>>() {
+			@Override
+			public void onSuccess(List<ParticipantProxy> result) {
+				participants.clear();
+				participants.addAll(result);
+				showParticipants(result);
+				if (!participants.isEmpty()) {
+					loadLocations(participants.get(0));
+				}
+			}
+		});
 	}
 
 	private void showParticipants(List<ParticipantProxy> result) {
@@ -143,8 +139,7 @@ public class LocationTracker implements EntryPoint, ResizeHandler,
 	}
 
 	private void loadLocations(ParticipantProxy participant) {
-		requestFactory.geoLocationRequest()
-				.findLocationsByParticipant(participant)
+		requestFactory.geoLocationRequest().findLocationsByParticipant(participant)
 				.fire(new Receiver<List<LocationProxy>>() {
 					@Override
 					public void onSuccess(List<LocationProxy> response) {
@@ -152,7 +147,7 @@ public class LocationTracker implements EntryPoint, ResizeHandler,
 					}
 				});
 	}
-	
+
 	private void clearOverlays() {
 		for (Overlay overlay : overlays) {
 			mapWidget.removeOverlay(overlay);
@@ -170,7 +165,7 @@ public class LocationTracker implements EntryPoint, ResizeHandler,
 			}
 		}
 	}
-	
+
 	private void showMarker(LatLng latLng, final LocationProxy location) {
 		final Marker marker = new Marker(latLng);
 		marker.addMarkerClickHandler(new MarkerClickHandler() {
@@ -186,8 +181,7 @@ public class LocationTracker implements EntryPoint, ResizeHandler,
 	private void showLocationInformation(Marker marker, final LocationProxy location) {
 		VerticalPanel panel = new VerticalPanel();
 		panel.add(new Label("Location Information"));
-		panel.add(new Label("Date: "
-				+ DATE_TIME_FORMAT.format(new Date(location.getTimestamp()))));
+		panel.add(new Label("Date: " + DATE_TIME_FORMAT.format(new Date(location.getTimestamp()))));
 		panel.add(new Label("Latitude: " + location.getLatitude()));
 		panel.add(new Label("Longitude: " + location.getLongitude()));
 		panel.add(new Label("Altitude: " + location.getAltitude()));
@@ -217,7 +211,9 @@ public class LocationTracker implements EntryPoint, ResizeHandler,
 		for (int i = 0; i < nbOfPoints; i++) {
 			double tc = Math.toRadians(a);
 			double lat2 = Math.asin(Math.sin(lat1) * Math.cos(d) + Math.cos(lat1) * Math.sin(d) * Math.cos(tc));
-			double lng2 = lng1	+ Math.atan2(Math.sin(tc) * Math.sin(d) * Math.cos(lat1), Math.cos(d) - Math.sin(lat1) * Math.sin(lat2));
+			double lng2 = lng1
+					+ Math.atan2(Math.sin(tc) * Math.sin(d) * Math.cos(lat1),
+							Math.cos(d) - Math.sin(lat1) * Math.sin(lat2));
 			LatLng point = LatLng.newInstance(Math.toDegrees(lat2), Math.toDegrees(lng2));
 			circlePoints[i] = point;
 			bounds.extend(point);
