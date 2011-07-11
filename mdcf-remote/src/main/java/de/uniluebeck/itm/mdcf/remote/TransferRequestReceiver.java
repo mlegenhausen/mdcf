@@ -1,4 +1,4 @@
-package de.uniluebeck.itm.mdcf.remote.locationtracker.server;
+package de.uniluebeck.itm.mdcf.remote;
 
 import java.io.IOException;
 
@@ -11,10 +11,10 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
-import de.uniluebeck.itm.mdcf.remote.locationtracker.server.model.TransferRequest;
+import de.uniluebeck.itm.mdcf.remote.model.TransferRequest;
 
 @Singleton
-public class DataReceiver extends HttpServlet {
+public class TransferRequestReceiver extends HttpServlet {
 
 	/**
 	 * Serial UID.
@@ -26,7 +26,7 @@ public class DataReceiver extends HttpServlet {
 	private final Provider<TransferRequestProcessor> processorProvider;
 	
 	@Inject
-	public DataReceiver(TransferRequestDeserializer deserializer, Provider<TransferRequestProcessor> processorProvider) {
+	public TransferRequestReceiver(TransferRequestDeserializer deserializer, Provider<TransferRequestProcessor> processorProvider) {
 		this.deserializer = deserializer;
 		this.processorProvider = processorProvider;
 	}

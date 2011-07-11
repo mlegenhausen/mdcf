@@ -1,11 +1,12 @@
-package de.uniluebeck.itm.mdcf.remote.locationtracker.server;
+package de.uniluebeck.itm.mdcf.remote.gson;
 
 import java.io.Reader;
 
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 
-import de.uniluebeck.itm.mdcf.remote.locationtracker.server.model.TransferRequest;
+import de.uniluebeck.itm.mdcf.remote.TransferRequestDeserializer;
+import de.uniluebeck.itm.mdcf.remote.model.TransferRequest;
 
 public class GsonTransferRequestDeserializer implements TransferRequestDeserializer {
 

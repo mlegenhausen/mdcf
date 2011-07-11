@@ -6,10 +6,11 @@ import java.util.List;
 import com.google.gwt.thirdparty.guava.common.base.Objects;
 import com.google.inject.Inject;
 
+import de.uniluebeck.itm.mdcf.remote.TransferRequestProcessor;
 import de.uniluebeck.itm.mdcf.remote.locationtracker.server.domain.Location;
 import de.uniluebeck.itm.mdcf.remote.locationtracker.server.domain.Participant;
-import de.uniluebeck.itm.mdcf.remote.locationtracker.server.model.Node;
-import de.uniluebeck.itm.mdcf.remote.locationtracker.server.model.TransferRequest;
+import de.uniluebeck.itm.mdcf.remote.model.Node;
+import de.uniluebeck.itm.mdcf.remote.model.TransferRequest;
 
 public class TransferRequestProcessorImpl implements TransferRequestProcessor {
 	

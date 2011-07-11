@@ -1,4 +1,4 @@
-package de.uniluebeck.itm.mdcf.remote.locationtracker.server.model;
+package de.uniluebeck.itm.mdcf.remote.gson;
 
 import java.lang.reflect.Type;
 import java.util.Date;
@@ -8,6 +8,10 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+
+import de.uniluebeck.itm.mdcf.remote.model.Binary;
+import de.uniluebeck.itm.mdcf.remote.model.PropertyType;
+import de.uniluebeck.itm.mdcf.remote.model.Value;
 
 public class ValueDeserializer implements JsonDeserializer<Value> {
 

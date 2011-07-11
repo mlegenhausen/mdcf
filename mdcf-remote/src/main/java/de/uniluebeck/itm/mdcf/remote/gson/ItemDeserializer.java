@@ -1,4 +1,4 @@
-package de.uniluebeck.itm.mdcf.remote.locationtracker.server.model;
+package de.uniluebeck.itm.mdcf.remote.gson;
 
 import static com.google.common.collect.Lists.newArrayList;
 
@@ -11,6 +11,11 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+
+import de.uniluebeck.itm.mdcf.remote.model.Item;
+import de.uniluebeck.itm.mdcf.remote.model.Node;
+import de.uniluebeck.itm.mdcf.remote.model.Property;
+import de.uniluebeck.itm.mdcf.remote.model.Value;
 
 
 public class ItemDeserializer implements JsonDeserializer<Item> {

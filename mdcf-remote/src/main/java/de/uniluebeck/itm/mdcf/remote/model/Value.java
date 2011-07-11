@@ -1,4 +1,4 @@
-package de.uniluebeck.itm.mdcf.remote.locationtracker.server.model;
+package de.uniluebeck.itm.mdcf.remote.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;

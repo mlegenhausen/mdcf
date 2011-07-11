@@ -10,10 +10,12 @@ import com.google.inject.servlet.ServletModule;
 import com.trycatchsoft.gwt.requestfactory.InjectedRequestFactoryModule;
 import com.trycatchsoft.gwt.requestfactory.InjectedRequestFactoryServlet;
 
-import de.uniluebeck.itm.mdcf.remote.locationtracker.server.model.Item;
-import de.uniluebeck.itm.mdcf.remote.locationtracker.server.model.ItemDeserializer;
-import de.uniluebeck.itm.mdcf.remote.locationtracker.server.model.Value;
-import de.uniluebeck.itm.mdcf.remote.locationtracker.server.model.ValueDeserializer;
+import de.uniluebeck.itm.mdcf.remote.TransferRequestReceiver;
+import de.uniluebeck.itm.mdcf.remote.TransferRequestProcessor;
+import de.uniluebeck.itm.mdcf.remote.gson.ItemDeserializer;
+import de.uniluebeck.itm.mdcf.remote.gson.ValueDeserializer;
+import de.uniluebeck.itm.mdcf.remote.model.Item;
+import de.uniluebeck.itm.mdcf.remote.model.Value;
 
 public class LocationTrackerServletModule extends ServletModule {
 
@@ -26,7 +28,7 @@ public class LocationTrackerServletModule extends ServletModule {
 		
 		filter("/*").through(PersistFilter.class);
 		
-		serve("/receiver").with(DataReceiver.class);
+		serve("/receiver").with(TransferRequestReceiver.class);
 		serve("/gwtRequest").with(InjectedRequestFactoryServlet.class);
 	}
 	
