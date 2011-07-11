@@ -19,6 +19,11 @@ public class LocationTrackerPlugin extends AbstractPlugin {
 		Node node = new Node();
 		node.setProperty("Latitude", location.getLatitude());
 		node.setProperty("Longitude", location.getLongitude());
+		node.setProperty("Altitude", location.getAltitude());
+		node.setProperty("Bearing", location.getBearing());
+		node.setProperty("Accuracy", location.getAccuracy());
+		node.setProperty("Speed", location.getSpeed());
+		node.setProperty("Provider", location.getProvider());
 		workspace.addNode(node);
 		getPersistenceManager().save(workspace);
 	}

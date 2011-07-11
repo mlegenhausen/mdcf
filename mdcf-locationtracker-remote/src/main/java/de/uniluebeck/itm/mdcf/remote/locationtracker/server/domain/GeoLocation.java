@@ -17,6 +17,16 @@ public class GeoLocation {
 	
 	private Double longitude;
 	
+	private Double altitude;
+	
+	private Float accuracy;
+	
+	private Float bearing;
+	
+	private String provider;
+	
+	private Float speed;
+	
 	private Long timestamp;
 
 	public GeoLocation() {
@@ -47,6 +57,46 @@ public class GeoLocation {
 		this.longitude = longitude;
 	}
 	
+	public Double getAltitude() {
+		return altitude;
+	}
+
+	public void setAltitude(Double altitude) {
+		this.altitude = altitude;
+	}
+
+	public Float getAccuracy() {
+		return accuracy;
+	}
+
+	public void setAccuracy(Float accuracy) {
+		this.accuracy = accuracy;
+	}
+
+	public Float getBearing() {
+		return bearing;
+	}
+
+	public void setBearing(Float bearing) {
+		this.bearing = bearing;
+	}
+
+	public String getProvider() {
+		return provider;
+	}
+
+	public void setProvider(String provider) {
+		this.provider = provider;
+	}
+
+	public Float getSpeed() {
+		return speed;
+	}
+
+	public void setSpeed(Float speed) {
+		this.speed = speed;
+	}
+
 	public Long getTimestamp() {
 		return timestamp;
 	}

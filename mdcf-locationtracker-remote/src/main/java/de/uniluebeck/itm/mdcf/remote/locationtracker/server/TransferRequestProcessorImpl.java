@@ -36,6 +36,11 @@ public class TransferRequestProcessorImpl implements TransferRequestProcessor {
 			location.setTimestamp(node.getTimestamp());
 			location.setLatitude(node.getProperty("Latitude").getValue().getDouble());
 			location.setLongitude(node.getProperty("Longitude").getValue().getDouble());
+			location.setAltitude(node.getProperty("Altitude").getValue().getDouble());
+			location.setBearing((float) node.getProperty("Bearing").getValue().getDouble());
+			location.setAccuracy((float) node.getProperty("Accuracy").getValue().getDouble());
+			location.setSpeed((float) node.getProperty("Speed").getValue().getDouble());
+			location.setProvider(node.getProperty("Provider").getValue().getString());
 			locations.add(location);
 		}
 		repository.persist(participant);

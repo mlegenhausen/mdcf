@@ -2,6 +2,7 @@ package de.uniluebeck.itm.mdcf.remote.locationtracker.client;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.Date;
 import java.util.List;
 
 import com.google.gwt.core.client.EntryPoint;
@@ -14,11 +15,15 @@ import com.google.gwt.event.logical.shared.ResizeEvent;
 import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.SimpleEventBus;
+import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.maps.client.InfoWindow;
+import com.google.gwt.maps.client.InfoWindowContent;
 import com.google.gwt.maps.client.MapType;
 import com.google.gwt.maps.client.MapUIOptions;
 import com.google.gwt.maps.client.MapWidget;
 import com.google.gwt.maps.client.Maps;
 import com.google.gwt.maps.client.control.OverviewMapControl;
+import com.google.gwt.maps.client.event.MarkerClickHandler;
 import com.google.gwt.maps.client.geom.LatLng;
 import com.google.gwt.maps.client.geom.Size;
 import com.google.gwt.maps.client.overlay.Marker;
@@ -29,6 +34,7 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.web.bindery.requestfactory.shared.Receiver;
 
 import de.uniluebeck.itm.mdcf.remote.locationtracker.shared.GeoLocationProxy;
@@ -38,6 +44,8 @@ import de.uniluebeck.itm.mdcf.remote.locationtracker.shared.ParticipantProxy;
  * Entry point classes define <code>onModuleLoad()</code>.
  */
 public class LocationTracker implements EntryPoint, ResizeHandler, ChangeHandler, ClickHandler {
+	
+	private static final DateTimeFormat DATE_TIME_FORMAT = DateTimeFormat.getFormat("dd.MM.yyyy HH:mm:ss");
 
 	private final EventBus eventBus = new SimpleEventBus();
 
@@ -142,13 +150,37 @@ public class LocationTracker implements EntryPoint, ResizeHandler, ChangeHandler
 		}
 		markers.clear();
 		if (locations != null) {
-			for (GeoLocationProxy location : locations) {
+			for (final GeoLocationProxy location : locations) {
 				LatLng latLng = LatLng.newInstance(location.getLatitude(), location.getLongitude());
-				Marker marker = new Marker(latLng);
+				final Marker marker = new Marker(latLng);
+				marker.addMarkerClickHandler(new MarkerClickHandler() {
+					@Override
+					public void onClick(MarkerClickEvent event) {
+						showLocationInformation(marker, location);
+					}
+				});
 				markers.add(marker);
 				mapWidget.addOverlay(marker);
 			}
 		}
+	}
+	
+	private void showLocationInformation(Marker marker, GeoLocationProxy location) {
+		VerticalPanel panel = new VerticalPanel();
+		panel.add(new Label("Location Information"));
+		panel.add(new Label("Date: " + DATE_TIME_FORMAT.format(new Date(location.getTimestamp()))));
+		panel.add(new Label("Latitude: " + location.getLatitude()));
+		panel.add(new Label("Longitude: " + location.getLongitude()));
+		panel.add(new Label("Altitude: " + location.getAltitude()));
+		panel.add(new Label("Bearing: "+ location.getBearing()));
+		panel.add(new Label("Accuracy: " + location.getAccuracy()));
+		panel.add(new Label("Speed: " + location.getSpeed()));
+		panel.add(new Label("Provider: " + location.getProvider()));
+		
+		InfoWindowContent content = new InfoWindowContent(panel);
+		
+		InfoWindow info = mapWidget.getInfoWindow();
+		info.open(marker, content);
 	}
 	
 	@Override

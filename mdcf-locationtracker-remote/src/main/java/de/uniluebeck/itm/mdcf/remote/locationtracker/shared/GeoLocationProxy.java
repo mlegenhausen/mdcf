@@ -14,4 +14,14 @@ public interface GeoLocationProxy extends EntityProxy {
 	Double getLatitude();
 	
 	Double getLongitude();
+	
+	Double getAltitude();
+	
+	Float getAccuracy();
+	
+	Float getBearing();
+	
+	String getProvider();
+	
+	Float getSpeed();
 }
