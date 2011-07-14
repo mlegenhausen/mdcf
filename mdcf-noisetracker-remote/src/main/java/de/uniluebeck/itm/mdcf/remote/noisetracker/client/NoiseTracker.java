@@ -30,6 +30,7 @@ import com.google.gwt.maps.client.geom.Size;
 import com.google.gwt.maps.client.overlay.Marker;
 import com.google.gwt.maps.client.overlay.Overlay;
 import com.google.gwt.maps.client.overlay.Polygon;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DockPanel;
@@ -46,9 +47,19 @@ import de.uniluebeck.itm.mdcf.remote.noisetracker.shared.ParticipantProxy;
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
-public class NoiseTracker implements EntryPoint, ResizeHandler, ChangeHandler, ClickHandler {
+public class NoiseTracker implements EntryPoint, ResizeHandler {
 
 	private static final DateTimeFormat DATE_TIME_FORMAT = DateTimeFormat.getFormat("dd.MM.yyyy HH:mm:ss");
+	
+	private final Timer playbackTimer = new Timer() {
+		@Override
+		public void run() {
+			showNextLocation();
+			if (locationsListBox.getSelectedIndex() + 1 >= locations.size()) {
+				stop();
+			}
+		}
+	};
 
 	private final EventBus eventBus = new SimpleEventBus();
 
@@ -57,12 +68,26 @@ public class NoiseTracker implements EntryPoint, ResizeHandler, ChangeHandler, C
 	private final Button refreshButton = new Button("Refresh");
 
 	private final ListBox participantsListBox = new ListBox();
+	
+	private final ListBox locationsListBox = new ListBox();
 
 	private final List<ParticipantProxy> participants = newArrayList();
+	
+	private final List<LocationProxy> locations = newArrayList();
+	
+	private final List<Marker> markers = newArrayList();
 
 	private final List<Overlay> overlays = newArrayList();
 
 	private final DockPanel dockPanel = new DockPanel();
+	
+	private final Button previousButton = new Button("Previous");
+	
+	private final Button nextButton = new Button("Next");
+	
+	private final Button playButton = new Button("Play");
+	
+	private final Button stopButton = new Button("Stop");
 
 	private MapWidget mapWidget;
 
@@ -70,13 +95,55 @@ public class NoiseTracker implements EntryPoint, ResizeHandler, ChangeHandler, C
 	 * This is the entry point method.
 	 */
 	public void onModuleLoad() {
-		requestFactory.initialize(eventBus);
-		participantsListBox.addChangeHandler(this);
-		refreshButton.addClickHandler(this);
-
 		Maps.loadMapsApi("", "2", false, new Runnable() {
 			public void run() {
 				initMap();
+			}
+		});
+		
+		requestFactory.initialize(eventBus);
+		participantsListBox.addChangeHandler(new ChangeHandler() {
+			@Override
+			public void onChange(ChangeEvent event) {
+				int index = participantsListBox.getSelectedIndex();
+				loadLocations(participants.get(index));
+			}
+		});
+		locationsListBox.addChangeHandler(new ChangeHandler() {
+			@Override
+			public void onChange(ChangeEvent event) {
+				int index = locationsListBox.getSelectedIndex();
+				showLocationIndex(index);
+			}
+		});
+		refreshButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				loadParticipants();
+			}
+		});
+		previousButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				showPreviousLocation();
+			}
+		});
+		nextButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				showNextLocation();
+			}
+		});
+		playButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				play();
+			}
+		});
+		stopButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				stop();
 			}
 		});
 
@@ -85,6 +152,11 @@ public class NoiseTracker implements EntryPoint, ResizeHandler, ChangeHandler, C
 		toolBar.add(new Label("Participant:"));
 		toolBar.add(participantsListBox);
 		toolBar.add(refreshButton);
+		toolBar.add(locationsListBox);
+		toolBar.add(previousButton);
+		toolBar.add(playButton);
+		toolBar.add(stopButton);
+		toolBar.add(nextButton);
 
 		dockPanel.setStylePrimaryName("fullWidth fullHeight");
 		dockPanel.add(toolBar, DockPanel.NORTH);
@@ -112,12 +184,14 @@ public class NoiseTracker implements EntryPoint, ResizeHandler, ChangeHandler, C
 		mapWidget.addControl(new OverviewMapControl());
 		mapWidget.setContinuousZoom(true);
 		mapWidget.setSize("100%", "100%");
+		mapWidget.setZoomLevel(16);
 		dockPanel.add(mapWidget, DockPanel.CENTER);
 		Window.addResizeHandler(this);
 		loadParticipants();
 	}
 
 	private void loadParticipants() {
+		clearOverlays();
 		requestFactory.participantRequest().findAll().fire(new Receiver<List<ParticipantProxy>>() {
 			@Override
 			public void onSuccess(List<ParticipantProxy> result) {
@@ -142,40 +216,53 @@ public class NoiseTracker implements EntryPoint, ResizeHandler, ChangeHandler, C
 		requestFactory.geoLocationRequest().findLocationsByParticipant(participant)
 				.fire(new Receiver<List<LocationProxy>>() {
 					@Override
-					public void onSuccess(List<LocationProxy> response) {
-						showGeoLocations(response);
+					public void onSuccess(List<LocationProxy> result) {
+						locations.clear();
+						locations.addAll(result);
+						showLocations(result);
+						if (!locations.isEmpty()) {
+							LocationProxy location = locations.get(0);
+							showMarker(location);
+						}
 					}
 				});
 	}
 
 	private void clearOverlays() {
-		for (Overlay overlay : overlays) {
-			mapWidget.removeOverlay(overlay);
-		}
+		mapWidget.clearOverlays();
+		markers.clear();
 		overlays.clear();
 	}
 
-	private void showGeoLocations(List<LocationProxy> locations) {
-		clearOverlays();
+	private void showLocations(List<LocationProxy> locations) {
+		locationsListBox.clear();
 		if (locations != null) {
 			for (final LocationProxy location : locations) {
-				LatLng latLng = LatLng.newInstance(location.getLatitude(), location.getLongitude());
-				showMarker(latLng, location);
-				drawCircleFromRadius(latLng, location.getAccuracy(), 100);
+				locationsListBox.addItem(DATE_TIME_FORMAT.format(new Date(location.getTimestamp())));
 			}
 		}
 	}
 
-	private void showMarker(LatLng latLng, final LocationProxy location) {
-		final Marker marker = new Marker(latLng);
+	private void showMarker(final LocationProxy location) {
+		clearOverlays();
+		LatLng center = LatLng.newInstance(location.getLatitude(), location.getLongitude());
+		final Marker marker = new Marker(center);
 		marker.addMarkerClickHandler(new MarkerClickHandler() {
 			@Override
 			public void onClick(MarkerClickEvent event) {
-				showLocationInformation(marker, location);
+				boolean visible = mapWidget.getInfoWindow().isVisible();
+				if (visible) {
+					mapWidget.closeInfoWindow();
+				} else {
+					showLocationInformation(marker, location);
+				}
 			}
 		});
-		overlays.add(marker);
+		markers.add(marker);
 		mapWidget.addOverlay(marker);
+		mapWidget.setCenter(center, 16);
+		drawCircleFromRadius(center, location.getAccuracy(), 100);
+		showLocationInformation(marker, location);
 	}
 
 	private void showLocationInformation(Marker marker, final LocationProxy location) {
@@ -222,8 +309,36 @@ public class NoiseTracker implements EntryPoint, ResizeHandler, ChangeHandler, C
 		}
 
 		Polygon circle = new Polygon(circlePoints, "white", 0, 0, "green", 0.5);
-		mapWidget.addOverlay(circle);
 		overlays.add(circle);
+		mapWidget.addOverlay(circle);
+	}
+	
+	private void showLocationIndex(int index) {
+		locationsListBox.setSelectedIndex(index);
+		LocationProxy location = locations.get(index);
+		showMarker(location);
+	}
+	
+	private void showNextLocation() {
+		int index = locationsListBox.getSelectedIndex() + 1;
+		if (index < locations.size()) {
+			showLocationIndex(index);
+		}
+	}
+	
+	private void showPreviousLocation() {
+		int index = locationsListBox.getSelectedIndex() - 1;
+		if (index >= 0) {
+			showLocationIndex(index);
+		}
+	}
+	
+	private void play() {
+		playbackTimer.scheduleRepeating(1000);
+	}
+	
+	private void stop() {
+		playbackTimer.cancel();
 	}
 
 	@Override
@@ -231,16 +346,5 @@ public class NoiseTracker implements EntryPoint, ResizeHandler, ChangeHandler, C
 		mapWidget.setWidth(event.getWidth() + "px");
 		mapWidget.setHeight(event.getHeight() - 36 + "px");
 		mapWidget.checkResizeAndCenter();
-	}
-
-	@Override
-	public void onChange(ChangeEvent event) {
-		int index = participantsListBox.getSelectedIndex();
-		loadLocations(participants.get(index));
-	}
-
-	@Override
-	public void onClick(ClickEvent event) {
-		loadParticipants();
 	}
 }

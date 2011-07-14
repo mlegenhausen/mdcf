@@ -45,7 +45,7 @@ public class Node extends Item {
 	
 	public Property getProperty(String name) {
 		Item item = properties.get(name);
-		if (item.isNode()) {
+		if (item != null && item.isNode()) {
 			throw new RuntimeException("This item is not a property.");
 		}
 		return (Property) item;
