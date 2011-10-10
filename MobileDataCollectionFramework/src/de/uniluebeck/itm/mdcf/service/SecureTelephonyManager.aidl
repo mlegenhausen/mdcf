@@ -1,5 +1,8 @@
 package de.uniluebeck.itm.mdcf.service;
 
+import android.telephony.NeighboringCellInfo;
+import de.uniluebeck.itm.mdcf.service.CellLocation;
+
 interface SecureTelephonyManager {
 
 	int getCallState();
@@ -9,6 +12,8 @@ interface SecureTelephonyManager {
 	int getDataState();
 	
 	String getDeviceSoftwareVersion();
+	
+	List<NeighboringCellInfo> getNeighboringCellInfo();
 	
 	String getNetworkCountryIso();
 	
@@ -31,4 +36,6 @@ interface SecureTelephonyManager {
 	boolean hasIccCard();
 	
 	boolean isNetworkRoaming();
+	
+	CellLocation getCellLocation();
 }

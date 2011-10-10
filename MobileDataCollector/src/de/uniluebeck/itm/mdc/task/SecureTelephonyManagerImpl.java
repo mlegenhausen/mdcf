@@ -1,9 +1,15 @@
 package de.uniluebeck.itm.mdc.task;
 
+import java.util.List;
+
 import android.os.RemoteException;
+import android.telephony.NeighboringCellInfo;
 import android.telephony.TelephonyManager;
+import android.telephony.cdma.CdmaCellLocation;
+import android.telephony.gsm.GsmCellLocation;
 import de.uniluebeck.itm.mdc.log.LogRecord;
 import de.uniluebeck.itm.mdc.log.LogEntry.Confidentiality;
+import de.uniluebeck.itm.mdcf.service.CellLocation;
 import de.uniluebeck.itm.mdcf.service.SecureTelephonyManager;
 
 public class SecureTelephonyManagerImpl extends SecureTelephonyManager.Stub {
@@ -119,6 +125,32 @@ public class SecureTelephonyManagerImpl extends SecureTelephonyManager.Stub {
 	public boolean isNetworkRoaming() throws RemoteException {
 		boolean result = telephonyManager.isNetworkRoaming();
 		logRecord.add(Confidentiality.MEDIUM, result ? "Network Roaming" : "No Network Roaming");
+		return result;
+	}
+
+	@Override
+	public List<NeighboringCellInfo> getNeighboringCellInfo() throws RemoteException {
+		logRecord.add(Confidentiality.HIGH, "Fetching neighboring cell infos");
+		return telephonyManager.getNeighboringCellInfo();
+	}
+	
+	@Override
+	public CellLocation getCellLocation() throws RemoteException {
+		android.telephony.CellLocation location = telephonyManager.getCellLocation();
+		CellLocation result = new CellLocation();
+		if (location instanceof GsmCellLocation) {
+			GsmCellLocation gsmCellLocation = (GsmCellLocation) location;
+			result.setCid(gsmCellLocation.getCid());
+			result.setLac(gsmCellLocation.getLac());
+			result.setPsc(gsmCellLocation.getPsc());
+		} else {
+			CdmaCellLocation cdmaCellLocation = (CdmaCellLocation) location;
+			result.setBaseStationId(cdmaCellLocation.getBaseStationId());
+			result.setBaseStationLatitude(cdmaCellLocation.getBaseStationLatitude());
+			result.setBaseStationLongitude(cdmaCellLocation.getBaseStationLongitude());
+			result.setNetworkId(cdmaCellLocation.getNetworkId());
+			result.setSystemId(cdmaCellLocation.getSystemId());
+		}
 		return result;
 	}
 }
