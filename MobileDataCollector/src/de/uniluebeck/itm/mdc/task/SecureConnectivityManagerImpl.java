@@ -20,13 +20,27 @@ public class SecureConnectivityManagerImpl extends SecureConnectivityManager.Stu
 
 	@Override
 	public NetworkInfo getActiveNetworkInfo() throws RemoteException {
-		return null;
+		return copy(connectivityManager.getActiveNetworkInfo());
+	}
+	
+	private NetworkInfo copy(android.net.NetworkInfo info) {
+		NetworkInfo result = new NetworkInfo(info.getType(), info.getSubtype(), info.getTypeName(), info.getSubtypeName());
+		result.setFailover(info.isFailover());
+		result.setIsAvailable(info.isAvailable());
+		return result;
+	}
+	
+	private NetworkInfo[] copy(android.net.NetworkInfo[] infos) {
+		NetworkInfo[] result = new NetworkInfo[infos.length];
+		for (int i = 0; i < infos.length; ++i) {
+			result[i] = copy(infos[i]);
+		}
+		return result;
 	}
 
 	@Override
 	public NetworkInfo[] getAllNetworkInfo() throws RemoteException {
-		// TODO Auto-generated method stub
-		return null;
+		return copy(connectivityManager.getAllNetworkInfo());
 	}
 
 	@Override
@@ -38,7 +52,7 @@ public class SecureConnectivityManagerImpl extends SecureConnectivityManager.Stu
 
 	@Override
 	public NetworkInfo getNetworkInfo(int networkType) throws RemoteException {
-		return null;
+		return copy(connectivityManager.getNetworkInfo(networkType));
 	}
 
 	@Override
