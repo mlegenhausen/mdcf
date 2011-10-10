@@ -235,12 +235,7 @@ public class PluginService extends Service implements PluginTaskListener {
 		fireModeChanged(configuration);
 	}
 	
-	/**
-	 * Call this method after a plugin was successfully transfered.
-	 * 
-	 * @param configuration
-	 */
-	public void reactivateAfterTransferPreparation(PluginConfiguration configuration) {
+	private void reactivateAfterTransferPreparation(PluginConfiguration configuration) {
 		configuration.setTotalActivationTime(0);
 		PluginInfo info = configuration.getPluginInfo();
 		if (info.isResetWorkspaceAfterTransfer()) {

@@ -4,10 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import com.google.common.util.concurrent.SimpleTimeLimiter;
-import com.google.common.util.concurrent.TimeLimiter;
-import com.google.common.util.concurrent.UncheckedTimeoutException;
-
 import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
@@ -16,6 +12,11 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
+
+import com.google.common.util.concurrent.SimpleTimeLimiter;
+import com.google.common.util.concurrent.TimeLimiter;
+import com.google.common.util.concurrent.UncheckedTimeoutException;
+
 import de.uniluebeck.itm.mdc.log.LogRecord;
 import de.uniluebeck.itm.mdc.persistence.PersistenceManagerImpl;
 import de.uniluebeck.itm.mdc.persistence.PluginConfigurationRepository;
@@ -23,7 +24,6 @@ import de.uniluebeck.itm.mdc.service.PluginConfiguration;
 import de.uniluebeck.itm.mdc.service.PluginConfiguration.State;
 import de.uniluebeck.itm.mdcf.Plugin;
 import de.uniluebeck.itm.mdcf.persistence.PersistenceManager;
-import de.uniluebeck.itm.mdcf.service.SecureAudioManager;
 import de.uniluebeck.itm.mdcf.service.SecureConnectivityManager;
 import de.uniluebeck.itm.mdcf.service.SecureLocationManager;
 import de.uniluebeck.itm.mdcf.service.SecureTelephonyManager;
@@ -93,11 +93,6 @@ public class PluginTask implements Runnable, ServiceConnection {
 			Log.d(LOG_TAG, "Setting Wifi Manager");
 			SecureWifiManager wifiManager = SecureManagerFactory.createSecureWifiManager(context, logRecord);
 			plugin.setWifiManager(wifiManager);
-		}
-		if (services.contains(Context.AUDIO_SERVICE)) {
-			Log.d(LOG_TAG, "Setting Audio Manager");
-			SecureAudioManager audioManager = SecureManagerFactory.createSecureAudioManager(context, logRecord);
-			plugin.setAudioManager(audioManager);
 		}
 		if (services.contains(Context.CONNECTIVITY_SERVICE)) {
 			Log.d(LOG_TAG, "Setting Connectivity Manager");

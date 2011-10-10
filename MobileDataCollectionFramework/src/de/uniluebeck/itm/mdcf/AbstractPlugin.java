@@ -6,7 +6,6 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 import de.uniluebeck.itm.mdcf.persistence.PersistenceManager;
-import de.uniluebeck.itm.mdcf.service.SecureAudioManager;
 import de.uniluebeck.itm.mdcf.service.SecureConnectivityManager;
 import de.uniluebeck.itm.mdcf.service.SecureLocationManager;
 import de.uniluebeck.itm.mdcf.service.SecureTelephonyManager;
@@ -24,11 +23,6 @@ public abstract class AbstractPlugin extends Service implements Plugin {
 		@Override
 		public void setWifiManager(SecureWifiManager wifiManager) throws RemoteException {
 			AbstractPlugin.this.wifiManager = wifiManager;
-		}
-
-		@Override
-		public void setAudioManager(SecureAudioManager audioManager) throws RemoteException {
-			AbstractPlugin.this.audioManager = audioManager;
 		}
 
 		@Override
@@ -60,8 +54,6 @@ public abstract class AbstractPlugin extends Service implements Plugin {
 	
 	private SecureWifiManager wifiManager;
 	
-	private SecureAudioManager audioManager;
-	
 	private SecureConnectivityManager connectivityManager;
 	
 	private SecureTelephonyManager telephonyManager;
@@ -79,11 +71,6 @@ public abstract class AbstractPlugin extends Service implements Plugin {
 	@Override
 	public void setWifiManager(SecureWifiManager wifiManager) throws RemoteException {
 		this.wifiManager = wifiManager;
-	}
-	
-	@Override
-	public void setAudioManager(SecureAudioManager audioManager) throws RemoteException {
-		this.audioManager = audioManager;
 	}
 	
 	@Override
@@ -127,10 +114,6 @@ public abstract class AbstractPlugin extends Service implements Plugin {
 	
 	protected PersistenceManager getPersistenceManager() {
 		return persistenceManager;
-	}
-	
-	protected SecureAudioManager getAudioManager() {
-		return audioManager;
 	}
 	
 	protected SecureConnectivityManager getConnectivityManager() {

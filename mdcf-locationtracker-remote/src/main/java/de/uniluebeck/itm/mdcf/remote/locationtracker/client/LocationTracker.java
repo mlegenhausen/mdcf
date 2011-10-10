@@ -95,7 +95,7 @@ private static final DateTimeFormat DATE_TIME_FORMAT = DateTimeFormat.getFormat(
 	 * This is the entry point method.
 	 */
 	public void onModuleLoad() {
-		Maps.loadMapsApi("", "2", false, new Runnable() {
+		Maps.loadMapsApi("ABQIAAAAySFd1_tUg6puEjALGC_BQBT6MLBuvjLLXqbaHf1Suy82Xn1b6RQ1i3W-K7S71xuoTKJqBhKou52zAg", "2", false, new Runnable() {
 			public void run() {
 				initMap();
 			}
