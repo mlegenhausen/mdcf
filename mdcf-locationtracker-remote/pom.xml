@@ -78,6 +78,8 @@
 			<groupId>com.trycatchsoft.gwt.requestfactory</groupId>
 			<artifactId>injected-requestfactory</artifactId>
 			<version>1.0.1-SNAPSHOT</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/injected-requestfactory-1.0.1-SNAPSHOT.jar</systemPath>
 		</dependency>
 		<!-- Logging -->
 		<dependency>
