@@ -1,9 +1,19 @@
 package de.uniluebeck.itm.mdcf;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.ElementList;
+import org.simpleframework.xml.Root;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class PluginInfo implements Parcelable {
+@Root
+public class PluginInfo implements Parcelable, Serializable {
 
 	public static final Parcelable.Creator<PluginInfo> CREATOR = new Parcelable.Creator<PluginInfo>() {
         public PluginInfo createFromParcel(Parcel in) {
@@ -14,18 +24,43 @@ public class PluginInfo implements Parcelable {
             return new PluginInfo[size];
         }
     };
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6097475469038464727L;
+
+    private String pkg;
     
+    @Element
     private String name;
     
+    @Attribute
     private String action;
     
+    @Attribute
     private String version;
     
+    @Element
     private String url;
     
+    @Element
     private int period;
     
+    @Element
     private int duration;
+    
+    @Element(required=false)
+    private String description;
+    
+    @Element
+    private long transferInterval;
+    
+    @ElementList(entry="service")
+    private List<String> services = new ArrayList<String>();
+    
+    @Element(required=false)
+    private boolean resetWorkspaceAfterTransfer = true;
     
     public PluginInfo() {
 		
@@ -48,18 +83,30 @@ public class PluginInfo implements Parcelable {
 	@Override
 	public void writeToParcel(Parcel parcel, int index) {
 		parcel.writeString(action);
+		parcel.writeString(pkg);
 		parcel.writeString(name);
 		parcel.writeString(version);
 		parcel.writeInt(period);
 		parcel.writeInt(duration);
+		parcel.writeString(url);
+		parcel.writeStringList(services);
+		parcel.writeString(description);
+		parcel.writeLong(transferInterval);
+		parcel.writeInt(resetWorkspaceAfterTransfer ? 1 : 0);
 	}
 	
 	public void readFromParcel(Parcel parcel) {
 		action = parcel.readString();
+		pkg = parcel.readString();
 		name = parcel.readString();
 		version = parcel.readString();
 		period = parcel.readInt();
 		duration = parcel.readInt();
+		url = parcel.readString();
+		parcel.readStringList(services);
+		description = parcel.readString();
+		transferInterval = parcel.readLong();
+		resetWorkspaceAfterTransfer = parcel.readInt() == 1;
 	}
 
 	public String getName() {
@@ -68,6 +115,14 @@ public class PluginInfo implements Parcelable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	public String getPackage() {
+		return pkg;
+	}
+	
+	public void setPackage(String pkg) {
+		this.pkg = pkg;
 	}
 
 	public String getAction() {
@@ -108,6 +163,38 @@ public class PluginInfo implements Parcelable {
 
 	public void setVersion(String version) {
 		this.version = version;
+	}
+	
+	public long getTransferInterval() {
+		return transferInterval;
+	}
+	
+	public void setTransferInterval(long transferInterval) {
+		this.transferInterval = transferInterval;
+	}
+	
+	public List<String> getServices() {
+		return services;
+	}
+	
+	public void setServices(List<String> services) {
+		this.services = services;
+	}
+	
+	public String getDescription() {
+		return description;
+	}
+	
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	
+	public boolean isResetWorkspaceAfterTransfer() {
+		return resetWorkspaceAfterTransfer;
+	}
+	
+	public void setResetWorkspaceAfterTransfer(boolean resetWorkspaceAfterTransfer) {
+		this.resetWorkspaceAfterTransfer = resetWorkspaceAfterTransfer;
 	}
 
 	@Override

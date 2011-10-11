@@ -1,11 +1,11 @@
 package de.uniluebeck.itm.mdc;
 
-import de.uniluebeck.itm.mdc.service.PluginService;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import de.uniluebeck.itm.mdc.service.PluginService;
 
 
 /**

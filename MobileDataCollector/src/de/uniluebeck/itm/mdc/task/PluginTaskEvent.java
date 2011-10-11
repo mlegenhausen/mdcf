@@ -1,8 +1,8 @@
 package de.uniluebeck.itm.mdc.task;
 
-import java.util.EventObject;
-
 import de.uniluebeck.itm.mdc.service.PluginConfiguration;
+
+import java.util.EventObject;
 
 public class PluginTaskEvent extends EventObject {
 

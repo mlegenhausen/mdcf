@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (C) 2011 Universität zu Lübeck, Institut für Telematik (ITM),
+                                Research Academic Computer Technology Institute (RACTI)
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<Configure class="org.mortbay.jetty.webapp.WebAppContext">
+    <Set name="systemClasses">
+        <Array type="java.lang.String">
+
+            <!-- we copied these paths from jetty WebAppContext source code ... -->
+            <Item>java.</Item>
+            <Item>javax.servlet.</Item>
+            <Item>javax.xml.</Item>
+            <Item>org.mortbay.</Item>
+            <Item>org.xml.</Item>
+            <Item>org.w3c.</Item>
+            <Item>org.apache.commons.logging.</Item>
+            <Item>org.apache.log4j.</Item>
+
+            <!-- and ... added slf4j -->
+            <Item>org.slf4j.</Item>
+
+
+            <!-- File to fix hosted mode bug We must promote slf4j to system classes,
+                   otherwise gwt hosted mode will not allow loading them due to a policy that
+                   don't allow server classes to be loaded from the outside world (see gwt JettyLauncher
+                   source code). http://osdir.com/ml/GoogleWebToolkit/2009-04/msg01034.html
+                   Issue : http://code.google.com/p/google-web-toolkit/issues/detail?id=3496 -->
+
+        </Array>
+    </Set>
+</Configure>

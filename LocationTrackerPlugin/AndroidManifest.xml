@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+      package="de.uniluebeck.itm.mdcf.plugin.locationtracker"
+      android:versionCode="1"
+      android:versionName="1.0">
+
+    <application android:icon="@drawable/icon" android:label="@string/app_name">
+
+		<receiver android:name="de.uniluebeck.itm.mdcf.plugin.locationtracker.LocationTrackerPluginRegister">
+			<intent-filter>
+				<action android:name="de.uniluebeck.itm.mdcf.PLUGIN_FIND"/>
+			</intent-filter>
+		</receiver>
+		
+		<service android:name="de.uniluebeck.itm.mdcf.plugin.locationtracker.LocationTrackerPlugin">
+			<intent-filter>
+				<action android:name="de.uniluebeck.itm.mdcf.plugin.locationtracker.LOCATION_TRACKER_PLUGIN"/>
+			</intent-filter>
+		</service>
+    </application>
+</manifest>
